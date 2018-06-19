@@ -26,12 +26,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         platoonsetup.cpp \
-    functions.cpp
+    functions.cpp \
+    actor.cpp
 
 HEADERS += \
         platoonsetup.h \
     functions.h \
-    variables.h
+    variables.h \
+    actor.h
 
 FORMS += \
         platoonsetup.ui
