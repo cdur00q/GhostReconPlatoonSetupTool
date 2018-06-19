@@ -7,6 +7,6 @@
 #include <QString>
 
 
-fileReadResult getGameData(QString target, std::ifstream &actorFile, std::vector<actor> &actors);
+//fileReadResult getGameData(QString target, std::ifstream &actorFile, std::vector<actor> &actors);
 
 #endif // FUNCTIONS_H

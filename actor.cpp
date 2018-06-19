@@ -1,4 +1,4 @@
-#include "functions.h"
+#include "actor.h"
 #include "variables.h"
 
 #include <fstream>
@@ -7,41 +7,45 @@
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
-/*
-fileReadResult getGameData(QString target, std::ifstream &file, std::vector<actor> &actors)
+actor::actor(std::ifstream &actorFile)
+{
+    getGameData(m_nameTag, m_name, actorFile);
+}
+
+fileReadResult actor::getGameData(QString targetTag, QString &valueToFill, std::ifstream &actorFile)
 {
     // only operate if the file stream is working
-    while (file.good())
+    while (actorFile.good())
     {
-        //QString target{"<ActorName>"};
         QString value{""};
         QString curString{""};
         char curChar;
-        file.seekg(0);
-        while (file)
+        actorFile.seekg(0);
+        while (actorFile)
         {
-            file.get(curChar);
+            actorFile.get(curChar);
             // found the first char of an item tag
             if (curChar == '<')
             {
                 curString += curChar;
                 // read the next chars
-                for (int i{0}; i < target.size() - 1; ++i)
+                for (int i{0}; i < targetTag.size() - 1; ++i)
                 {
-                    curString += file.get();
+                    curString += actorFile.get();
                 }
                 QTextStream(stdout) << "extracted " << curString << endl;
                 // then compare if this is the right tag
-                if (curString == target)
+                if (curString == targetTag)
                 {
                     // it is, now extract the value
-                    curChar = file.get();
+                    curChar = actorFile.get();
                     while (curChar != '<')
                     {
                         value += curChar;
-                        curChar = file.get();
+                        curChar = actorFile.get();
                     }
                     QTextStream(stdout) << "matched " << curString << " value is " << value << '\n';
+                    valueToFill = value;
                     return fileReadResult::FOUND;
                 }
                 else
@@ -61,4 +65,3 @@ fileReadResult getGameData(QString target, std::ifstream &file, std::vector<acto
     return fileReadResult::FILESTREAMERROR;
 
 }
-*/
