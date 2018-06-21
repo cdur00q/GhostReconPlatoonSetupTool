@@ -8,6 +8,7 @@
 class actor
 {
 private:
+    const QString m_fileName{"Default file name"};
     const QString m_nameTag{"<ActorName>"};
     QString m_name{"Default name"};
     const QString m_kitPathTag{"<KitPath>"};
@@ -24,15 +25,19 @@ private:
     fileReadResult getGameData(QString targetTag, QString &valueToFill, std::ifstream &actorFile);
 
 public:
-    actor(std::ifstream &actorFile);
+    actor(QString fileName, std::ifstream &actorFile);
 
     ~actor()
     {
     }
 
+    QString getName(){return m_name;}
+
     void print()
     {
-        QTextStream(stdout) << m_name << " " << m_kitPath <<
+        QTextStream(stdout) << m_fileName <<
+        " " << m_name <<
+        " " << m_kitPath <<
         " W: " << m_weaponStat <<
         " S: " << m_staminaStat <<
         " S: " << m_stealthStat <<

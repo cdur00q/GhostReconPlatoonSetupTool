@@ -19,10 +19,13 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // model / view test
+    /*
     QFileSystemModel *model = new QFileSystemModel;
     model->setRootPath("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman");
     ui->listView->setModel(model);
     ui->listView->setRootIndex(model->index("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman"));
+    */
 
     //QTextStream(stdout) << "string to print" << endl;
 
@@ -42,17 +45,27 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 
     fs::directory_iterator dirIt ("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman");
 
-    int count{0};
-    for (auto& element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman"))
+    //int count{0};
+    for (auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman"))
     {
-        fs::path temp(element.path());
+        //fs::path temp(element.path());
+        //auto temp2{temp.filename()};
+        //QString temp3{QString::fromStdWString(temp.filename())};
         currentFile.open(element.path());
-        actor actor(currentFile);
+        //actor actor(currentFile);
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        actors.push_back(actor(curFileName, currentFile));
         currentFile.close();
-        //actors.push_back(actor(currentFile));
+
 
         //QTextStream(stdout) << element << endl;
-        ++count;
+        //++count;
+    }
+
+    for (auto &element : actors)
+    {
+        element.print();
+        new QListWidgetItem(element.getName(), ui->listWidget);
     }
 
     /*
