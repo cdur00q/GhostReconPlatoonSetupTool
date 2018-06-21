@@ -7,7 +7,8 @@
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
-actor::actor(std::ifstream &actorFile)
+actor::actor(QString fileName, std::ifstream &actorFile)
+    : m_fileName(fileName)
 {
     getGameData(m_nameTag, m_name, actorFile);
 }
@@ -33,7 +34,7 @@ fileReadResult actor::getGameData(QString targetTag, QString &valueToFill, std::
                 {
                     curString += actorFile.get();
                 }
-                QTextStream(stdout) << "extracted " << curString << endl;
+                //QTextStream(stdout) << "extracted " << curString << endl;
                 // then compare if this is the right tag
                 if (curString == targetTag)
                 {
@@ -44,13 +45,13 @@ fileReadResult actor::getGameData(QString targetTag, QString &valueToFill, std::
                         value += curChar;
                         curChar = actorFile.get();
                     }
-                    QTextStream(stdout) << "matched " << curString << " value is " << value << '\n';
+                    //QTextStream(stdout) << "matched " << curString << " value is " << value << '\n';
                     valueToFill = value;
                     return fileReadResult::FOUND;
                 }
                 else
                 {
-                    QTextStream(stdout) << "no match" << endl;
+                    //QTextStream(stdout) << "no match" << endl;
                     curString = "";
                 }
             }
@@ -60,7 +61,7 @@ fileReadResult actor::getGameData(QString targetTag, QString &valueToFill, std::
     }
 
     // something went wrong with the file stream
-    QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in getGameData().");
+    QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in actor::getGameData().");
     msgBox.exec();
     return fileReadResult::FILESTREAMERROR;
 
