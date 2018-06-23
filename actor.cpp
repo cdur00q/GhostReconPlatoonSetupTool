@@ -11,6 +11,11 @@ actor::actor(QString fileName, std::ifstream &actorFile)
     : m_fileName(fileName)
 {
     getGameData(m_nameTag, m_name, actorFile);
+    getGameData(m_kitPathTag, m_kitPath, actorFile);
+    getGameData(m_weaponStatTag, m_weaponStat, actorFile);
+    getGameData(m_staminaStatTag, m_staminaStat, actorFile);
+    getGameData(m_stealthStatTag, m_stealthStat, actorFile);
+    getGameData(m_leadershipStatTag, m_leadershipStat, actorFile);
 }
 
 fileReadResult actor::getGameData(QString targetTag, QString &valueToFill, std::ifstream &actorFile)
@@ -65,4 +70,14 @@ fileReadResult actor::getGameData(QString targetTag, QString &valueToFill, std::
     msgBox.exec();
     return fileReadResult::FILESTREAMERROR;
 
+}
+
+bool operator== (const actor &actor1, const actor &actor2)
+{
+    return (actor1.m_fileName == actor2.m_fileName);
+}
+
+bool operator!= (const actor &actor1, const actor &actor2)
+{
+    return !(actor1 == actor2);
 }

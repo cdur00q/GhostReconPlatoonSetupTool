@@ -15,6 +15,15 @@ public:
     explicit PlatoonSetup(QWidget *parent = 0);
     ~PlatoonSetup();
 
+private slots:
+    void on_pbAlpha_clicked();
+
+    void on_lwSoldierPool_itemSelectionChanged();
+
+    void on_lwAlpha_itemSelectionChanged();
+
+    void on_pbUnassign_clicked();
+
 private:
     Ui::PlatoonSetup *ui;
 };

@@ -33,15 +33,18 @@ public:
 
     QString getName(){return m_name;}
 
+    friend bool operator== (const actor &actor1, const actor &actor2);
+    friend bool operator!= (const actor &actor1, const actor &actor2);
+
     void print()
     {
         QTextStream(stdout) << m_fileName <<
         " " << m_name <<
         " " << m_kitPath <<
-        " W: " << m_weaponStat <<
-        " S: " << m_staminaStat <<
-        " S: " << m_stealthStat <<
-        " L: " << m_leadershipStat << '\n';
+        " Weap: " << m_weaponStat <<
+        " Stma: " << m_staminaStat <<
+        " Stlh: " << m_stealthStat <<
+        " Ldsp: " << m_leadershipStat << '\n';
     }
 };
 

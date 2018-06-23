@@ -14,7 +14,10 @@
    <string>PlatoonSetup</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QListWidget" name="listWidget">
+   <widget class="QListWidget" name="lwSoldierPool">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -24,44 +27,123 @@
      </rect>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="pbAlpha">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>230</y>
+      <x>10</x>
+      <y>10</y>
       <width>75</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>A</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="pbBravo">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>230</y>
+      <x>90</x>
+      <y>10</y>
       <width>75</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>B</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_3">
+   <widget class="QPushButton" name="pbCharlie">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>230</y>
+      <x>170</x>
+      <y>10</y>
       <width>75</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>C</string>
     </property>
+   </widget>
+   <widget class="QPushButton" name="pbUnassign">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>10</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>X</string>
+    </property>
+   </widget>
+   <widget class="QListWidget" name="lwAlpha">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>70</y>
+      <width>251</width>
+      <height>71</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Alpha</string>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>300</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="showGrid">
+     <bool>false</bool>
+    </property>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <column>
+     <property name="text">
+      <string>New Column</string>
+     </property>
+    </column>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
