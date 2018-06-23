@@ -6,6 +6,7 @@
 #include <fstream>
 #include <QString>
 
+int writeCoopAvatar(std::ofstream &file);
 
 //fileReadResult getGameData(QString target, std::ifstream &actorFile, std::vector<actor> &actors);
 

@@ -11,6 +11,17 @@ struct actor
 };
 */
 
+constexpr int fireteamMaxMembers{3};
+
+enum class uiLists
+{
+    NONE,
+    SOLDIERPOOL,
+    ALPHA,
+    BRAVO,
+    CHARLIE
+};
+
 enum class fileReadResult
 {
     FOUND,
