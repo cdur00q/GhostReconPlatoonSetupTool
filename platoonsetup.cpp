@@ -123,7 +123,8 @@ void PlatoonSetup::on_pbAlpha_clicked()
     else if (onAlpha && alpha.size() >= 2)
     {
         // find actor's place on team
-        for (int i{0}; i < alpha.size(); ++i)
+        bool done{false};
+        for (int i{0}; i < alpha.size() && !done; ++i)
         {
             // found actor
             if (*alpha[i] == actors[selectedActor])
@@ -138,6 +139,8 @@ void PlatoonSetup::on_pbAlpha_clicked()
                         //actor* temp{alpha[j]};
                         alpha[j] = alpha[j + 1];
                     }
+                    alpha.pop_back();
+                    done = true;
                     //alpha[alpha.size() - 1] == temp;
                 }
 
@@ -155,15 +158,16 @@ void PlatoonSetup::on_pbAlpha_clicked()
 
     // backend done, now update front end
     // delete all current entries
-    for (int i{0}; i < ui->lwAlpha->count(); ++i)
+    while (ui->lwAlpha->count() > 0)
     {
-        delete ui->lwAlpha->takeItem(i);
+        delete ui->lwAlpha->takeItem(0);
+        QTextStream(stdout) << "frontend item count: " << ui->lwAlpha->count() << endl;
     }
 
     // and recreate list based on new backend
     if (alpha.size() > 0)
     {
-        for (auto &element : alpha)
+        for (const auto &element : alpha)
         {
             new QListWidgetItem(element->getName(), ui->lwAlpha);
         }
@@ -172,24 +176,7 @@ void PlatoonSetup::on_pbAlpha_clicked()
     // debug info
     QTextStream(stdout) << "new backend" << endl;
     printActorVector(alpha);
-
-    // team empty
-    if (alpha.size() == 0)
-    {
-        /*
-        alpha.push_back(actors[selectedActor]);
-        QListWidgetItem *alpha1 = new QListWidgetItem;
-        alpha1->setText(actors[selectedActor].getName());
-        ui->lwAlpha->insertItem(0, alpha1);
-        */
-    }
-
-    /*
-    actors[selectedActor].print();
-    QTextStream(stdout) << ui->lwSoldierPool->currentRow() << endl;
-    ui->lwSoldierPool->clearSelection();
-    QTextStream(stdout) << ui->lwSoldierPool->currentRow() << endl;
-    */
+    QTextStream(stdout) << "frontend item count: " << ui->lwAlpha->count() << endl;
 
 }
 
@@ -263,8 +250,8 @@ void PlatoonSetup::on_pbUnassign_clicked()
                 if (i == alpha.size() - 1)
                 {
                     alpha.pop_back();
-                    QTextStream(stdout) << "actor last" << endl;
-                    printActorVector(alpha);
+                    //QTextStream(stdout) << "actor last" << endl;
+                    //printActorVector(alpha);
                 }
                 // actor not last
                 else
@@ -276,8 +263,8 @@ void PlatoonSetup::on_pbUnassign_clicked()
                         alpha[j] = alpha[j + 1];
                     }
                     alpha.pop_back(); // and remove last
-                    QTextStream(stdout) << "actor not last" << endl;
-                    printActorVector(alpha);
+                    //QTextStream(stdout) << "actor not last" << endl;
+                    //printActorVector(alpha);
                 }
             }
         }
@@ -285,19 +272,26 @@ void PlatoonSetup::on_pbUnassign_clicked()
 
     // backend done, now update front end
     // delete all current entries
-    for (int i{0}; i < ui->lwAlpha->count(); ++i)
+    while (ui->lwAlpha->count() > 0)
     {
-        delete ui->lwAlpha->takeItem(i);
+        delete ui->lwAlpha->takeItem(0);
     }
 
     // and recreate list based on new backend
     if (alpha.size() > 0)
     {
-        for (auto &element : alpha)
+        for (const auto &element : alpha)
         {
             new QListWidgetItem(element->getName(), ui->lwAlpha);
         }
     }
+
+    // debug info
+    /*
+    QTextStream(stdout) << "new backend" << endl;
+    printActorVector(alpha);
+    QTextStream(stdout) << "frontend item count: " << ui->lwAlpha->count() << endl;
+    */
 
     ui->lwAlpha->clearSelection();
     ui->lwSoldierPool->clearSelection();
