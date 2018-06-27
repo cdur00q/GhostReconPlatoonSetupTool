@@ -7,6 +7,26 @@
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
+/*
+// sync the selection boxes
+// check if selected soldier is on any of the teams and select them there if so
+void syncSelectionBoxes(const std::vector<actor> soldierPool, const int soldierPoolCurRow, const std::vector<actor*> fireteam, Ui::PlatoonSetup *ui)
+{
+    for (int i{0}; i < fireteam.size(); ++i)
+    {
+        if (soldierPool[soldierPoolCurRow] == *fireteam[i])
+        {
+            ui->lwAlpha->setCurrentRow(i);
+            i = fireteam.size();
+        }
+        else
+        {
+            ui->lwAlpha->clearSelection();
+        }
+    }
+}
+*/
+
 int writeCoopAvatar(std::ofstream &file)
 {
     // only operate if the file stream is working

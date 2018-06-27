@@ -105,6 +105,10 @@ PlatoonSetup::~PlatoonSetup()
 
 void PlatoonSetup::on_pbAlpha_clicked()
 {
+
+    fireteamButtonClicked(alpha, ui->lwAlpha);
+    syncSoldierPoolWithFireteam(alpha, ui->lwAlpha);
+    /*
     int selectedActor{ui->lwSoldierPool->currentRow()};
 
     // check if actor is on alpha team already
@@ -177,15 +181,38 @@ void PlatoonSetup::on_pbAlpha_clicked()
     QTextStream(stdout) << "new backend" << endl;
     printActorVector(alpha);
     QTextStream(stdout) << "frontend item count: " << ui->lwAlpha->count() << endl;
-
+    */
 }
 
 void PlatoonSetup::on_lwSoldierPool_itemSelectionChanged()
 {
-    ui->lwAlpha->clearSelection();
+    int selectedActor{ui->lwSoldierPool->currentRow()};
+
+    /*
+    // sync the selection boxes
+    // check if selected soldier is on any of the teams and select them there if so
+    for (int i{0}; i < alpha.size(); ++i)
+    {
+        if (actors[selectedActor] == *alpha[i])
+        {
+            ui->lwAlpha->setCurrentRow(i);
+            i = alpha.size();
+        }
+        else
+        {
+            ui->lwAlpha->clearSelection();
+        }
+    }
+    */
+
+    syncSoldierPoolWithFireteam(alpha, ui->lwAlpha);
+    //syncSelectionBoxes(actors, selectedActor, alpha, ui);
+
+    //ui->lwAlpha->clearSelection();
     //QTextStream(stdout) << ui->lwSoldierPool->currentRow() << endl;
 
-    int selectedActor{ui->lwSoldierPool->currentRow()};
+
+
     // check if actor is on alpha team already
     bool onAlpha{false};
     for (auto &element : alpha)
@@ -221,8 +248,8 @@ void PlatoonSetup::on_lwSoldierPool_itemSelectionChanged()
 
 void PlatoonSetup::on_lwAlpha_itemSelectionChanged()
 {
-    ui->lwSoldierPool->clearSelection();
-    QTextStream(stdout) << ui->lwAlpha->currentRow() << endl;
+    //ui->lwSoldierPool->clearSelection();
+    //QTextStream(stdout) << ui->lwAlpha->currentRow() << endl;
 }
 
 void PlatoonSetup::on_pbUnassign_clicked()
@@ -295,4 +322,97 @@ void PlatoonSetup::on_pbUnassign_clicked()
 
     ui->lwAlpha->clearSelection();
     ui->lwSoldierPool->clearSelection();
+}
+
+// sync the selection boxes
+// check if selected soldier is on any of the teams and select them there if so
+void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<actor*> &fireteam, QListWidget *fireteamList)
+{
+    for (int i{0}; i < fireteam.size(); ++i)
+    {
+        if (actors[ui->lwSoldierPool->currentRow()] == *fireteam[i])
+        {
+            //PlatoonSetup::ui->
+            fireteamList->setCurrentRow(i);
+            i = fireteam.size();
+        }
+        else
+        {
+            fireteamList->clearSelection();
+        }
+    }
+}
+
+void PlatoonSetup::fireteamButtonClicked(std::vector<actor *> &fireteam, QListWidget *fireteamList)
+{
+    int selectedActor{ui->lwSoldierPool->currentRow()};
+
+    // check if actor is on fireteam already
+    bool onTeam{false};
+    for (auto &element : fireteam)
+    {
+        if (actors[selectedActor] == *element)
+        onTeam = true;
+    }
+
+    // actor not on team already
+    if (!onTeam)
+    fireteam.push_back(&actors[selectedActor]);
+
+    // actor on team already so this is a promotion
+    else if (onTeam && fireteam.size() >= 2)
+    {
+        // find actor's place on team
+        bool done{false};
+        for (int i{0}; i < fireteam.size() && !done; ++i)
+        {
+            // found actor
+            if (*fireteam[i] == actors[selectedActor])
+            {
+                // actor is first, so move to back
+                if (i == 0)
+                {
+                    fireteam.push_back(fireteam[0]);
+                    // and then move everyone else up
+                    for (int j{i}; j < fireteam.size() - 1; ++j)
+                    {
+                        fireteam[j] = fireteam[j + 1];
+                    }
+                    fireteam.pop_back();
+                    done = true;
+                }
+
+                // actor is not first
+                if (i > 0)
+                {
+                    // swap with actor before this actor(promotion)
+                    actor* temp{fireteam[i - 1]};
+                    fireteam[i - 1] = fireteam[i];
+                    fireteam[i] = temp;
+                }
+            }
+        }
+    }
+
+    // backend done, now update front end
+    // delete all current entries
+    while (fireteamList->count() > 0)
+    {
+        delete fireteamList->takeItem(0);
+        QTextStream(stdout) << "frontend item count: " << fireteamList->count() << endl;
+    }
+
+    // and recreate list based on new backend
+    if (fireteam.size() > 0)
+    {
+        for (const auto &element : fireteam)
+        {
+            new QListWidgetItem(element->getName(), fireteamList);
+        }
+    }
+
+    // debug info
+    QTextStream(stdout) << "new backend" << endl;
+    printActorVector(fireteam);
+    QTextStream(stdout) << "frontend item count: " << fireteamList->count() << endl;
 }

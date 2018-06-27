@@ -3,6 +3,12 @@
 
 #include <QMainWindow>
 
+#include <QListWidget>
+#include <vector>
+#include "variables.h"
+#include "functions.h"
+#include "actor.h"
+
 namespace Ui {
 class PlatoonSetup;
 }
@@ -26,6 +32,10 @@ private slots:
 
 private:
     Ui::PlatoonSetup *ui;
+
+    void syncSoldierPoolWithFireteam(const std::vector<actor *> &fireteam, QListWidget *fireteamList);
+
+    void fireteamButtonClicked(std::vector<actor*> &fireteam, QListWidget *fireteamList);
 };
 
 #endif // PLATOONSETUP_H
