@@ -3,13 +3,6 @@
 
 #include <string>
 
-// obsolete compared to actor class?
-/*
-struct actor
-{
-    std::string name;
-};
-*/
 
 constexpr int fireteamMaxMembers{3};
 
