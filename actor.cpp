@@ -7,7 +7,7 @@
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
-actor::actor(QString fileName, std::ifstream &actorFile)
+Actor::Actor(QString fileName, std::ifstream &actorFile)
     : m_fileName(fileName)
 {
     getGameData(m_nameTag, m_name, actorFile);
@@ -18,7 +18,7 @@ actor::actor(QString fileName, std::ifstream &actorFile)
     getGameData(m_leadershipStatTag, m_leadershipStat, actorFile);
 }
 
-fileReadResult actor::getGameData(QString targetTag, QString &valueToFill, std::ifstream &actorFile)
+fileReadResult Actor::getGameData(QString targetTag, QString &valueToFill, std::ifstream &actorFile)
 {
     // only operate if the file stream is working
     while (actorFile.good())
@@ -38,6 +38,8 @@ fileReadResult actor::getGameData(QString targetTag, QString &valueToFill, std::
                 for (int i{0}; i < targetTag.size() - 1; ++i)
                 {
                     curString += actorFile.get();
+                    if (curString[curString.size() - 1] == '>')
+                        break; // stop reading if a tag closing symbol is encountered
                 }
                 //QTextStream(stdout) << "extracted " << curString << endl;
                 // then compare if this is the right tag
@@ -62,22 +64,26 @@ fileReadResult actor::getGameData(QString targetTag, QString &valueToFill, std::
             }
         }
         // whole file searched and no match
+        if (actorFile.eof())
+        {
+            actorFile.clear(); // this function works on a stream reference so clear the eof bit so the stream is left in good standing
+        }
         return fileReadResult::NOTFOUND;
     }
 
     // something went wrong with the file stream
-    QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in actor::getGameData().");
+    QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Actor::getGameData().");
     msgBox.exec();
     return fileReadResult::FILESTREAMERROR;
 
 }
 
-bool operator== (const actor &actor1, const actor &actor2)
+bool operator== (const Actor &actor1, const Actor &actor2)
 {
     return (actor1.m_fileName == actor2.m_fileName);
 }
 
-bool operator!= (const actor &actor1, const actor &actor2)
+bool operator!= (const Actor &actor1, const Actor &actor2)
 {
     return !(actor1 == actor2);
 }

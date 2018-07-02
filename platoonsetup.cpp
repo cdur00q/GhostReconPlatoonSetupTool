@@ -12,16 +12,18 @@
 #include "variables.h"
 #include "functions.h"
 #include "actor.h"
+#include "kit.h"
 namespace fs = std::experimental::filesystem;
 
-static std::vector<actor> actors;
-static std::vector<actor*> alpha;
-static std::vector<actor*> bravo;
-static std::vector<actor*> charlie;
+static std::vector<Actor> actors;
+static std::vector<Actor*> alpha;
+static std::vector<Actor*> bravo;
+static std::vector<Actor*> charlie;
 static uiLists lastSelection{uiLists::NONE};
+static std::vector<Kit> kits;
 
 // for debugging
-void printActorVector(const std::vector<actor*> &vec)
+void printActorVector(const std::vector<Actor*> &vec)
 {
     for (auto &element : vec)
     {
@@ -64,6 +66,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     fs::directory_iterator dirIt ("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman");
 
     //int count{0};
+    // read in actors
     for (auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman"))
     {
         //fs::path temp(element.path());
@@ -72,7 +75,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         currentFile.open(element.path());
         //actor actor(currentFile);
         QString curFileName{QString::fromStdWString(element.path().filename())};
-        actors.push_back(actor(curFileName, currentFile));
+        actors.push_back(Actor(curFileName, currentFile));
         currentFile.close();
 
 
@@ -80,10 +83,28 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         //++count;
     }
 
+    // build solider pool from actors
     for (auto &element : actors)
     {
         //element.print();
         new QListWidgetItem(element.getName(), ui->lwSoldierPool);
+    }
+
+    // read in kits
+    //dirIt = "C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman";
+    for (auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman"))
+    {
+        currentFile.open(element.path());
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        kits.push_back(Kit(curFileName, currentFile));
+        currentFile.close();
+    }
+
+    // build kit pool from kits
+    for (auto &element : kits)
+    {
+        element.print();
+        //new QListWidgetItem(element.getName(), ui->lwSoldierPool);
     }
 
     /*
@@ -199,7 +220,7 @@ void PlatoonSetup::on_pbUnassign_clicked()
 
 // sync a selection from the soldier pool with the specified fireteam
 // check if selected soldier is on any of the specified team and select them there if so
-void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<actor*> &fireteam, QListWidget *fireteamList)
+void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<Actor*> &fireteam, QListWidget *fireteamList)
 {
     bool done{false};
     bool noMatch{true};
@@ -240,7 +261,7 @@ void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<actor*> &firete
 
 // sync a selection from the specified fireteam with the soldier pool
 // check if selected soldier is on any of the specified team and select them there if so
-void PlatoonSetup::syncFireteamWithSoldierPool(const std::vector<actor*> &fireteam, const QListWidget *fireteamList)
+void PlatoonSetup::syncFireteamWithSoldierPool(const std::vector<Actor*> &fireteam, const QListWidget *fireteamList)
 {
     bool done{false};
     bool noMatch{true};
@@ -261,7 +282,7 @@ void PlatoonSetup::syncFireteamWithSoldierPool(const std::vector<actor*> &firete
     }
 }
 
-void PlatoonSetup::fireteamButtonClicked(std::vector<actor *> &fireteam, QListWidget *fireteamList)
+void PlatoonSetup::fireteamButtonClicked(std::vector<Actor *> &fireteam, QListWidget *fireteamList)
 {
     int selectedActor{ui->lwSoldierPool->currentRow()};
 
@@ -304,7 +325,7 @@ void PlatoonSetup::fireteamButtonClicked(std::vector<actor *> &fireteam, QListWi
                 if (i > 0)
                 {
                     // swap with actor before this actor(promotion)
-                    actor* temp{fireteam[i - 1]};
+                    Actor* temp{fireteam[i - 1]};
                     fireteam[i - 1] = fireteam[i];
                     fireteam[i] = temp;
                 }
@@ -335,7 +356,7 @@ void PlatoonSetup::fireteamButtonClicked(std::vector<actor *> &fireteam, QListWi
     //QTextStream(stdout) << "frontend item count: " << fireteamList->count() << endl;
 }
 
-void PlatoonSetup::unassignButtonClicked(std::vector<actor*> &fireteam, QListWidget *fireteamList)
+void PlatoonSetup::unassignButtonClicked(std::vector<Actor*> &fireteam, QListWidget *fireteamList)
 {
     int selectedActor{ui->lwSoldierPool->currentRow()};
 
@@ -403,7 +424,7 @@ void PlatoonSetup::unassignButtonClicked(std::vector<actor*> &fireteam, QListWid
     */
 }
 
-void PlatoonSetup::updateTeamButton(std::vector<actor*> &fireteam, QPushButton *teamButton)
+void PlatoonSetup::updateTeamButton(std::vector<Actor*> &fireteam, QPushButton *teamButton)
 {
     // check if actor is on specified team already
     bool onTeam{false};

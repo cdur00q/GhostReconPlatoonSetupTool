@@ -5,10 +5,10 @@
 #include <QString>
 #include <QTextStream> // for printing to console
 
-class actor
+class Actor
 {
 private:
-    const QString m_fileName{"Default file name"};
+    QString m_fileName{"Default file name"};
     const QString m_nameTag{"<ActorName>"};
     QString m_name{"Default name"};
     const QString m_kitPathTag{"<KitPath>"};
@@ -25,16 +25,16 @@ private:
     fileReadResult getGameData(QString targetTag, QString &valueToFill, std::ifstream &actorFile);
 
 public:
-    actor(QString fileName, std::ifstream &actorFile);
+    Actor(QString fileName, std::ifstream &actorFile);
 
-    ~actor()
+    ~Actor()
     {
     }
 
     QString getName(){return m_name;}
 
-    friend bool operator== (const actor &actor1, const actor &actor2);
-    friend bool operator!= (const actor &actor1, const actor &actor2);
+    friend bool operator== (const Actor &actor1, const Actor &actor2);
+    friend bool operator!= (const Actor &actor1, const Actor &actor2);
 
     void print()
     {

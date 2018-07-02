@@ -42,14 +42,14 @@ private slots:
 private:
     Ui::PlatoonSetup *ui;
 
-    void syncSoldierPoolWithFireteam(const std::vector<actor *> &fireteam, QListWidget *fireteamList);
-    void syncFireteamWithSoldierPool(const std::vector<actor *> &fireteam, const QListWidget *fireteamList);
+    void syncSoldierPoolWithFireteam(const std::vector<Actor *> &fireteam, QListWidget *fireteamList);
+    void syncFireteamWithSoldierPool(const std::vector<Actor *> &fireteam, const QListWidget *fireteamList);
 
-    void fireteamButtonClicked(std::vector<actor*> &fireteam, QListWidget *fireteamList);
+    void fireteamButtonClicked(std::vector<Actor*> &fireteam, QListWidget *fireteamList);
 
-    void unassignButtonClicked(std::vector<actor*> &fireteam, QListWidget *fireteamList);
+    void unassignButtonClicked(std::vector<Actor*> &fireteam, QListWidget *fireteamList);
 
-    void updateTeamButton(std::vector<actor*> &fireteam, QPushButton *teamButton);
+    void updateTeamButton(std::vector<Actor*> &fireteam, QPushButton *teamButton);
 
     void updateUnassignButton();
 };
