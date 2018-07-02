@@ -27,13 +27,15 @@ SOURCES += \
         main.cpp \
         platoonsetup.cpp \
     functions.cpp \
-    actor.cpp
+    actor.cpp \
+    kit.cpp
 
 HEADERS += \
         platoonsetup.h \
     functions.h \
     variables.h \
-    actor.h
+    actor.h \
+    kit.h
 
 FORMS += \
         platoonsetup.ui
