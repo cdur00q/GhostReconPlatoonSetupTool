@@ -1,7 +1,7 @@
 #ifndef VARIABLES_H
 #define VARIABLES_H
 
-#include <string>
+//#include <string>
 
 
 constexpr int fireteamMaxMembers{3};

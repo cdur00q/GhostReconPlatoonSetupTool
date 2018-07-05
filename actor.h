@@ -31,7 +31,7 @@ public:
     {
     }
 
-    QString getName(){return m_name;}
+    QString getName() const {return m_name;}
 
     friend bool operator== (const Actor &actor1, const Actor &actor2);
     friend bool operator!= (const Actor &actor1, const Actor &actor2);

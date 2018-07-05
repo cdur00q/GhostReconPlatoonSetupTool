@@ -13,6 +13,7 @@
 #include "functions.h"
 #include "actor.h"
 #include "kit.h"
+#include "gun.h"
 namespace fs = std::experimental::filesystem;
 
 static std::vector<Actor> actors;
@@ -103,9 +104,13 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // build kit pool from kits
     for (auto &element : kits)
     {
-        element.print();
+        //element.print();
         //new QListWidgetItem(element.getName(), ui->lwSoldierPool);
     }
+
+    // read in guns
+    currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip\\m16.GUN");
+    Gun("m16.GUN", currentFile);
 
     /*
     std::string fileName{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman\\rifleman-01.atr"};

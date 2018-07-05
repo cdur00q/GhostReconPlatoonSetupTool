@@ -28,14 +28,16 @@ SOURCES += \
         platoonsetup.cpp \
     functions.cpp \
     actor.cpp \
-    kit.cpp
+    kit.cpp \
+    gun.cpp
 
 HEADERS += \
         platoonsetup.h \
     functions.h \
     variables.h \
     actor.h \
-    kit.h
+    kit.h \
+    gun.h
 
 FORMS += \
         platoonsetup.ui
