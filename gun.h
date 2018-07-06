@@ -31,9 +31,14 @@ private:
         QString mode;
     };
     std::vector<FireMode> fireModes;
+    QString m_maxZoom{"0"};
 
+    // extracts 1 piece of data from a .gun file. targetTag is the data tag to look for
     fileReadResult getGameData(QString targetTag, QString &valueToFill, std::ifstream &gunFile);
+    // uses recursion to extract all listed fire selection options from a .gun file
     fileReadResult getFireModes(std::vector<FireMode> &fireModes, std::ifstream &gunFile, int startReadingPos);
+    // uses recursion to find and extract the maximum zoom value from a .gun file
+    fileReadResult getMaxZoom(QString &valueToFill, std::ifstream &gunFile, int startReadingPos);
 
 public:
     Gun(QString fileName, std::ifstream &gunFile);
@@ -41,6 +46,8 @@ public:
     ~Gun()
     {
     }
+
+    void print() const;
 };
 
 #endif // GUN_H

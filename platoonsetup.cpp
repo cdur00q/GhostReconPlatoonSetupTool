@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
+#include <QMessageBox>
 #include <QTextStream> // for printing to console
 
 #include "variables.h"
@@ -22,6 +23,7 @@ static std::vector<Actor*> bravo;
 static std::vector<Actor*> charlie;
 static uiLists lastSelection{uiLists::NONE};
 static std::vector<Kit> kits;
+static std::vector<Gun> guns;
 
 // for debugging
 void printActorVector(const std::vector<Actor*> &vec)
@@ -31,6 +33,31 @@ void printActorVector(const std::vector<Actor*> &vec)
         //element->print();
         QTextStream(stdout) << element->getName() << endl;
     }
+}
+
+// takes a QString and returns the file extension
+QString getFileExtension(const QString &fileName)
+{
+    // starting at the end of the string, check each character
+    for (int i{fileName.size() - 1}; i > 0; --i)
+    {
+        // found period closest to end, now read and return extension
+        if (fileName[i] == '.')
+        {
+            QString extension{""};
+            for (int j{i}; j < fileName.size(); ++j)
+            {
+                extension += fileName[j];
+            }
+            return extension;
+        }
+    }
+    // no extension found
+    QString errorMessage{"Error in getFileExtension().  No extension could be found for filename: "};
+    errorMessage += fileName;
+    QMessageBox msgBox(QMessageBox::Critical, "Error", errorMessage);
+    msgBox.exec();
+    return "error";
 }
 
 
@@ -68,7 +95,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 
     //int count{0};
     // read in actors
-    for (auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman"))
+    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman"))
     {
         //fs::path temp(element.path());
         //auto temp2{temp.filename()};
@@ -85,7 +112,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // build solider pool from actors
-    for (auto &element : actors)
+    for (const auto &element : actors)
     {
         //element.print();
         new QListWidgetItem(element.getName(), ui->lwSoldierPool);
@@ -93,7 +120,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 
     // read in kits
     //dirIt = "C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman";
-    for (auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman"))
+    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman"))
     {
         currentFile.open(element.path());
         QString curFileName{QString::fromStdWString(element.path().filename())};
@@ -102,15 +129,34 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // build kit pool from kits
-    for (auto &element : kits)
+    for (const auto &element : kits)
     {
         //element.print();
         //new QListWidgetItem(element.getName(), ui->lwSoldierPool);
     }
 
     // read in guns
-    currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip\\m16.GUN");
-    Gun("m16.GUN", currentFile);
+    QString gunExtension{".gun"};
+    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip"))
+    {
+        currentFile.open(element.path());
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        getFileExtension(curFileName);
+        if (QString::compare(getFileExtension(curFileName), gunExtension, Qt::CaseInsensitive) == 0)
+        {
+            guns.push_back(Gun(curFileName, currentFile));
+        }
+        currentFile.close();
+    }
+    //currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip\\m16.GUN");
+    //Gun m16("m16.GUN", currentFile);
+    //m16.print();
+
+    // print guns
+    for (const auto &element : guns)
+    {
+        element.print();
+    }
 
     /*
     std::string fileName{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman\\rifleman-01.atr"};

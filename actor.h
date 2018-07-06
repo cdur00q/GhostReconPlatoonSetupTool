@@ -36,7 +36,7 @@ public:
     friend bool operator== (const Actor &actor1, const Actor &actor2);
     friend bool operator!= (const Actor &actor1, const Actor &actor2);
 
-    void print()
+    void print() const
     {
         QTextStream(stdout) << m_fileName <<
         " " << m_name <<
