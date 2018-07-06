@@ -189,7 +189,7 @@ fileReadResult Kit::getGameData(QString targetSlotTag, QString targetTag, QStrin
 
 }
 
-void Kit::print()
+void Kit::print() const
 {
     QTextStream(stdout) << m_fileName <<
     " " << m_slot1ItemFileName <<

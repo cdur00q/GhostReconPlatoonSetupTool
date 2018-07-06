@@ -19,6 +19,7 @@ Gun::Gun(QString fileName, std::ifstream &gunFile)
     getGameData(m_stabilizationTimeTag, m_stabilizationTime, gunFile);
     getGameData(m_silencedTag, m_silenced, gunFile);
     getFireModes(fireModes, gunFile, 0);
+    getMaxZoom(m_maxZoom, gunFile, 0);
 }
 
 fileReadResult Gun::getGameData(QString targetTag, QString &valueToFill, std::ifstream &gunFile)
@@ -148,7 +149,7 @@ fileReadResult Gun::getFireModes(std::vector<FireMode> &fireModes, std::ifstream
                         }
                         fireMode.mode = value;
                         fireModes.push_back(fireMode); // push the fireMode object this function created onto the referenced fireModes vector
-                        getFireModes(fireModes, gunFile, gunFile.tellg());
+                        getFireModes(fireModes, gunFile, gunFile.tellg()); // search for the next fire mode starting at where this function call left off
                     }
                     else if (curChar == 'I')
                     {
@@ -174,7 +175,7 @@ fileReadResult Gun::getFireModes(std::vector<FireMode> &fireModes, std::ifstream
                             fireMode.mode = "Not Full Auto";
                         }
                         fireModes.push_back(fireMode); // push the fireMode object this function created onto the referenced fireModes vector
-                        getFireModes(fireModes, gunFile, gunFile.tellg());
+                        getFireModes(fireModes, gunFile, gunFile.tellg());  // search for the next fire mode starting at where this function call left off
                     }
                 }
                 else
@@ -193,8 +194,87 @@ fileReadResult Gun::getFireModes(std::vector<FireMode> &fireModes, std::ifstream
     }
 
     // something went wrong with the file stream
-    QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Gun::getGameData().");
+    QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Gun::getFireModes().");
     msgBox.exec();
     return fileReadResult::FILESTREAMERROR;
 
+}
+
+fileReadResult Gun::getMaxZoom(QString &valueToFill, std::ifstream &gunFile, int startReadingPos)
+{
+    // only operate if the file stream is working
+    while (gunFile.good())
+    {
+        QString zoomEntryTag{"<Zoom>"};
+        QString value{""};
+        QString curString{""};
+        char curChar;
+        gunFile.seekg(startReadingPos);
+        while (gunFile)
+        {
+            gunFile.get(curChar);
+            // found the first char of an item tag
+            if (curChar == '<')
+            {
+                curString += curChar;
+                // read the next chars
+                for (int i{0}; i < zoomEntryTag.size() - 1; ++i)
+                {
+                    curString += gunFile.get();
+                    if (curString[curString.size() - 1] == '>')
+                        break; // stop reading if a tag closing symbol is encountered
+                }
+                // then compare if this is the right tag
+                if (curString == zoomEntryTag)
+                {
+                    // it is, now extract the value
+                    curChar = gunFile.get();
+                    while (curChar != '<')
+                    {
+                        value += curChar;
+                        curChar = gunFile.get();
+                    }
+                    // compare extracted value to value being referenced
+                    // only assign the new value if it's bigger
+                    if (value > valueToFill)
+                    {
+                        valueToFill = value;
+                    }
+                    getMaxZoom(valueToFill, gunFile, gunFile.tellg()); // search for the next zoom value starting at where this function call left off
+                }
+                else
+                {
+                    curString = "";
+                }
+            }
+        }
+        // whole file searched and no match
+        if (gunFile.eof())
+        {
+            gunFile.clear(); // this function works on a stream reference so clear the eof bit so the stream is left in good standing
+        }
+        return fileReadResult::NOTFOUND;
+    }
+
+    // something went wrong with the file stream
+    QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Gun::getMaxZoom().");
+    msgBox.exec();
+    return fileReadResult::FILESTREAMERROR;
+}
+
+void Gun::print() const
+{
+    QTextStream(stdout) << m_fileName <<
+    " " << m_nameToken << '\n'
+    << "mag cap: " << m_magCap << '\n'
+    << "max range: " << m_maxRange << '\n'
+    << "muzzle velocity: " << m_muzzleVelocity << '\n'
+    << "recoil: " << m_recoil << '\n'
+    << "max accuracy: " << m_maxAccuracy << '\n'
+    << "stabilization time: " << m_stabilizationTime << '\n'
+    << "silenced: " << m_silenced << '\n'
+    << "max zoom: " << m_maxZoom << '\n';
+
+    for (auto const &element : fireModes)
+        QTextStream(stdout) << "fire mode: " << element.rpm << " RPM " << element.mode << " rounds per pull" << '\n';
 }

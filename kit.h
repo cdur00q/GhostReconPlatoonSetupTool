@@ -45,7 +45,7 @@ public:
     {
     }
 
-    void print();
+    void print() const;
 };
 
 #endif // KIT_H
