@@ -29,7 +29,10 @@ SOURCES += \
     functions.cpp \
     actor.cpp \
     kit.cpp \
-    gun.cpp
+    gun.cpp \
+    projectile.cpp \
+    item.cpp \
+    strings.cpp
 
 HEADERS += \
         platoonsetup.h \
@@ -37,7 +40,10 @@ HEADERS += \
     variables.h \
     actor.h \
     kit.h \
-    gun.h
+    gun.h \
+    projectile.h \
+    item.h \
+    strings.h
 
 FORMS += \
         platoonsetup.ui
