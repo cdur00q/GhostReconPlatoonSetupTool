@@ -15,6 +15,9 @@
 #include "actor.h"
 #include "kit.h"
 #include "gun.h"
+#include "projectile.h"
+#include "item.h"
+#include "strings.h"
 namespace fs = std::experimental::filesystem;
 
 static std::vector<Actor> actors;
@@ -24,6 +27,9 @@ static std::vector<Actor*> charlie;
 static uiLists lastSelection{uiLists::NONE};
 static std::vector<Kit> kits;
 static std::vector<Gun> guns;
+static std::vector<Projectile> projectiles;
+static std::vector<Item> items;
+static Strings strings;
 
 // for debugging
 void printActorVector(const std::vector<Actor*> &vec)
@@ -118,6 +124,19 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         new QListWidgetItem(element.getName(), ui->lwSoldierPool);
     }
 
+    // read in strings
+    currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Data\\Shell\\strings.txt");
+    strings.readFromFile(currentFile);
+    currentFile.close();
+
+    // print strings
+    /*
+    for (const auto &element : strings)
+    {
+        //QTextStream(stdout) << element. << endl;
+    }
+    */
+
     // read in kits
     //dirIt = "C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman";
     for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman"))
@@ -141,21 +160,56 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     {
         currentFile.open(element.path());
         QString curFileName{QString::fromStdWString(element.path().filename())};
-        getFileExtension(curFileName);
+        //getFileExtension(curFileName);
         if (QString::compare(getFileExtension(curFileName), gunExtension, Qt::CaseInsensitive) == 0)
         {
             guns.push_back(Gun(curFileName, currentFile));
         }
         currentFile.close();
     }
-    //currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip\\m16.GUN");
-    //Gun m16("m16.GUN", currentFile);
-    //m16.print();
 
     // print guns
     for (const auto &element : guns)
     {
-        element.print();
+        //element.print();
+    }
+
+    // read in projectiles
+    QString projectileExtension{".prj"};
+    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip"))
+    {
+        currentFile.open(element.path());
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        if (QString::compare(getFileExtension(curFileName), projectileExtension, Qt::CaseInsensitive) == 0)
+        {
+            projectiles.push_back(Projectile(curFileName, currentFile));
+        }
+        currentFile.close();
+    }
+
+    // print projectiles
+    for (const auto &element : projectiles)
+    {
+        //element.print();
+    }
+
+    // read in items
+    QString itemExtension{".itm"};
+    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip"))
+    {
+        currentFile.open(element.path());
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        if (QString::compare(getFileExtension(curFileName), itemExtension, Qt::CaseInsensitive) == 0)
+        {
+            items.push_back(Item(curFileName, currentFile));
+        }
+        currentFile.close();
+    }
+
+    // print items
+    for (const auto &element : items)
+    {
+        //element.print();
     }
 
     /*
@@ -333,6 +387,7 @@ void PlatoonSetup::syncFireteamWithSoldierPool(const std::vector<Actor*> &firete
     }
 }
 
+// moves a selected actor to the specified fireteam or promotes an actor already on the team
 void PlatoonSetup::fireteamButtonClicked(std::vector<Actor *> &fireteam, QListWidget *fireteamList)
 {
     int selectedActor{ui->lwSoldierPool->currentRow()};
@@ -407,6 +462,7 @@ void PlatoonSetup::fireteamButtonClicked(std::vector<Actor *> &fireteam, QListWi
     //QTextStream(stdout) << "frontend item count: " << fireteamList->count() << endl;
 }
 
+// removes an actor from the specified fireteam
 void PlatoonSetup::unassignButtonClicked(std::vector<Actor*> &fireteam, QListWidget *fireteamList)
 {
     int selectedActor{ui->lwSoldierPool->currentRow()};
@@ -475,6 +531,7 @@ void PlatoonSetup::unassignButtonClicked(std::vector<Actor*> &fireteam, QListWid
     */
 }
 
+// enables / disables the the specfied fireteam button based on the selected actor
 void PlatoonSetup::updateTeamButton(std::vector<Actor*> &fireteam, QPushButton *teamButton)
 {
     // check if actor is on specified team already
@@ -510,6 +567,7 @@ void PlatoonSetup::updateTeamButton(std::vector<Actor*> &fireteam, QPushButton *
     }
 }
 
+// enables / disables the unassign button based on the selected actor
 void PlatoonSetup::updateUnassignButton()
 {
     bool onAnyTeam{false};
