@@ -2,6 +2,9 @@
 #define KIT_H
 
 #include "variables.h"
+//#include "gun.h"
+//#include "projectile.h"
+//#include "item.h"
 #include <QString>
 #include <QTextStream> // for printing to console
 
@@ -44,6 +47,10 @@ public:
     ~Kit()
     {
     }
+
+    kitType getKitType() const {return m_type;}
+    QString getSlot1FileName() const {return m_slot1ItemFileName;}
+    QString getSlot2FileName() const;
 
     void print() const;
 };

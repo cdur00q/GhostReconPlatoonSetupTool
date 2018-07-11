@@ -14,7 +14,7 @@ private:
     const QString m_kitPathTag{"<KitPath>"};
     QString m_kitPath{"rifleman"};
     const QString m_weaponStatTag{"<Weapon>"};
-    QString m_weaponStat{"1"}; // value can only be 1-8 so okay to store as string
+    QString m_weaponStat{"1"};
     const QString m_staminaStatTag{"<Stamina>"};
     QString m_staminaStat{"1"};
     const QString m_stealthStatTag{"<Stealth>"};
