@@ -78,5 +78,18 @@ Strings::stringFileReadResult Strings::readFromFile(std::ifstream &stringsFile)
     QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Strings::readFromFile().");
     msgBox.exec();
     return stringFileReadResult::FILESTREAMERROR;
+}
 
+// returns a string from the string map or "string not found" if supplied key doesn't exist
+QString Strings::getString(const QString &key) const
+{
+    auto tempIterator{m_stringsMap.find(key)};
+    if (tempIterator != m_stringsMap.end())
+    {
+        return tempIterator->second;
+    }
+    else
+    {
+        return "string not found";
+    }
 }

@@ -191,6 +191,22 @@ fileReadResult Kit::getGameData(QString targetSlotTag, QString targetTag, QStrin
 
 }
 
+QString Kit::getSlot2FileName() const
+{
+    if (m_type == kitType::TWOGUNS || m_type == kitType::GUNANDTHROWABLE || m_type == kitType::GUNANDHANDHELD)
+    {
+        return m_slot2ItemFileName;
+    }
+    else if (m_type == kitType::GUNANDAMMO)
+    {
+        return "extra ammo";
+    }
+    else
+    {
+        return "error in getSlot2FileName(): no matching kitType";
+    }
+}
+
 void Kit::print() const
 {
     QTextStream(stdout) << m_fileName <<

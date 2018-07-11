@@ -2,6 +2,7 @@
 #define GUN_H
 
 #include "variables.h"
+#include "strings.h"
 #include <QString>
 #include <QTextStream> // for printing to console
 
@@ -11,6 +12,7 @@ private:
     QString m_fileName{"Default file name"};
     const QString m_nameTokenTag{"<NameToken>"};
     QString m_nameToken{"Default name Token"};
+    QString m_name{"Default name"};
     const QString m_magCapTag{"<MagazineCapacity>"};
     QString m_magCap{"0"};
     const QString m_maxRangeTag{"<MaxRange>"};
@@ -41,11 +43,14 @@ private:
     fileReadResult getMaxZoom(QString &valueToFill, std::ifstream &gunFile, int startReadingPos);
 
 public:
-    Gun(QString fileName, std::ifstream &gunFile);
+    Gun(QString fileName, std::ifstream &gunFile, const Strings &strings);
 
     ~Gun()
     {
     }
+
+    QString getFileName() const {return m_fileName;}
+    QString getName() const {return m_name;}
 
     void print() const;
 };

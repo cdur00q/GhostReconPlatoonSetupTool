@@ -129,6 +129,8 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     strings.readFromFile(currentFile);
     currentFile.close();
 
+    //QString temp = strings.getString("ITM_BOMB2");
+    //QTextStream(stdout) << temp << endl;
     // print strings
     /*
     for (const auto &element : strings)
@@ -136,23 +138,6 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         //QTextStream(stdout) << element. << endl;
     }
     */
-
-    // read in kits
-    //dirIt = "C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman";
-    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman"))
-    {
-        currentFile.open(element.path());
-        QString curFileName{QString::fromStdWString(element.path().filename())};
-        kits.push_back(Kit(curFileName, currentFile));
-        currentFile.close();
-    }
-
-    // build kit pool from kits
-    for (const auto &element : kits)
-    {
-        //element.print();
-        //new QListWidgetItem(element.getName(), ui->lwSoldierPool);
-    }
 
     // read in guns
     QString gunExtension{".gun"};
@@ -163,7 +148,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         //getFileExtension(curFileName);
         if (QString::compare(getFileExtension(curFileName), gunExtension, Qt::CaseInsensitive) == 0)
         {
-            guns.push_back(Gun(curFileName, currentFile));
+            guns.push_back(Gun(curFileName, currentFile, strings));
         }
         currentFile.close();
     }
@@ -182,7 +167,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         QString curFileName{QString::fromStdWString(element.path().filename())};
         if (QString::compare(getFileExtension(curFileName), projectileExtension, Qt::CaseInsensitive) == 0)
         {
-            projectiles.push_back(Projectile(curFileName, currentFile));
+            projectiles.push_back(Projectile(curFileName, currentFile, strings));
         }
         currentFile.close();
     }
@@ -201,7 +186,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         QString curFileName{QString::fromStdWString(element.path().filename())};
         if (QString::compare(getFileExtension(curFileName), itemExtension, Qt::CaseInsensitive) == 0)
         {
-            items.push_back(Item(curFileName, currentFile));
+            items.push_back(Item(curFileName, currentFile, strings));
         }
         currentFile.close();
     }
@@ -210,6 +195,83 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     for (const auto &element : items)
     {
         //element.print();
+    }
+
+    // read in kits
+    //dirIt = "C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman";
+    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman"))
+    {
+        currentFile.open(element.path());
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        kits.push_back(Kit(curFileName, currentFile));
+        currentFile.close();
+    }
+
+    // build kit pool from kits
+    QString item1{""};
+    QString item2{""};
+    for (const auto &element : kits)
+    {
+
+        // the first item in a kit is always a gun
+        item1 = element.getSlot1FileName();
+        for (const auto &element2 : guns)
+        {
+            if (QString::compare(item1, element2.getFileName(), Qt::CaseInsensitive) == 0)
+            {
+                item1 = element2.getName();
+            }
+        }
+        // second item is also a gun
+        if (element.getKitType() == element.kitType::TWOGUNS)
+        {
+            item2 = element.getSlot2FileName();
+            for (const auto &element2 : guns)
+            {
+                if (QString::compare(item2, element2.getFileName(), Qt::CaseInsensitive) == 0)
+                {
+                    item2 = element2.getName();
+                }
+            }
+        }
+        // second item is a projectile/throwable
+        else if (element.getKitType() == element.kitType::GUNANDTHROWABLE)
+        {
+            item2 = element.getSlot2FileName();
+            for (const auto &element2 : projectiles)
+            {
+                if (QString::compare(item2, element2.getFileName(), Qt::CaseInsensitive) == 0)
+                {
+                    item2 = element2.getName();
+                }
+            }
+        }
+        // second item is an item/handheld
+        else if (element.getKitType() == element.kitType::GUNANDHANDHELD)
+        {
+            item2 = element.getSlot2FileName();
+            for (const auto &element2 : items)
+            {
+                if (QString::compare(item2, element2.getFileName(), Qt::CaseInsensitive) == 0)
+                {
+                    item2 = element2.getName();
+                }
+            }
+        }
+        // no second item - extra ammo for slot1's gun
+        else if (element.getKitType() == element.kitType::GUNANDAMMO)
+        {
+            item2 = strings.getString("WPN_EXTRAAMMO");
+        }
+        // nothing else matched - must be an error
+        else
+        {
+            item2 = "error resolving item2 while building kit list";
+        }
+        //QString label{item1 + " + " item2};
+        item1 += " + ";
+        item1 += item2; // add item2 to item1 to create the final label for the list widget
+        new QListWidgetItem(item1, ui->lwKits);
     }
 
     /*

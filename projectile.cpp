@@ -1,5 +1,6 @@
 #include "projectile.h"
 #include "variables.h"
+#include "strings.h"
 
 #include <fstream>
 #include <vector>
@@ -7,10 +8,11 @@
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
-Projectile::Projectile(QString fileName, std::ifstream &projectileFile)
+Projectile::Projectile(QString fileName, std::ifstream &projectileFile, const Strings &strings)
     : m_fileName(fileName)
 {
     getGameData(m_nameTokenTag, m_nameToken, projectileFile);
+    m_name = strings.getString(m_nameToken);
 }
 
 fileReadResult Projectile::getGameData(QString targetTag, QString &valueToFill, std::ifstream &projectileFile)
@@ -76,5 +78,5 @@ fileReadResult Projectile::getGameData(QString targetTag, QString &valueToFill, 
 void Projectile::print() const
 {
     QTextStream(stdout) << m_fileName <<
-    " " << m_nameToken << '\n';
+    " " << m_nameToken << " " << m_name << '\n';
 }
