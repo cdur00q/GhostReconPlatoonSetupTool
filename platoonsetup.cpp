@@ -385,6 +385,62 @@ void PlatoonSetup::on_pbUnassign_clicked()
     updateUnassignButton();
 }
 
+void PlatoonSetup::on_lwKits_itemClicked()
+{
+    QString kitNumber{QString::number(ui->lwKits->currentRow() + 1)};
+    ui->leKitName->setText(kitNumber);
+
+    QString test{R"(<TOEFile>
+                 <VersionNumber>2.000000</VersionNumber>
+                 <Company IgorId = "4" ScriptId = "0" Name = "_---" MultiplayerCompany = "2">
+                     <Platoon IgorId = "3" ScriptId = "0" Name = "_Platoon1" MultiplayerPlatoon = "1">
+                         <Team IgorId = "2" ScriptId = "0" Name = "_Alpha">
+                             <Actor IgorId = "1" ScriptId = "0" Name = "_Actor" File = "mp_plt1_asl.atr" Kit = "rifleman-01.kit" Owner = "0"/>
+                         </Team>
+                     </Platoon>
+                 </Company>
+             </TOEFile>")"};
+    QString test2;
+    //test2 << "test2 " << " + " << "test3" << '\n';
+    ui->pteFireModes1->setPlainText(test2);
+    ui->pteFireModes1->setReadOnly(true);
+}
+
+void PlatoonSetup::on_pbKitLeft_clicked()
+{
+    int curRow{ui->lwKits->currentRow()};
+    int nextRow{0};
+    // if this is the first kit select the last kit
+    if (curRow == 0)
+    {
+        nextRow = ui->lwKits->count() - 1;
+    }
+    // otherwise select the next kit to the left(minus)
+    else
+    {
+        nextRow = curRow - 1;
+    }
+    ui->lwKits->setCurrentRow(nextRow);
+}
+
+void PlatoonSetup::on_pbKitRight_clicked()
+{
+    int curRow{ui->lwKits->currentRow()};
+    int nextRow{0};
+    // if this is the last kit select the first kit
+    if (curRow == ui->lwKits->count() - 1)
+    {
+        nextRow = 0;
+    }
+    // otherwise select the next kit to the right(plus)
+    else
+    {
+        nextRow = curRow + 1;
+    }
+    ui->lwKits->setCurrentRow(nextRow);
+}
+
+
 // sync a selection from the soldier pool with the specified fireteam
 // check if selected soldier is on any of the specified team and select them there if so
 void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<Actor*> &fireteam, QListWidget *fireteamList)
