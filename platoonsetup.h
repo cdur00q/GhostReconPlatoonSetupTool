@@ -39,6 +39,12 @@ private slots:
 
     void on_pbUnassign_clicked();
 
+    void on_lwKits_itemClicked();
+
+    void on_pbKitLeft_clicked();
+
+    void on_pbKitRight_clicked();
+
 private:
     Ui::PlatoonSetup *ui;
 
