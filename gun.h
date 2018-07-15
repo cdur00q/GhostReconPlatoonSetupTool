@@ -25,6 +25,8 @@ private:
     QString m_maxAccuracy{"0.0"};
     const QString m_stabilizationTimeTag{"<StabilizationTime>"};
     QString m_stabilizationTime{"0.0"};
+    const QString m_weaponTypeTag{"<WeaponMotionType>"};
+    QString m_weaponType{"0"};
     const QString m_silencedTag{"<Silenced>"};
     QString m_silenced{"0"};
     struct FireMode
@@ -32,7 +34,7 @@ private:
         QString rpm;
         QString mode;
     };
-    std::vector<FireMode> fireModes;
+    std::vector<FireMode> m_fireModes;
     QString m_maxZoom{"0"};
 
     // extracts 1 piece of data from a .gun file. targetTag is the data tag to look for
@@ -51,6 +53,16 @@ public:
 
     QString getFileName() const {return m_fileName;}
     QString getName() const {return m_name;}
+    QString getMagCap() const {return m_magCap;}
+    QString getMaxRange() const {return m_maxRange;}
+    QString getMuzzleVelocity() const {return m_muzzleVelocity;}
+    QString getRecoil() const {return m_recoil;}
+    QString getMaxAccuracy() const {return m_maxAccuracy;}
+    QString getStabilizationTime() const {return m_stabilizationTime;}
+    QString getWeaponType() const {return m_weaponType;}
+    QString getSilenced() const {return m_silenced;}
+    QString getMaxZoom() const {return m_maxZoom;}
+    std::vector<FireMode> getFireModes() const {return m_fireModes;}
 
     void print() const;
 };
