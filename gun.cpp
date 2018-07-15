@@ -19,8 +19,9 @@ Gun::Gun(QString fileName, std::ifstream &gunFile, const Strings &strings)
     getGameData(m_recoilTag, m_recoil, gunFile);
     getGameData(m_maxAccuracyTag, m_maxAccuracy, gunFile);
     getGameData(m_stabilizationTimeTag, m_stabilizationTime, gunFile);
+    getGameData(m_weaponTypeTag, m_weaponType, gunFile);
     getGameData(m_silencedTag, m_silenced, gunFile);
-    getFireModes(fireModes, gunFile, 0);
+    getFireModes(m_fireModes, gunFile, 0);
     getMaxZoom(m_maxZoom, gunFile, 0);
 }
 
@@ -137,7 +138,7 @@ fileReadResult Gun::getFireModes(std::vector<FireMode> &fireModes, std::ifstream
                     // found an 'R' or an 'I'.
                     if (curChar == 'R')
                     {
-                        // find the rounds per pull value opening quote
+                        // find the "rounds per pull" value opening quote
                         while (curChar != '"')
                         {
                             curChar = gunFile.get();
@@ -155,7 +156,7 @@ fileReadResult Gun::getFireModes(std::vector<FireMode> &fireModes, std::ifstream
                     }
                     else if (curChar == 'I')
                     {
-                        // find the is full auto value opening quote
+                        // find the "is full auto" value opening quote
                         while (curChar != '"')
                         {
                             curChar = gunFile.get();
@@ -266,6 +267,22 @@ fileReadResult Gun::getMaxZoom(QString &valueToFill, std::ifstream &gunFile, int
 
 void Gun::print() const
 {
+    QString weaponType{"unspecified type"};
+    if (m_weaponType == "0")
+        weaponType = "pistol";
+    else if (m_weaponType == "1")
+        weaponType = "rifle";
+    else if (m_weaponType == "2")
+        weaponType = "sniper rifle";
+    else if (m_weaponType == "3")
+        weaponType = "bolt action";
+    else if (m_weaponType == "4")
+        weaponType = "grenade launcher";
+    else if (m_weaponType == "5")
+        weaponType = "rocket launcher";
+    else if (m_weaponType == "6")
+        weaponType = "shotgun";
+
     QTextStream(stdout) << m_fileName <<
     " " << m_nameToken << " " << m_name << '\n'
     << "mag cap: " << m_magCap << '\n'
@@ -274,9 +291,10 @@ void Gun::print() const
     << "recoil: " << m_recoil << '\n'
     << "max accuracy: " << m_maxAccuracy << '\n'
     << "stabilization time: " << m_stabilizationTime << '\n'
+    << "weapon type: " << weaponType << '\n'
     << "silenced: " << m_silenced << '\n'
     << "max zoom: " << m_maxZoom << '\n';
 
-    for (auto const &element : fireModes)
+    for (auto const &element : m_fireModes)
         QTextStream(stdout) << "fire mode: " << element.rpm << " RPM " << element.mode << " rounds per pull" << '\n';
 }

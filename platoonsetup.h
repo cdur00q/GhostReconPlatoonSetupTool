@@ -58,6 +58,8 @@ private:
     void updateTeamButton(std::vector<Actor*> &fireteam, QPushButton *teamButton);
 
     void updateUnassignButton();
+
+    void updateSelectedKitInfo();
 };
 
 #endif // PLATOONSETUP_H
