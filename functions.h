@@ -7,10 +7,14 @@
 #include <fstream>
 #include <QString>
 
-//void syncSelectionBoxes(const std::vector<actor> soldierPool, const int soldierPoolCurRow, const std::vector<actor*> fireteam, Ui::PlatoonSetup *ui);
+long getRandomNumber(long min, long max);
+
+QString getFileExtension(const QString &fileName);
+
+void readInActors(const std::string &directoryPath, std::vector<Actor> &actors);
+
+void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Actor> &destination);
 
 int writeCoopAvatar(std::ofstream &file);
-
-//fileReadResult getGameData(QString target, std::ifstream &actorFile, std::vector<actor> &actors);
 
 #endif // FUNCTIONS_H

@@ -20,6 +20,10 @@
 #include "strings.h"
 namespace fs = std::experimental::filesystem;
 
+static std::vector<Actor> rifleman;
+static std::vector<Actor> heavyWeapons;
+static std::vector<Actor> sniper;
+static std::vector<Actor> demolitions;
 static std::vector<Actor> actors;
 static std::vector<Actor*> alpha;
 static std::vector<Actor*> bravo;
@@ -41,6 +45,7 @@ void printActorVector(const std::vector<Actor*> &vec)
     }
 }
 
+/*
 // takes a QString and returns the file extension
 QString getFileExtension(const QString &fileName)
 {
@@ -65,6 +70,7 @@ QString getFileExtension(const QString &fileName)
     msgBox.exec();
     return "error";
 }
+*/
 
 
 PlatoonSetup::PlatoonSetup(QWidget *parent) :
@@ -123,31 +129,38 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     actor1.print();
     */
 
-    fs::directory_iterator dirIt ("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman");
+    //fs::directory_iterator dirIt ("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman");
 
-    //int count{0};
+    /*
     // read in actors
     for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman"))
     {
-        //fs::path temp(element.path());
-        //auto temp2{temp.filename()};
-        //QString temp3{QString::fromStdWString(temp.filename())};
         currentFile.open(element.path());
-        //actor actor(currentFile);
         QString curFileName{QString::fromStdWString(element.path().filename())};
         actors.push_back(Actor(curFileName, currentFile));
         currentFile.close();
-
-
-        //QTextStream(stdout) << element << endl;
-        //++count;
     }
+    */
+
+    // read in all actors
+    readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman", rifleman);
+    readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\heavy-weapons", heavyWeapons);
+    readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\sniper", sniper);
+    readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\demolitions", demolitions);
+    //readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\TestMod1\\Actor\\rifleman", actors);
+
+    // randomly choose nine actors of each class and put them into the actors pool
+    for (int i{0}; i < 9; ++i) { assignRandomActorToVector(rifleman, actors); }
+    for (int i{0}; i < 9; ++i) { assignRandomActorToVector(heavyWeapons, actors); }
+    for (int i{0}; i < 9; ++i) { assignRandomActorToVector(sniper, actors); }
+    for (int i{0}; i < 9; ++i) { assignRandomActorToVector(demolitions, actors); }
+
 
     // build solider pool from actors
     for (const auto &element : actors)
     {
         //element.print();
-        new QListWidgetItem(element.getName(), ui->lwSoldierPool);
+        new QListWidgetItem(element.getFirstInitialLastName() + "       " + element.getClassName().toUpper(), ui->lwSoldierPool);
     }
 
     // read in strings
@@ -417,297 +430,6 @@ void PlatoonSetup::on_lwKits_itemClicked()
     ui->leKitName->setText(kitNumber);
 
     updateSelectedKitInfo();
-    /*
-    Gun *gun = &guns[0];
-    for (auto &element : guns)
-    {
-        if (QString::compare(kits[ui->lwKits->currentRow()].getSlot1FileName(), element.getFileName(), Qt::CaseInsensitive) == 0)
-        {
-            gun = &element;
-        }
-    }
-
-    ui->leName1->setText(gun->getName());
-    ui->leMagCap1->setText(gun->getMagCap());
-    ui->leMaxRange1->setText(gun->getMaxRange());
-    ui->leVelocity1->setText(gun->getMuzzleVelocity());
-    ui->leRecoil->setText(gun->getRecoil());
-    ui->leAccuracy1->setText(gun->getMaxAccuracy());
-    ui->leStabilization1->setText(gun->getStabilizationTime());
-    ui->leSilenced->setText(gun->getSilenced());
-    ui->leMaxZoom1->setText(gun->getMaxZoom());
-    QString fireModesForBox{""};
-    for (auto &element : gun->getFireModes())
-    {
-        fireModesForBox += element.rpm;
-        fireModesForBox += " rpm ";
-        if (element.mode == "Full Auto")
-        {
-            //fireModesForBox += " ";
-            fireModesForBox += "Full Auto";
-        }
-        else if (element.mode == "1")
-        {
-            //fireModesForBox += " ";
-            fireModesForBox += "Single Shot";
-        }
-        else
-        {
-            fireModesForBox += element.mode;
-            fireModesForBox += " Round Burst";
-        }
-        fireModesForBox += '\n';
-    }
-    ui->pteFireModes1->setPlainText(fireModesForBox);
-    */
-}
-
-void PlatoonSetup::updateSelectedKitInfo()
-{
-    // first clear all the boxes of any info
-    ui->leName1->clear();
-    ui->leWeaponType1->clear();
-    ui->leMagCap1->clear();
-    ui->leMaxRange1->clear();
-    ui->leVelocity1->clear();
-    ui->leRecoil1->clear();
-    ui->leAccuracy1->clear();
-    ui->leStabilization1->clear();
-    ui->leMaxZoom1->clear();
-    ui->leSilenced1->clear();
-    ui->pteFireModes1->clear();
-
-    ui->leName2->clear();
-    ui->leWeaponType2->clear();
-    ui->leMagCap2->clear();
-    ui->leMaxRange2->clear();
-    ui->leVelocity2->clear();
-    ui->leRecoil2->clear();
-    ui->leAccuracy2->clear();
-    ui->leStabilization2->clear();
-    ui->leMaxZoom2->clear();
-    ui->leSilenced2->clear();
-    ui->pteFireModes2->clear();
-
-    // the first item is always a gun
-    const Gun *gun{nullptr};
-    for (const auto &element : guns)
-    {
-        if (QString::compare(kits[ui->lwKits->currentRow()].getSlot1FileName(), element.getFileName(), Qt::CaseInsensitive) == 0)
-        {
-            gun = &element;
-        }
-    }
-
-    if (!gun)
-    {
-        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find first item of selected kit.");
-        msgBox.exec();
-        //QCoreApplication::exit(-1);
-        exit(EXIT_FAILURE);
-    }
-
-    QString magCountText{kits[ui->lwKits->currentRow()].getSlot1MagCount()};
-    double magCountNumber{magCountText.toDouble()};
-    double magCapNumber{gun->getMagCap().toDouble()};
-    double totalRoundsNumber{magCountNumber * magCapNumber};
-    QString totalRoundsText{QString::number(totalRoundsNumber)};
-
-    ui->leName1->setText(gun->getName() + "   " + totalRoundsText + "/" + magCountText);
-    ui->leMagCap1->setText(gun->getMagCap());
-    ui->leMaxRange1->setText(gun->getMaxRange() + " m");
-    ui->leVelocity1->setText(gun->getMuzzleVelocity() + " m/s");
-    ui->leRecoil1->setText(gun->getRecoil());
-    ui->leAccuracy1->setText(gun->getMaxAccuracy());
-    ui->leStabilization1->setText(gun->getStabilizationTime() + " s");
-    QString weaponType{gun->getWeaponType()};
-    QString weaponTypeText{"Unspecified Type"};
-    if (weaponType == "0")
-        weaponTypeText = "Pistol";
-    else if (weaponType == "1")
-        weaponTypeText = "Rifle";
-    else if (weaponType == "2")
-        weaponTypeText = "Sniper Rifle";
-    else if (weaponType == "3")
-        weaponTypeText = "Bolt Action";
-    else if (weaponType == "4")
-        weaponTypeText = "Grenade Launcher";
-    else if (weaponType == "5")
-        weaponTypeText = "Rocket Launcher";
-    else if (weaponType == "6")
-        weaponTypeText = "Shotgun";
-    ui->leWeaponType1->setText(weaponTypeText);
-    if (gun->getSilenced() == "1")
-    {
-        ui->leSilenced1->setText("Yes");
-    }
-    else
-    {
-        ui->leSilenced1->setText("No");
-    }
-    ui->leMaxZoom1->setText(gun->getMaxZoom() + "x");
-    QString fireModesForBox{""};
-    for (auto &element : gun->getFireModes())
-    {
-        fireModesForBox += element.rpm;
-        fireModesForBox += " rpm ";
-        if (element.mode == "Full Auto")
-        {
-            //fireModesForBox += " ";
-            fireModesForBox += "Full Auto";
-        }
-        else if (element.mode == "1")
-        {
-            //fireModesForBox += " ";
-            fireModesForBox += "Single Shot";
-        }
-        else
-        {
-            fireModesForBox += element.mode;
-            fireModesForBox += " Round Burst";
-        }
-        fireModesForBox += '\n';
-    }
-    ui->pteFireModes1->setPlainText(fireModesForBox);
-
-    // second item is also a gun
-    if (kits[ui->lwKits->currentRow()].getKitType() == Kit::kitType::TWOGUNS)
-    {
-        const Gun *gun2{nullptr};
-        for (const auto &element : guns)
-        {
-            if (QString::compare(kits[ui->lwKits->currentRow()].getSlot2FileName(), element.getFileName(), Qt::CaseInsensitive) == 0)
-            {
-                gun2 = &element;
-            }
-        }
-
-        if (!gun2)
-        {
-            QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find second item of selected kit.");
-            msgBox.exec();
-            //QCoreApplication::exit(-1);
-            exit(EXIT_FAILURE);
-
-        }
-
-        ui->leName2->setText(gun2->getName());
-        ui->leMagCap2->setText(gun2->getMagCap());
-        ui->leMaxRange2->setText(gun2->getMaxRange() + " m");
-        ui->leVelocity2->setText(gun2->getMuzzleVelocity() + " m/s");
-        ui->leRecoil2->setText(gun2->getRecoil());
-        ui->leAccuracy2->setText(gun2->getMaxAccuracy());
-        ui->leStabilization2->setText(gun2->getStabilizationTime() + " s");
-        weaponType = gun2->getWeaponType();
-        weaponTypeText = "Unspecified Type";
-        if (weaponType == "0")
-            weaponTypeText = "Pistol";
-        else if (weaponType == "1")
-            weaponTypeText = "Rifle";
-        else if (weaponType == "2")
-            weaponTypeText = "Sniper Rifle";
-        else if (weaponType == "3")
-            weaponTypeText = "Bolt Action";
-        else if (weaponType == "4")
-            weaponTypeText = "Grenade Launcher";
-        else if (weaponType == "5")
-            weaponTypeText = "Rocket Launcher";
-        else if (weaponType == "6")
-            weaponTypeText = "Shotgun";
-        ui->leWeaponType2->setText(weaponTypeText);
-        if (gun2->getSilenced() == "1")
-        {
-            ui->leSilenced2->setText("Yes");
-        }
-        else
-        {
-            ui->leSilenced2->setText("No");
-        }
-        ui->leMaxZoom2->setText(gun2->getMaxZoom() + "x");
-        fireModesForBox = "";
-        for (auto &element : gun2->getFireModes())
-        {
-            fireModesForBox += element.rpm;
-            fireModesForBox += " rpm ";
-            if (element.mode == "Full Auto")
-            {
-                fireModesForBox += "Full Auto";
-            }
-            else if (element.mode == "1")
-            {
-                fireModesForBox += "Single Shot";
-            }
-            else
-            {
-                fireModesForBox += element.mode;
-                fireModesForBox += " Round Burst";
-            }
-            fireModesForBox += '\n';
-        }
-        ui->pteFireModes2->setPlainText(fireModesForBox);
-    }
-
-    // second item is a projectile/throwable
-    if (kits[ui->lwKits->currentRow()].getKitType() == Kit::kitType::GUNANDTHROWABLE)
-    {
-        const Projectile *projectile{nullptr};
-        for (const auto &element : projectiles)
-        {
-            if (QString::compare(kits[ui->lwKits->currentRow()].getSlot2FileName(), element.getFileName(), Qt::CaseInsensitive) == 0)
-            {
-                projectile = &element;
-            }
-        }
-
-        if (!projectile)
-        {
-            QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find second item of selected kit.");
-            msgBox.exec();
-            //QCoreApplication::exit(-1);
-            exit(EXIT_FAILURE);
-        }
-        ui->leName2->setText(projectile->getName());
-    }
-
-    // second item is an item/handheld
-    if (kits[ui->lwKits->currentRow()].getKitType() == Kit::kitType::GUNANDHANDHELD)
-    {
-        const Item *item{nullptr};
-        for (const auto &element : items)
-        {
-            if (QString::compare(kits[ui->lwKits->currentRow()].getSlot2FileName(), element.getFileName(), Qt::CaseInsensitive) == 0)
-            {
-                item = &element;
-            }
-        }
-
-        if (!item)
-        {
-            QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find second item of selected kit.");
-            msgBox.exec();
-            //QCoreApplication::exit(-1);
-            exit(EXIT_FAILURE);
-        }
-        ui->leName2->setText(item->getName());
-    }
-
-    // no second item - extra ammo for first item
-    if (kits[ui->lwKits->currentRow()].getKitType() == Kit::kitType::GUNANDAMMO)
-    {
-        // remove extra ammo from item1's count
-        //magCountText = kits[ui->lwKits->currentRow()].getSlot1MagCount();
-        //double magCountNumber{magCountText.toDouble()};
-        double extraAmmoNumber{kits[ui->lwKits->currentRow()].getExtraAmmo().toDouble()};
-        magCountNumber -= extraAmmoNumber;
-        magCountText = QString::number(magCountNumber);
-        //double magCapNumber{gun->getMagCap().toDouble()};
-        //double totalRoundsNumber{magCountNumber * magCapNumber};
-        totalRoundsNumber = magCountNumber * magCapNumber;
-        totalRoundsText = QString::number(totalRoundsNumber);
-
-        ui->leName1->setText(gun->getName() + "   " + totalRoundsText + "/" + magCountText);
-        ui->leName2->setText(strings.getString("WPN_EXTRAAMMO"));
-    }
 }
 
 void PlatoonSetup::on_pbKitLeft_clicked()
@@ -725,6 +447,7 @@ void PlatoonSetup::on_pbKitLeft_clicked()
         nextRow = curRow - 1;
     }
     ui->lwKits->setCurrentRow(nextRow);
+    updateSelectedKitInfo();
 }
 
 void PlatoonSetup::on_pbKitRight_clicked()
@@ -742,8 +465,8 @@ void PlatoonSetup::on_pbKitRight_clicked()
         nextRow = curRow + 1;
     }
     ui->lwKits->setCurrentRow(nextRow);
+    updateSelectedKitInfo();
 }
-
 
 // sync a selection from the soldier pool with the specified fireteam
 // check if selected soldier is on any of the specified team and select them there if so
@@ -758,21 +481,21 @@ void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<Actor*> &firete
         if (actors[ui->lwSoldierPool->currentRow()] == *fireteam[i])
         {
             // they are, now check if the current rows are in sync
-            QTextStream(stdout) << "found " << actors[ui->lwSoldierPool->currentRow()].getName() << " at row " << fireteamList->currentRow() << endl;
+            QTextStream(stdout) << "found " << actors[ui->lwSoldierPool->currentRow()].getFirstInitialLastName() << " at row " << fireteamList->currentRow() << endl;
             fireteamList->setCurrentRow(i);
             done = true;
             noMatch = false;
             /*
             if (fireteamList->currentRow() != i)
             {
-                QTextStream(stdout) << "found " << actors[ui->lwSoldierPool->currentRow()].getName() << " at row " << fireteamList->currentRow() << endl;
+                QTextStream(stdout) << "found " << actors[ui->lwSoldierPool->currentRow()].getFirstInitialLastName() << " at row " << fireteamList->currentRow() << endl;
                 fireteamList->setCurrentRow(i);
                 done = true;
                 noMatch = false;
             }
             else if (fireteamList->currentRow() == i)
             {
-                QTextStream(stdout) << "already in sync. found " << actors[ui->lwSoldierPool->currentRow()].getName() << " at row " << fireteamList->currentRow() << endl;
+                QTextStream(stdout) << "already in sync. found " << actors[ui->lwSoldierPool->currentRow()].getFirstInitialLastName() << " at row " << fireteamList->currentRow() << endl;
                 done = true;
                 noMatch = false;
             }
@@ -781,7 +504,7 @@ void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<Actor*> &firete
     }
     if (noMatch)
     {
-        QTextStream(stdout) << "didn't find " << actors[ui->lwSoldierPool->currentRow()].getName() << endl;
+        QTextStream(stdout) << "didn't find " << actors[ui->lwSoldierPool->currentRow()].getFirstInitialLastName() << endl;
         fireteamList->clearSelection();
     }
 }
@@ -874,7 +597,7 @@ void PlatoonSetup::fireteamButtonClicked(std::vector<Actor *> &fireteam, QListWi
     {
         for (const auto &element : fireteam)
         {
-            new QListWidgetItem(element->getName(), fireteamList);
+            new QListWidgetItem(element->getFirstInitialLastName(), fireteamList);
         }
     }
 
@@ -941,7 +664,7 @@ void PlatoonSetup::unassignButtonClicked(std::vector<Actor*> &fireteam, QListWid
     {
         for (const auto &element : fireteam)
         {
-            new QListWidgetItem(element->getName(), fireteamList);
+            new QListWidgetItem(element->getFirstInitialLastName(), fireteamList);
         }
     }
 
@@ -1027,4 +750,268 @@ void PlatoonSetup::updateUnassignButton()
     // not on any of the teams
     if (!onAnyTeam)
         ui->pbUnassign->setEnabled(false);
+}
+
+// updates all the kit detail boxs (mag cap, range, etc) to the currently selected kit when called
+void PlatoonSetup::updateSelectedKitInfo()
+{
+    // first clear all the boxes of any info
+    ui->leName1->clear();
+    ui->leWeaponType1->clear();
+    ui->leMagCap1->clear();
+    ui->leMaxRange1->clear();
+    ui->leVelocity1->clear();
+    ui->leRecoil1->clear();
+    ui->leAccuracy1->clear();
+    ui->leStabilization1->clear();
+    ui->leMaxZoom1->clear();
+    ui->leSilenced1->clear();
+    ui->pteFireModes1->clear();
+
+    ui->leName2->clear();
+    ui->leWeaponType2->clear();
+    ui->leMagCap2->clear();
+    ui->leMaxRange2->clear();
+    ui->leVelocity2->clear();
+    ui->leRecoil2->clear();
+    ui->leAccuracy2->clear();
+    ui->leStabilization2->clear();
+    ui->leMaxZoom2->clear();
+    ui->leSilenced2->clear();
+    ui->pteFireModes2->clear();
+
+    const Kit &currentKit{kits[ui->lwKits->currentRow()]};
+
+    // the first item is always a gun
+    const Gun *gun{nullptr};
+    for (const auto &element : guns)
+    {
+        if (QString::compare(currentKit.getSlot1FileName(), element.getFileName(), Qt::CaseInsensitive) == 0)
+        {
+            gun = &element;
+        }
+    }
+
+    if (!gun)
+    {
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find first item of selected kit.");
+        msgBox.exec();
+        //QCoreApplication::exit(-1);
+        exit(EXIT_FAILURE);
+    }
+
+    // get total ammo / number of magazines and display it along with the gun name
+    QString magCountText{currentKit.getSlot1MagCount()};
+    double magCountNumber{magCountText.toDouble()};
+    double magCapNumber{gun->getMagCap().toDouble()};
+    double totalRoundsNumber{magCountNumber * magCapNumber};
+    QString totalRoundsText{QString::number(totalRoundsNumber)};
+    ui->leName1->setText(gun->getName() + "   " + totalRoundsText + "/" + magCountText);
+
+    ui->leMagCap1->setText(gun->getMagCap());
+    ui->leMaxRange1->setText(gun->getMaxRange() + " m");
+    ui->leVelocity1->setText(gun->getMuzzleVelocity() + " m/s");
+    ui->leRecoil1->setText(gun->getRecoil());
+    ui->leAccuracy1->setText(gun->getMaxAccuracy());
+    ui->leStabilization1->setText(gun->getStabilizationTime() + " s");
+    QString weaponType{gun->getWeaponType()};
+    QString weaponTypeText{"Unspecified Type"};
+    if (weaponType == "0")
+        weaponTypeText = "Pistol";
+    else if (weaponType == "1")
+        weaponTypeText = "Rifle";
+    else if (weaponType == "2")
+        weaponTypeText = "Sniper Rifle";
+    else if (weaponType == "3")
+        weaponTypeText = "Bolt Action";
+    else if (weaponType == "4")
+        weaponTypeText = "Grenade Launcher";
+    else if (weaponType == "5")
+        weaponTypeText = "Rocket Launcher";
+    else if (weaponType == "6")
+        weaponTypeText = "Shotgun";
+    ui->leWeaponType1->setText(weaponTypeText);
+    if (gun->getSilenced() == "1")
+    {
+        ui->leSilenced1->setText("Yes");
+    }
+    else
+    {
+        ui->leSilenced1->setText("No");
+    }
+    ui->leMaxZoom1->setText(gun->getMaxZoom() + "x");
+    QString fireModesForBox{""};
+    for (auto &element : gun->getFireModes())
+    {
+        fireModesForBox += element.rpm;
+        fireModesForBox += " rpm ";
+        if (element.mode == "Full Auto")
+        {
+            //fireModesForBox += " ";
+            fireModesForBox += "Full Auto";
+        }
+        else if (element.mode == "1")
+        {
+            //fireModesForBox += " ";
+            fireModesForBox += "Single Shot";
+        }
+        else
+        {
+            fireModesForBox += element.mode;
+            fireModesForBox += " Round Burst";
+        }
+        fireModesForBox += '\n';
+    }
+    ui->pteFireModes1->setPlainText(fireModesForBox);
+
+    // second item is also a gun
+    if (currentKit.getKitType() == Kit::kitType::TWOGUNS)
+    {
+        const Gun *gun2{nullptr};
+        for (const auto &element : guns)
+        {
+            if (QString::compare(currentKit.getSlot2FileName(), element.getFileName(), Qt::CaseInsensitive) == 0)
+            {
+                gun2 = &element;
+            }
+        }
+
+        if (!gun2)
+        {
+            QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find second item of selected kit.");
+            msgBox.exec();
+            //QCoreApplication::exit(-1);
+            exit(EXIT_FAILURE);
+
+        }
+
+        // get total ammo / number of magazines and display it along with the gun name
+        magCountText = currentKit.getSlot2MagCount();
+        magCountNumber = magCountText.toDouble();
+        magCapNumber = gun2->getMagCap().toDouble();
+        totalRoundsNumber = magCountNumber * magCapNumber;
+        totalRoundsText = QString::number(totalRoundsNumber);
+        ui->leName2->setText(gun2->getName() + "   " + totalRoundsText + "/" + magCountText);
+
+        ui->leMagCap2->setText(gun2->getMagCap());
+        ui->leMaxRange2->setText(gun2->getMaxRange() + " m");
+        ui->leVelocity2->setText(gun2->getMuzzleVelocity() + " m/s");
+        ui->leRecoil2->setText(gun2->getRecoil());
+        ui->leAccuracy2->setText(gun2->getMaxAccuracy());
+        ui->leStabilization2->setText(gun2->getStabilizationTime() + " s");
+        weaponType = gun2->getWeaponType();
+        weaponTypeText = "Unspecified Type";
+        if (weaponType == "0")
+            weaponTypeText = "Pistol";
+        else if (weaponType == "1")
+            weaponTypeText = "Rifle";
+        else if (weaponType == "2")
+            weaponTypeText = "Sniper Rifle";
+        else if (weaponType == "3")
+            weaponTypeText = "Bolt Action";
+        else if (weaponType == "4")
+            weaponTypeText = "Grenade Launcher";
+        else if (weaponType == "5")
+            weaponTypeText = "Rocket Launcher";
+        else if (weaponType == "6")
+            weaponTypeText = "Shotgun";
+        ui->leWeaponType2->setText(weaponTypeText);
+        if (gun2->getSilenced() == "1")
+        {
+            ui->leSilenced2->setText("Yes");
+        }
+        else
+        {
+            ui->leSilenced2->setText("No");
+        }
+        ui->leMaxZoom2->setText(gun2->getMaxZoom() + "x");
+        fireModesForBox = "";
+        for (auto &element : gun2->getFireModes())
+        {
+            fireModesForBox += element.rpm;
+            fireModesForBox += " rpm ";
+            if (element.mode == "Full Auto")
+            {
+                fireModesForBox += "Full Auto";
+            }
+            else if (element.mode == "1")
+            {
+                fireModesForBox += "Single Shot";
+            }
+            else
+            {
+                fireModesForBox += element.mode;
+                fireModesForBox += " Round Burst";
+            }
+            fireModesForBox += '\n';
+        }
+        ui->pteFireModes2->setPlainText(fireModesForBox);
+    }
+
+    // second item is a projectile/throwable
+    if (currentKit.getKitType() == Kit::kitType::GUNANDTHROWABLE)
+    {
+        const Projectile *projectile{nullptr};
+        for (const auto &element : projectiles)
+        {
+            if (QString::compare(currentKit.getSlot2FileName(), element.getFileName(), Qt::CaseInsensitive) == 0)
+            {
+                projectile = &element;
+            }
+        }
+
+        if (!projectile)
+        {
+            QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find second item of selected kit.");
+            msgBox.exec();
+            //QCoreApplication::exit(-1);
+            exit(EXIT_FAILURE);
+        }
+
+        // get quantity of this thowable and display it along with the throwable's name
+        QString itemCount{currentKit.getSlot2ItemCount()};
+        ui->leName2->setText(projectile->getName() + "  x" + itemCount);
+    }
+
+    // second item is an item/handheld
+    if (currentKit.getKitType() == Kit::kitType::GUNANDHANDHELD)
+    {
+        const Item *item{nullptr};
+        for (const auto &element : items)
+        {
+            if (QString::compare(currentKit.getSlot2FileName(), element.getFileName(), Qt::CaseInsensitive) == 0)
+            {
+                item = &element;
+            }
+        }
+
+        if (!item)
+        {
+            QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find second item of selected kit.");
+            msgBox.exec();
+            //QCoreApplication::exit(-1);
+            exit(EXIT_FAILURE);
+        }
+
+        // get quantity of this handheld and display it along with the handheld's name
+        QString itemCount{currentKit.getSlot2ItemCount()};
+        ui->leName2->setText(item->getName() + "  x" + itemCount);
+    }
+
+    // no second item - extra ammo for first item
+    if (currentKit.getKitType() == Kit::kitType::GUNANDAMMO)
+    {
+        // remove extra ammo from item1's count
+        double extraAmmoNumber{currentKit.getExtraAmmo().toDouble()};
+        magCountNumber -= extraAmmoNumber;
+        magCountText = QString::number(magCountNumber);
+        totalRoundsNumber = magCountNumber * magCapNumber;
+        totalRoundsText = QString::number(totalRoundsNumber);
+        ui->leName1->setText(gun->getName() + "   " + totalRoundsText + "/" + magCountText);
+
+        // get total ammo / number of magazines and display it next to extra ammo's name
+        totalRoundsNumber = extraAmmoNumber * magCapNumber;
+        totalRoundsText = QString::number(totalRoundsNumber);
+        ui->leName2->setText(strings.getString("WPN_EXTRAAMMO") + "   " + totalRoundsText + "/" + currentKit.getExtraAmmo());
+    }
 }

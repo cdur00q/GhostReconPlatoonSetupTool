@@ -11,6 +11,7 @@ Actor::Actor(QString fileName, std::ifstream &actorFile)
     : m_fileName(fileName)
 {
     getGameData(m_nameTag, m_name, actorFile);
+    getGameData(m_classNameTag, m_className, actorFile);
     getGameData(m_kitPathTag, m_kitPath, actorFile);
     getGameData(m_weaponStatTag, m_weaponStat, actorFile);
     getGameData(m_staminaStatTag, m_staminaStat, actorFile);
@@ -78,6 +79,25 @@ fileReadResult Actor::getGameData(QString targetTag, QString &valueToFill, std::
 
 }
 
+QString Actor::getFirstInitialLastName() const
+{
+    QString condensedName{""};
+    condensedName += m_name[0]; // first take the first initial
+    condensedName += "."; // add period
+    for (int i{0}; i < m_name.size(); ++i)
+    {
+        if (m_name[i] == ' ') // found space before last name
+        {
+            for (int j{i}; j < m_name.size(); ++j)
+            {
+                condensedName += m_name[j]; // read in last name
+            }
+            i = m_name.size(); // we're done, end the outer loop
+        }
+    }
+    return condensedName;
+}
+
 bool operator== (const Actor &actor1, const Actor &actor2)
 {
     return (actor1.m_fileName == actor2.m_fileName);
@@ -86,4 +106,32 @@ bool operator== (const Actor &actor1, const Actor &actor2)
 bool operator!= (const Actor &actor1, const Actor &actor2)
 {
     return !(actor1 == actor2);
+}
+
+Actor& Actor::operator= (const Actor &actor)
+{
+    if (this == &actor)
+    {
+        return *this;
+    }
+    m_fileName = actor.m_fileName;
+    m_name = actor.m_name;
+    m_className = actor.m_className;
+    m_kitPath = actor.m_kitPath;
+    m_weaponStat = actor.m_weaponStat;
+    m_staminaStat = actor.m_staminaStat;
+    m_stealthStat = actor.m_stealthStat;
+    m_leadershipStat = actor.m_leadershipStat;
+    return *this;
+}
+
+void Actor::print() const
+{
+    QTextStream(stdout) << m_fileName <<
+    " " << m_name <<
+    " " << m_className <<
+    " Weap: " << m_weaponStat <<
+    " Stma: " << m_staminaStat <<
+    " Stlh: " << m_stealthStat <<
+    " Ldsp: " << m_leadershipStat << '\n';
 }
