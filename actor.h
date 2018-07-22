@@ -11,6 +11,8 @@ private:
     QString m_fileName{"Default file name"};
     const QString m_nameTag{"<ActorName>"};
     QString m_name{"Default name"};
+    const QString m_classNameTag{"<ClassName>"};
+    QString m_className{"Default class name"};
     const QString m_kitPathTag{"<KitPath>"};
     QString m_kitPath{"rifleman"};
     const QString m_weaponStatTag{"<Weapon>"};
@@ -31,21 +33,17 @@ public:
     {
     }
 
+    QString getFileName() const {return m_fileName;}
     QString getName() const {return m_name;}
+    QString getClassName() const {return m_className;}
+    QString getFirstInitialLastName() const;
 
     friend bool operator== (const Actor &actor1, const Actor &actor2);
     friend bool operator!= (const Actor &actor1, const Actor &actor2);
 
-    void print() const
-    {
-        QTextStream(stdout) << m_fileName <<
-        " " << m_name <<
-        " " << m_kitPath <<
-        " Weap: " << m_weaponStat <<
-        " Stma: " << m_staminaStat <<
-        " Stlh: " << m_stealthStat <<
-        " Ldsp: " << m_leadershipStat << '\n';
-    }
+    Actor& operator= (const Actor &actor);
+
+    void print() const;
 };
 
 #endif // ACTOR_H
