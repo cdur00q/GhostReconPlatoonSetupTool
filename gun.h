@@ -64,6 +64,8 @@ public:
     QString getMaxZoom() const {return m_maxZoom;}
     std::vector<FireMode> getFireModes() const {return m_fireModes;}
 
+    Gun& operator= (const Gun &gun);
+
     void print() const;
 };
 

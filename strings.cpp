@@ -5,7 +5,6 @@
 #include <QString>
 #include <QMessageBox>
 #include <utility> // for std::make_pair
-#include <QTextStream> // for printing to console
 
 Strings::Strings()
 {
@@ -25,7 +24,6 @@ Strings::stringFileReadResult Strings::readFromFile(std::ifstream &stringsFile)
     {
         QString key{""};
         QString value{""};
-        //QString curString{""};
         char curChar;
         stringsFile.seekg(0);
         while (stringsFile)
@@ -35,7 +33,6 @@ Strings::stringFileReadResult Strings::readFromFile(std::ifstream &stringsFile)
             if (curChar == '"')
             {
                 stringsFile.get(curChar);
-                //key += curChar;
                 // read until the next quotation mark
                 while (curChar != '"')
                 {
@@ -52,7 +49,6 @@ Strings::stringFileReadResult Strings::readFromFile(std::ifstream &stringsFile)
                 if (curChar == '"')
                 {
                     stringsFile.get(curChar);
-                    //key += curChar;
                     // read until the next quotation mark
                     while (curChar != '"')
                     {

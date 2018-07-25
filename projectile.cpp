@@ -75,6 +75,18 @@ fileReadResult Projectile::getGameData(QString targetTag, QString &valueToFill, 
 
 }
 
+Projectile& Projectile::operator= (const Projectile &projectile)
+{
+    if (this == &projectile)
+    {
+        return *this;
+    }
+    m_fileName = projectile.m_fileName;
+    m_nameToken = projectile.m_nameToken;
+    m_name = projectile.m_name;
+    return *this;
+}
+
 void Projectile::print() const
 {
     QTextStream(stdout) << m_fileName <<

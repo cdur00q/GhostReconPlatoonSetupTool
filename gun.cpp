@@ -265,6 +265,28 @@ fileReadResult Gun::getMaxZoom(QString &valueToFill, std::ifstream &gunFile, int
     return fileReadResult::FILESTREAMERROR;
 }
 
+Gun& Gun::operator= (const Gun &gun)
+{
+    if (this == &gun)
+    {
+        return *this;
+    }
+    m_fileName = gun.m_fileName;
+    m_nameToken = gun.m_nameToken;
+    m_name = gun.m_name;
+    m_magCap = gun.m_magCap;
+    m_maxRange = gun.m_maxRange;
+    m_muzzleVelocity = gun.m_muzzleVelocity;
+    m_recoil = gun.m_recoil;
+    m_maxAccuracy = gun.m_maxAccuracy;
+    m_stabilizationTime = gun.m_stabilizationTime;
+    m_weaponType = gun.m_weaponType;
+    m_silenced = gun.m_silenced;
+    m_fireModes = gun.m_fireModes;
+    m_maxZoom = gun.m_maxZoom;
+    return *this;
+}
+
 void Gun::print() const
 {
     QString weaponType{"unspecified type"};
