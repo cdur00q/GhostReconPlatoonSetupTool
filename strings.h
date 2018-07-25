@@ -4,7 +4,6 @@
 #include "variables.h"
 #include <QString>
 #include <map>
-#include <QTextStream> // for printing to console
 
 
 class Strings

@@ -10,6 +10,10 @@
 #include "variables.h"
 #include "functions.h"
 #include "actor.h"
+#include "strings.h"
+#include "gun.h"
+#include "projectile.h"
+#include "item.h"
 
 namespace fs = std::experimental::filesystem;
 
@@ -78,6 +82,93 @@ void readInActors(const std::string &directoryPath, std::vector<Actor> &actors)
     }
 }
 
+// read in guns
+void readInGuns(const std::string &directoryPath, std::vector<Gun> &guns, const Strings &strings)
+{
+    const QString gunExtension{".gun"};
+    std::ifstream currentFile;
+    for (const auto &element : fs::directory_iterator(directoryPath))
+    {
+        currentFile.open(element.path());
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        if (QString::compare(getFileExtension(curFileName), gunExtension, Qt::CaseInsensitive) == 0)  // check this is a gun file
+        {
+            bool replacedGun{false};
+            for (auto &element2 : guns)
+            {
+                if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found a gun in the vector with same filename as this one, replace it with this new one
+                {
+                    element2 = Gun(curFileName, currentFile, strings);
+                    replacedGun = true;
+                }
+            }
+            if (!replacedGun) // didn't find a gun in the vector with this name already so add in this new gun
+            {
+                guns.push_back(Gun(curFileName, currentFile, strings));
+            }
+        }
+        currentFile.close();
+    }
+}
+
+// read in projectiles
+void readInProjectiles(const std::string &directoryPath, std::vector<Projectile> &projectiles, const Strings &strings)
+{
+    const QString projectileExtension{".prj"};
+    std::ifstream currentFile;
+    for (const auto &element : fs::directory_iterator(directoryPath))
+    {
+        currentFile.open(element.path());
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        if (QString::compare(getFileExtension(curFileName), projectileExtension, Qt::CaseInsensitive) == 0)  // check this is a projectile file
+        {
+            bool replacedProjectile{false};
+            for (auto &element2 : projectiles)
+            {
+                if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found a projectile in the vector with same filename as this one, replace it with this new one
+                {
+                    element2 = Projectile(curFileName, currentFile, strings);
+                    replacedProjectile = true;
+                }
+            }
+            if (!replacedProjectile) // didn't find a projectile in the vector with this name already so add in this new projectile
+            {
+                projectiles.push_back(Projectile(curFileName, currentFile, strings));
+            }
+        }
+        currentFile.close();
+    }
+}
+
+// read in items
+void readInItems(const std::string &directoryPath, std::vector<Item> &items, const Strings &strings)
+{
+    const QString itemExtension{".itm"};
+    std::ifstream currentFile;
+    for (const auto &element : fs::directory_iterator(directoryPath))
+    {
+        currentFile.open(element.path());
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        if (QString::compare(getFileExtension(curFileName), itemExtension, Qt::CaseInsensitive) == 0)  // check this is an item file
+        {
+            bool replacedItem{false};
+            for (auto &element2 : items)
+            {
+                if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found an item in the vector with same filename as this one, replace it with this new one
+                {
+                    element2 = Item(curFileName, currentFile, strings);
+                    replacedItem = true;
+                }
+            }
+            if (!replacedItem) // didn't find an item in the vector with this name already so add in this new item
+            {
+                items.push_back(Item(curFileName, currentFile, strings));
+            }
+        }
+        currentFile.close();
+    }
+}
+
 // randomly chooses actors from one vector and places them into another
 // vector if that actor isn't already in there.
 // loops until it can find an actor from the source that isn't in the destination
@@ -90,7 +181,6 @@ void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Act
     {
         actorAlreadyPresent = false;
         actorPtr = &source[getRandomNumber(0, source.size() - 1)];
-        QTextStream(stdout) << getRandomNumber(0, source.size() - 1) << endl;
         for (auto &element : destination)
         {
             if (element == *actorPtr)

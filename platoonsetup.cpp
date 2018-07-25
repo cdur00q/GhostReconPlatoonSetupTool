@@ -45,34 +45,6 @@ void printActorVector(const std::vector<Actor*> &vec)
     }
 }
 
-/*
-// takes a QString and returns the file extension
-QString getFileExtension(const QString &fileName)
-{
-    // starting at the end of the string, check each character
-    for (int i{fileName.size() - 1}; i > 0; --i)
-    {
-        // found period closest to end, now read and return extension
-        if (fileName[i] == '.')
-        {
-            QString extension{""};
-            for (int j{i}; j < fileName.size(); ++j)
-            {
-                extension += fileName[j];
-            }
-            return extension;
-        }
-    }
-    // no extension found
-    QString errorMessage{"Error in getFileExtension().  No extension could be found for filename: "};
-    errorMessage += fileName;
-    QMessageBox msgBox(QMessageBox::Critical, "Error", errorMessage);
-    msgBox.exec();
-    return "error";
-}
-*/
-
-
 PlatoonSetup::PlatoonSetup(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::PlatoonSetup)
@@ -106,21 +78,11 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     ui->leSilenced2->setReadOnly(true);
     ui->pteFireModes2->setReadOnly(true);
     ui->pteFireModes2->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
-    // model / view test
-    /*
-    QFileSystemModel *model = new QFileSystemModel;
-    model->setRootPath("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman");
-    ui->listView->setModel(model);
-    ui->listView->setRootIndex(model->index("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman"));
-    */
 
     //QTextStream(stdout) << "string to print" << endl;
-
-
-
     //fs::path b(a->path());
 
-    actors.reserve(76); // 76 rifleman, mods could have less or more?
+    actors.reserve(76); // do this for all the vectors that store actors in the program?
 
     std::ifstream currentFile;
     /*
@@ -130,17 +92,6 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     */
 
     //fs::directory_iterator dirIt ("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman");
-
-    /*
-    // read in actors
-    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman"))
-    {
-        currentFile.open(element.path());
-        QString curFileName{QString::fromStdWString(element.path().filename())};
-        actors.push_back(Actor(curFileName, currentFile));
-        currentFile.close();
-    }
-    */
 
     // read in all actors
     readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman", rifleman);
@@ -168,8 +119,6 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     strings.readFromFile(currentFile);
     currentFile.close();
 
-    //QString temp = strings.getString("ITM_BOMB2");
-    //QTextStream(stdout) << temp << endl;
     // print strings
     /*
     for (const auto &element : strings)
@@ -179,6 +128,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     */
 
     // read in guns
+    /*
     QString gunExtension{".gun"};
     for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip"))
     {
@@ -191,6 +141,8 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         }
         currentFile.close();
     }
+    */
+    readInGuns("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip", guns, strings);
 
     // print guns
     for (const auto &element : guns)
@@ -199,6 +151,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // read in projectiles
+    /*
     QString projectileExtension{".prj"};
     for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip"))
     {
@@ -210,6 +163,8 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         }
         currentFile.close();
     }
+    */
+    readInProjectiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip", projectiles, strings);
 
     // print projectiles
     for (const auto &element : projectiles)
@@ -218,6 +173,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // read in items
+    /*
     QString itemExtension{".itm"};
     for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip"))
     {
@@ -229,6 +185,8 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         }
         currentFile.close();
     }
+    */
+    readInItems("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip", items, strings);
 
     // print items
     for (const auto &element : items)
