@@ -207,6 +207,23 @@ QString Kit::getSlot2FileName() const
     }
 }
 
+Kit& Kit::operator= (const Kit &kit)
+{
+    if (this == &kit)
+    {
+        return *this;
+    }
+    m_fileName = kit.m_fileName;
+    m_slot1ItemFileName = kit.m_slot1ItemFileName;
+    m_slot2ItemFileName = kit.m_slot2ItemFileName;
+    m_slot1MagCount = kit.m_slot1MagCount;
+    m_slot2MagCount = kit.m_slot2MagCount;
+    m_slot2ItemCount = kit.m_slot2ItemCount;
+    m_extraAmmo = kit.m_extraAmmo;
+    m_type = kit.m_type;
+    return *this;
+}
+
 void Kit::print() const
 {
     QTextStream(stdout) << m_fileName <<

@@ -37,6 +37,7 @@ public:
     QString getName() const {return m_name;}
     QString getClassName() const {return m_className;}
     QString getFirstInitialLastName() const;
+    QString getKitPath() const {return m_kitPath;}
 
     friend bool operator== (const Actor &actor1, const Actor &actor2);
     friend bool operator!= (const Actor &actor1, const Actor &actor2);
