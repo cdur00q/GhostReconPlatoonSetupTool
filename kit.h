@@ -46,12 +46,15 @@ public:
     }
 
     kitType getKitType() const {return m_type;}
+    QString getFileName() const {return m_fileName;}
     QString getSlot1FileName() const {return m_slot1ItemFileName;}
     QString getSlot2FileName() const;
     QString getSlot1MagCount() const {return m_slot1MagCount;}
     QString getSlot2MagCount() const {return m_slot2MagCount;}
     QString getSlot2ItemCount() const {return m_slot2ItemCount;}
     QString getExtraAmmo() const {return m_extraAmmo;}
+
+    Kit& operator= (const Kit &kit);
 
     void print() const;
 };

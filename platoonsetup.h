@@ -9,6 +9,7 @@
 #include "variables.h"
 #include "functions.h"
 #include "actor.h"
+#include "kit.h"
 
 namespace Ui {
 class PlatoonSetup;
@@ -59,7 +60,11 @@ private:
 
     void updateUnassignButton();
 
-    void updateSelectedKitInfo();
+    std::vector<Kit>& getSelectedActorsKits();
+
+    void buildKitPool(const std::vector<Kit> &kits);
+
+    void updateSelectedKitInfo(const std::vector<Kit> &kits);
 };
 
 #endif // PLATOONSETUP_H

@@ -30,6 +30,10 @@ static std::vector<Actor*> bravo;
 static std::vector<Actor*> charlie;
 static uiLists lastSelection{uiLists::NONE};
 static std::vector<Kit> kits;
+static std::vector<Kit> riflemanKits;
+static std::vector<Kit> heavyWeaponsKits;
+static std::vector<Kit> sniperKits;
+static std::vector<Kit> demolitionsKits;
 static std::vector<Gun> guns;
 static std::vector<Projectile> projectiles;
 static std::vector<Item> items;
@@ -80,32 +84,22 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     ui->pteFireModes2->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
 
     //QTextStream(stdout) << "string to print" << endl;
-    //fs::path b(a->path());
 
     actors.reserve(76); // do this for all the vectors that store actors in the program?
 
     std::ifstream currentFile;
-    /*
-    currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman\\rifleman-01.atr");
-    actor actor1(currentFile);
-    actor1.print();
-    */
-
-    //fs::directory_iterator dirIt ("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman");
 
     // read in all actors
-    readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman", rifleman);
-    readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\heavy-weapons", heavyWeapons);
-    readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\sniper", sniper);
-    readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\demolitions", demolitions);
-    //readInActors("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\TestMod1\\Actor\\rifleman", actors);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman", actorExtension, rifleman);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\heavy-weapons", actorExtension, heavyWeapons);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\sniper", actorExtension, sniper);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\demolitions", actorExtension, demolitions);
 
     // randomly choose nine actors of each class and put them into the actors pool
-    for (int i{0}; i < 9; ++i) { assignRandomActorToVector(rifleman, actors); }
-    for (int i{0}; i < 9; ++i) { assignRandomActorToVector(heavyWeapons, actors); }
-    for (int i{0}; i < 9; ++i) { assignRandomActorToVector(sniper, actors); }
-    for (int i{0}; i < 9; ++i) { assignRandomActorToVector(demolitions, actors); }
-
+    if (rifleman.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(rifleman, actors); }
+    if (heavyWeapons.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(heavyWeapons, actors); }
+    if (sniper.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(sniper, actors); }
+    if (demolitions.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(demolitions, actors); }
 
     // build solider pool from actors
     for (const auto &element : actors)
@@ -128,21 +122,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     */
 
     // read in guns
-    /*
-    QString gunExtension{".gun"};
-    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip"))
-    {
-        currentFile.open(element.path());
-        QString curFileName{QString::fromStdWString(element.path().filename())};
-        //getFileExtension(curFileName);
-        if (QString::compare(getFileExtension(curFileName), gunExtension, Qt::CaseInsensitive) == 0)
-        {
-            guns.push_back(Gun(curFileName, currentFile, strings));
-        }
-        currentFile.close();
-    }
-    */
-    readInGuns("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip", guns, strings);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip", gunExtension, guns, strings);
 
     // print guns
     for (const auto &element : guns)
@@ -151,20 +131,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // read in projectiles
-    /*
-    QString projectileExtension{".prj"};
-    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip"))
-    {
-        currentFile.open(element.path());
-        QString curFileName{QString::fromStdWString(element.path().filename())};
-        if (QString::compare(getFileExtension(curFileName), projectileExtension, Qt::CaseInsensitive) == 0)
-        {
-            projectiles.push_back(Projectile(curFileName, currentFile, strings));
-        }
-        currentFile.close();
-    }
-    */
-    readInProjectiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip", projectiles, strings);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip", projectileExtension, projectiles, strings);
 
     // print projectiles
     for (const auto &element : projectiles)
@@ -173,20 +140,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // read in items
-    /*
-    QString itemExtension{".itm"};
-    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip"))
-    {
-        currentFile.open(element.path());
-        QString curFileName{QString::fromStdWString(element.path().filename())};
-        if (QString::compare(getFileExtension(curFileName), itemExtension, Qt::CaseInsensitive) == 0)
-        {
-            items.push_back(Item(curFileName, currentFile, strings));
-        }
-        currentFile.close();
-    }
-    */
-    readInItems("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip", items, strings);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Equip", itemExtension, items, strings);
 
     // print items
     for (const auto &element : items)
@@ -195,15 +149,12 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // read in kits
-    //dirIt = "C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman";
-    for (const auto &element : fs::directory_iterator("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman"))
-    {
-        currentFile.open(element.path());
-        QString curFileName{QString::fromStdWString(element.path().filename())};
-        kits.push_back(Kit(curFileName, currentFile));
-        currentFile.close();
-    }
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman", kitExtension, riflemanKits);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\heavy-weapons", kitExtension, heavyWeaponsKits);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\sniper", kitExtension, sniperKits);
+    readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\demolitions", kitExtension, demolitionsKits);
 
+    /*
     // build kit pool from kits
     QString item1{""};
     QString item2{""};
@@ -270,6 +221,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         item1 += item2; // add item2 to item1 to create the final label for the list widget
         new QListWidgetItem(item1, ui->lwKits);
     }
+    */
 
     /*
     std::string fileName{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman\\rifleman-01.atr"};
@@ -336,6 +288,8 @@ void PlatoonSetup::on_lwSoldierPool_itemClicked()
     updateTeamButton(bravo, ui->pbBravo);
     updateTeamButton(charlie, ui->pbCharlie);
     updateUnassignButton();
+
+    buildKitPool(getSelectedActorsKits());
 }
 
 void PlatoonSetup::on_lwAlpha_itemClicked()
@@ -387,7 +341,7 @@ void PlatoonSetup::on_lwKits_itemClicked()
     QString kitNumber{QString::number(ui->lwKits->currentRow() + 1)};
     ui->leKitName->setText(kitNumber);
 
-    updateSelectedKitInfo();
+    updateSelectedKitInfo(getSelectedActorsKits());
 }
 
 void PlatoonSetup::on_pbKitLeft_clicked()
@@ -405,7 +359,7 @@ void PlatoonSetup::on_pbKitLeft_clicked()
         nextRow = curRow - 1;
     }
     ui->lwKits->setCurrentRow(nextRow);
-    updateSelectedKitInfo();
+    updateSelectedKitInfo(getSelectedActorsKits());
 }
 
 void PlatoonSetup::on_pbKitRight_clicked()
@@ -423,7 +377,7 @@ void PlatoonSetup::on_pbKitRight_clicked()
         nextRow = curRow + 1;
     }
     ui->lwKits->setCurrentRow(nextRow);
-    updateSelectedKitInfo();
+    updateSelectedKitInfo(getSelectedActorsKits());
 }
 
 // sync a selection from the soldier pool with the specified fireteam
@@ -710,8 +664,117 @@ void PlatoonSetup::updateUnassignButton()
         ui->pbUnassign->setEnabled(false);
 }
 
+// returns a reference to the appropriate kit vector of the selected actor
+std::vector<Kit>& PlatoonSetup::getSelectedActorsKits()
+{
+    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
+    if (selectedActor.getKitPath() == "rifleman")
+    {
+        return riflemanKits;
+    }
+    else if (selectedActor.getKitPath() == "heavy-weapons")
+    {
+        return heavyWeaponsKits;
+    }
+    else if (selectedActor.getKitPath() == "sniper")
+    {
+        return sniperKits;
+    }
+    else if (selectedActor.getKitPath() == "demolitions")
+    {
+        return demolitionsKits;
+    }
+    else
+    {
+        QString errorMsg{"Error in getSelectedActorsKitPath().  Unrecognized kit path: '"};
+        errorMsg += selectedActor.getKitPath();
+        errorMsg += "' for actor: ";
+        errorMsg += selectedActor.getFirstInitialLastName();
+        errorMsg += " filename: ";
+        errorMsg += selectedActor.getFileName();
+        QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+        msgBox.exec();
+        exit(EXIT_FAILURE);
+    }
+}
+
+// build kit pool from kits
+void PlatoonSetup::buildKitPool(const std::vector<Kit> &kits)
+{
+    // first delete all current entries in the kit pool
+    while (ui->lwKits->count() > 0)
+    {
+        delete ui->lwKits->takeItem(0);
+    }
+    QString item1{""};
+    QString item2{""};
+    for (const auto &element : kits)
+    {
+
+        // the first item in a kit is always a gun
+        item1 = element.getSlot1FileName();
+        for (const auto &element2 : guns)
+        {
+            if (QString::compare(item1, element2.getFileName(), Qt::CaseInsensitive) == 0)
+            {
+                item1 = element2.getName();
+            }
+        }
+        // second item is also a gun
+        if (element.getKitType() == element.kitType::TWOGUNS)
+        {
+            item2 = element.getSlot2FileName();
+            for (const auto &element2 : guns)
+            {
+                if (QString::compare(item2, element2.getFileName(), Qt::CaseInsensitive) == 0)
+                {
+                    item2 = element2.getName();
+                }
+            }
+        }
+        // second item is a projectile/throwable
+        else if (element.getKitType() == element.kitType::GUNANDTHROWABLE)
+        {
+            item2 = element.getSlot2FileName();
+            for (const auto &element2 : projectiles)
+            {
+                if (QString::compare(item2, element2.getFileName(), Qt::CaseInsensitive) == 0)
+                {
+                    item2 = element2.getName();
+                }
+            }
+        }
+        // second item is an item/handheld
+        else if (element.getKitType() == element.kitType::GUNANDHANDHELD)
+        {
+            item2 = element.getSlot2FileName();
+            for (const auto &element2 : items)
+            {
+                if (QString::compare(item2, element2.getFileName(), Qt::CaseInsensitive) == 0)
+                {
+                    item2 = element2.getName();
+                }
+            }
+        }
+        // no second item - extra ammo for slot1's gun
+        else if (element.getKitType() == element.kitType::GUNANDAMMO)
+        {
+            item2 = strings.getString("WPN_EXTRAAMMO");
+        }
+        // nothing else matched - must be an error
+        else
+        {
+            item2 = "error resolving item2 while building kit list";
+        }
+        //QString label{item1 + " + " item2};
+        item1 += " + ";
+        item1 += item2; // add item2 to item1 to create the final label for the list widget
+        new QListWidgetItem(item1, ui->lwKits);
+    }
+}
+
 // updates all the kit detail boxs (mag cap, range, etc) to the currently selected kit when called
-void PlatoonSetup::updateSelectedKitInfo()
+void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
 {
     // first clear all the boxes of any info
     ui->leName1->clear();
