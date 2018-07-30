@@ -7,6 +7,8 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
+#include <map>
+#include <utility> // for std::make_pair
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
@@ -38,6 +40,7 @@ static std::vector<Gun> guns;
 static std::vector<Projectile> projectiles;
 static std::vector<Item> items;
 static Strings strings;
+static std::map<QString, int> assignedKitMap;
 
 // for debugging
 void printActorVector(const std::vector<Actor*> &vec)
@@ -57,6 +60,8 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     PlatoonSetup::grabKeyboard(); // send all keboard input to the main window to prevent messing up the selection logic of the fireteam/soldier pool boxes
 
     // set all line edit boxes and plain text boxes to read only
+    ui->leKitName->setReadOnly(true);
+
     ui->leName1->setReadOnly(true);
     ui->leWeaponType1->setReadOnly(true);
     ui->leMagCap1->setReadOnly(true);
@@ -105,7 +110,14 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     for (const auto &element : actors)
     {
         //element.print();
-        new QListWidgetItem(element.getFirstInitialLastName() + "       " + element.getClassName().toUpper(), ui->lwSoldierPool);
+        if (element.getClassName() == "demolitions")
+        {
+            new QListWidgetItem(element.getFirstInitialLastName() + "       " + "DEMO", ui->lwSoldierPool);
+        }
+        else
+        {
+            new QListWidgetItem(element.getFirstInitialLastName() + "       " + element.getClassName().toUpper(), ui->lwSoldierPool);
+        }
     }
 
     // read in strings
@@ -154,83 +166,38 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\sniper", kitExtension, sniperKits);
     readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\demolitions", kitExtension, demolitionsKits);
 
-    /*
-    // build kit pool from kits
-    QString item1{""};
-    QString item2{""};
-    for (const auto &element : kits)
+    // assign default kits to actors
+    for (auto &element : actors)
     {
-
-        // the first item in a kit is always a gun
-        item1 = element.getSlot1FileName();
-        for (const auto &element2 : guns)
+        if (element.getKitPath() == "rifleman")
         {
-            if (QString::compare(item1, element2.getFileName(), Qt::CaseInsensitive) == 0)
-            {
-                item1 = element2.getName();
-            }
+            assignedKitMap.insert(std::make_pair(element.getFileName(), 0));
         }
-        // second item is also a gun
-        if (element.getKitType() == element.kitType::TWOGUNS)
+        else if (element.getKitPath() == "heavy-weapons")
         {
-            item2 = element.getSlot2FileName();
-            for (const auto &element2 : guns)
-            {
-                if (QString::compare(item2, element2.getFileName(), Qt::CaseInsensitive) == 0)
-                {
-                    item2 = element2.getName();
-                }
-            }
+            assignedKitMap.insert(std::make_pair(element.getFileName(), 0));
         }
-        // second item is a projectile/throwable
-        else if (element.getKitType() == element.kitType::GUNANDTHROWABLE)
+        else if (element.getKitPath() == "sniper")
         {
-            item2 = element.getSlot2FileName();
-            for (const auto &element2 : projectiles)
-            {
-                if (QString::compare(item2, element2.getFileName(), Qt::CaseInsensitive) == 0)
-                {
-                    item2 = element2.getName();
-                }
-            }
+            assignedKitMap.insert(std::make_pair(element.getFileName(), 0));
         }
-        // second item is an item/handheld
-        else if (element.getKitType() == element.kitType::GUNANDHANDHELD)
+        else if (element.getKitPath() == "demolitions")
         {
-            item2 = element.getSlot2FileName();
-            for (const auto &element2 : items)
-            {
-                if (QString::compare(item2, element2.getFileName(), Qt::CaseInsensitive) == 0)
-                {
-                    item2 = element2.getName();
-                }
-            }
+            assignedKitMap.insert(std::make_pair(element.getFileName(), 0));
         }
-        // no second item - extra ammo for slot1's gun
-        else if (element.getKitType() == element.kitType::GUNANDAMMO)
-        {
-            item2 = strings.getString("WPN_EXTRAAMMO");
-        }
-        // nothing else matched - must be an error
         else
         {
-            item2 = "error resolving item2 while building kit list";
+            QString errorMsg{"Error while assigning default kits.  Unrecognized kit path: '"};
+            errorMsg += element.getKitPath();
+            errorMsg += "' for actor: ";
+            errorMsg += element.getFirstInitialLastName();
+            errorMsg += " filename: ";
+            errorMsg += element.getFileName();
+            QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+            msgBox.exec();
+            exit(EXIT_FAILURE);
         }
-        //QString label{item1 + " + " item2};
-        item1 += " + ";
-        item1 += item2; // add item2 to item1 to create the final label for the list widget
-        new QListWidgetItem(item1, ui->lwKits);
     }
-    */
-
-    /*
-    std::string fileName{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Actor\\rifleman\\rifleman-01.atr"};
-    std::ifstream actorFile(fileName);
-    if (actorFile.good())
-        QTextStream(stdout) << "good" << '\n';
-    else
-        QTextStream(stdout) << "bad" << '\n';
-    */
 
     // writing avatar file
     std::string coopAvatarPath{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Data\\Temp\\coop_avatar.toe"};
@@ -290,6 +257,9 @@ void PlatoonSetup::on_lwSoldierPool_itemClicked()
     updateUnassignButton();
 
     buildKitPool(getSelectedActorsKits());
+    selectActorsKit();
+    updateKitNameBox();
+    updateSelectedKitInfo(getSelectedActorsKits());
 }
 
 void PlatoonSetup::on_lwAlpha_itemClicked()
@@ -301,6 +271,11 @@ void PlatoonSetup::on_lwAlpha_itemClicked()
     updateUnassignButton();
     ui->lwBravo->clearSelection();
     ui->lwCharlie->clearSelection();
+
+    buildKitPool(getSelectedActorsKits());
+    selectActorsKit();
+    updateKitNameBox();
+    updateSelectedKitInfo(getSelectedActorsKits());
 }
 
 void PlatoonSetup::on_lwBravo_itemClicked()
@@ -312,6 +287,11 @@ void PlatoonSetup::on_lwBravo_itemClicked()
     updateUnassignButton();
     ui->lwAlpha->clearSelection();
     ui->lwCharlie->clearSelection();
+
+    buildKitPool(getSelectedActorsKits());
+    selectActorsKit();
+    updateKitNameBox();
+    updateSelectedKitInfo(getSelectedActorsKits());
 }
 
 void PlatoonSetup::on_lwCharlie_itemClicked()
@@ -323,6 +303,11 @@ void PlatoonSetup::on_lwCharlie_itemClicked()
     updateUnassignButton();
     ui->lwAlpha->clearSelection();
     ui->lwBravo->clearSelection();
+
+    buildKitPool(getSelectedActorsKits());
+    selectActorsKit();
+    updateKitNameBox();
+    updateSelectedKitInfo(getSelectedActorsKits());
 }
 
 void PlatoonSetup::on_pbUnassign_clicked()
@@ -338,46 +323,57 @@ void PlatoonSetup::on_pbUnassign_clicked()
 
 void PlatoonSetup::on_lwKits_itemClicked()
 {
-    QString kitNumber{QString::number(ui->lwKits->currentRow() + 1)};
-    ui->leKitName->setText(kitNumber);
-
+    updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
+    setActorsKit();
 }
 
 void PlatoonSetup::on_pbKitLeft_clicked()
 {
-    int curRow{ui->lwKits->currentRow()};
-    int nextRow{0};
-    // if this is the first kit select the last kit
-    if (curRow == 0)
-    {
-        nextRow = ui->lwKits->count() - 1;
+    // if there is at least one kit in the kit list
+    if (ui->lwKits->count() >= 1){
+        int curRow{ui->lwKits->currentRow()};
+        int nextRow{0};
+        // if this is the first kit select the last kit
+        if (curRow == 0)
+        {
+            nextRow = ui->lwKits->count() - 1;
+        }
+        // otherwise select the next kit to the left(minus)
+        else
+        {
+            nextRow = curRow - 1;
+        }
+        ui->lwKits->setCurrentRow(nextRow);
+
+        updateKitNameBox();
+        updateSelectedKitInfo(getSelectedActorsKits());
+        setActorsKit();
     }
-    // otherwise select the next kit to the left(minus)
-    else
-    {
-        nextRow = curRow - 1;
-    }
-    ui->lwKits->setCurrentRow(nextRow);
-    updateSelectedKitInfo(getSelectedActorsKits());
 }
 
 void PlatoonSetup::on_pbKitRight_clicked()
 {
-    int curRow{ui->lwKits->currentRow()};
-    int nextRow{0};
-    // if this is the last kit select the first kit
-    if (curRow == ui->lwKits->count() - 1)
-    {
-        nextRow = 0;
+    // if there is at least one kit in the kit list
+    if (ui->lwKits->count() >= 1){
+        int curRow{ui->lwKits->currentRow()};
+        int nextRow{0};
+        // if this is the last kit select the first kit
+        if (curRow == ui->lwKits->count() - 1)
+        {
+            nextRow = 0;
+        }
+        // otherwise select the next kit to the right(plus)
+        else
+        {
+            nextRow = curRow + 1;
+        }
+        ui->lwKits->setCurrentRow(nextRow);
+
+        updateKitNameBox();
+        updateSelectedKitInfo(getSelectedActorsKits());
+        setActorsKit();
     }
-    // otherwise select the next kit to the right(plus)
-    else
-    {
-        nextRow = curRow + 1;
-    }
-    ui->lwKits->setCurrentRow(nextRow);
-    updateSelectedKitInfo(getSelectedActorsKits());
 }
 
 // sync a selection from the soldier pool with the specified fireteam
@@ -664,6 +660,40 @@ void PlatoonSetup::updateUnassignButton()
         ui->pbUnassign->setEnabled(false);
 }
 
+// assigns the selected kit to the selected actor
+void PlatoonSetup::setActorsKit()
+{
+    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
+    auto tempIterator{assignedKitMap.find(selectedActor.getFileName())};
+    if (tempIterator != assignedKitMap.end())
+    {
+        tempIterator->second = ui->lwKits->currentRow();
+    }
+    else
+    {
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in PlatoonSetup::setActorsKit().  Actor not found.");
+        msgBox.exec();
+        exit(EXIT_FAILURE);
+    }
+}
+
+// selects actor's current kit from the kit list
+void PlatoonSetup::selectActorsKit()
+{
+    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
+    auto tempIterator{assignedKitMap.find(selectedActor.getFileName())};
+    if (tempIterator != assignedKitMap.end())
+    {
+        ui->lwKits->setCurrentRow(tempIterator->second);
+    }
+    else
+    {
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in PlatoonSetup::selectActorsKit().  Actor not found.");
+        msgBox.exec();
+        exit(EXIT_FAILURE);
+    }
+}
+
 // returns a reference to the appropriate kit vector of the selected actor
 std::vector<Kit>& PlatoonSetup::getSelectedActorsKits()
 {
@@ -771,6 +801,23 @@ void PlatoonSetup::buildKitPool(const std::vector<Kit> &kits)
         item1 += item2; // add item2 to item1 to create the final label for the list widget
         new QListWidgetItem(item1, ui->lwKits);
     }
+}
+
+// updates the box that displays the currently selected kits name
+void PlatoonSetup::updateKitNameBox()
+{
+    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
+    QString kitName{""};
+    if (selectedActor.getClassName() == "demolitions")
+    {
+        kitName = "DEMO KIT: ";
+    }
+    else
+    {
+        kitName = selectedActor.getClassName().toUpper() + " KIT: ";
+    }
+    QString kitNumber{QString::number(ui->lwKits->currentRow() + 1)};
+    ui->leKitName->setText(kitName + kitNumber);
 }
 
 // updates all the kit detail boxs (mag cap, range, etc) to the currently selected kit when called

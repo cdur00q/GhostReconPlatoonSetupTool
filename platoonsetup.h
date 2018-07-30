@@ -60,9 +60,15 @@ private:
 
     void updateUnassignButton();
 
+    void setActorsKit();
+
+    void selectActorsKit();
+
     std::vector<Kit>& getSelectedActorsKits();
 
     void buildKitPool(const std::vector<Kit> &kits);
+
+    void updateKitNameBox();
 
     void updateSelectedKitInfo(const std::vector<Kit> &kits);
 };
