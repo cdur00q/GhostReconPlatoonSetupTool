@@ -71,6 +71,8 @@ private:
     void updateKitNameBox();
 
     void updateSelectedKitInfo(const std::vector<Kit> &kits);
+
+    void updateSoldierDetails();
 };
 
 #endif // PLATOONSETUP_H

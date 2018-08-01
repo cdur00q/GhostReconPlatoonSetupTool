@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>841</width>
-    <height>650</height>
+    <height>678</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,9 +21,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>361</y>
+      <y>471</y>
       <width>256</width>
-      <height>181</height>
+      <height>150</height>
      </rect>
     </property>
    </widget>
@@ -34,9 +34,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
-      <width>75</width>
-      <height>23</height>
+      <y>100</y>
+      <width>51</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -49,10 +49,10 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>10</y>
-      <width>75</width>
-      <height>23</height>
+      <x>70</x>
+      <y>100</y>
+      <width>51</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -65,10 +65,10 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>10</y>
-      <width>75</width>
-      <height>23</height>
+      <x>130</x>
+      <y>100</y>
+      <width>51</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -81,10 +81,10 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>10</y>
-      <width>75</width>
-      <height>23</height>
+      <x>210</x>
+      <y>100</y>
+      <width>51</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -95,7 +95,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
+      <y>170</y>
       <width>251</width>
       <height>71</height>
      </rect>
@@ -105,7 +105,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
+      <y>150</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -118,7 +118,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>140</y>
+      <y>250</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -131,7 +131,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>160</y>
+      <y>270</y>
       <width>251</width>
       <height>71</height>
      </rect>
@@ -141,7 +141,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>240</y>
+      <y>350</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -154,7 +154,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>260</y>
+      <y>370</y>
       <width>251</width>
       <height>71</height>
      </rect>
@@ -167,9 +167,9 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>61</y>
-      <width>256</width>
-      <height>481</height>
+      <y>30</y>
+      <width>251</width>
+      <height>591</height>
      </rect>
     </property>
    </widget>
@@ -177,7 +177,7 @@
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>40</y>
+      <y>9</y>
       <width>47</width>
       <height>13</height>
      </rect>
@@ -190,7 +190,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>340</y>
+      <y>450</y>
       <width>71</width>
       <height>16</height>
      </rect>
@@ -205,18 +205,21 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>60</y>
+      <x>610</x>
+      <y>30</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPushButton" name="pbKitLeft">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>60</y>
+      <x>570</x>
+      <y>30</y>
       <width>41</width>
       <height>23</height>
      </rect>
@@ -228,8 +231,8 @@
    <widget class="QPushButton" name="pbKitRight">
     <property name="geometry">
      <rect>
-      <x>700</x>
-      <y>60</y>
+      <x>720</x>
+      <y>30</y>
       <width>41</width>
       <height>23</height>
      </rect>
@@ -242,17 +245,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>90</y>
+      <y>60</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>150</y>
+      <y>120</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -268,17 +274,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>170</y>
+      <y>140</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>190</y>
+      <y>160</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -291,17 +300,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>210</y>
+      <y>180</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>230</y>
+      <y>200</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -314,17 +326,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>250</y>
+      <y>220</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_9">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>270</y>
+      <y>240</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -337,17 +352,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>290</y>
+      <y>260</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_10">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>310</y>
+      <y>280</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -360,17 +378,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>330</y>
+      <y>300</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_11">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>350</y>
+      <y>320</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -383,17 +404,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>370</y>
+      <y>340</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_12">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>390</y>
+      <y>360</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -406,17 +430,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>410</y>
+      <y>380</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_13">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>430</y>
+      <y>400</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -429,17 +456,20 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>450</y>
+      <y>420</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_14">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>470</y>
+      <y>440</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -455,7 +485,7 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>490</y>
+      <y>460</y>
       <width>111</width>
       <height>91</height>
      </rect>
@@ -469,12 +499,15 @@
     <property name="frameShadow">
      <enum>QFrame::Sunken</enum>
     </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QLabel" name="label_15">
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>110</y>
+      <y>80</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -490,20 +523,26 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>130</y>
+      <y>100</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leName2">
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>90</y>
+      <y>60</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leWeaponType2">
@@ -513,10 +552,13 @@
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>130</y>
+      <y>100</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leMagCap2">
@@ -526,80 +568,104 @@
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>170</y>
+      <y>140</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leMaxRange2">
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>210</y>
+      <y>180</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leVelocity2">
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>250</y>
+      <y>220</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leRecoil2">
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>290</y>
+      <y>260</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leAccuracy2">
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>330</y>
+      <y>300</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leMaxZoom2">
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>410</y>
+      <y>380</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leSilenced2">
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>450</y>
+      <y>420</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leStabilization2">
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>370</y>
+      <y>340</y>
       <width>113</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QPlainTextEdit" name="pteFireModes2">
@@ -609,7 +675,7 @@
     <property name="geometry">
      <rect>
       <x>670</x>
-      <y>490</y>
+      <y>460</y>
       <width>111</width>
       <height>91</height>
      </rect>
@@ -623,6 +689,116 @@
     <property name="frameShadow">
      <enum>QFrame::Sunken</enum>
     </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leSoldierName">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>251</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="frame">
+     <bool>true</bool>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leWeapon">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="frame">
+     <bool>true</bool>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leStealth">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="frame">
+     <bool>true</bool>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leStamina">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>30</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="frame">
+     <bool>true</bool>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="leLeadership">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>50</y>
+      <width>121</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="frame">
+     <bool>true</bool>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="clearButtonEnabled">
+     <bool>false</bool>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -634,14 +810,6 @@
      <height>21</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>

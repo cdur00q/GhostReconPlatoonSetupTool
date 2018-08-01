@@ -33,11 +33,15 @@ public:
     {
     }
 
-    QString getFileName() const {return m_fileName;}
-    QString getName() const {return m_name;}
-    QString getClassName() const {return m_className;}
+    const QString getFileName() const {return m_fileName;}
+    const QString& getName() const {return m_name;}
+    const QString& getClassName() const {return m_className;}
     QString getFirstInitialLastName() const;
-    QString getKitPath() const {return m_kitPath;}
+    const QString& getKitPath() const {return m_kitPath;}
+    const QString& getWeaponStat() const {return m_weaponStat;}
+    const QString& getStaminaStat() const {return m_staminaStat;}
+    const QString& getStealthStat() const {return m_stealthStat;}
+    const QString& getLeadershipStat() const {return m_leadershipStat;}
 
     friend bool operator== (const Actor &actor1, const Actor &actor2);
     friend bool operator!= (const Actor &actor1, const Actor &actor2);
