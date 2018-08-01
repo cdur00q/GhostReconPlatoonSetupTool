@@ -31,7 +31,7 @@ static std::vector<Actor*> alpha;
 static std::vector<Actor*> bravo;
 static std::vector<Actor*> charlie;
 static uiLists lastSelection{uiLists::NONE};
-static std::vector<Kit> kits;
+//static std::vector<Kit> kits;
 static std::vector<Kit> riflemanKits;
 static std::vector<Kit> heavyWeaponsKits;
 static std::vector<Kit> sniperKits;
@@ -58,34 +58,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 {
     ui->setupUi(this);
     PlatoonSetup::grabKeyboard(); // send all keboard input to the main window to prevent messing up the selection logic of the fireteam/soldier pool boxes
-
-    // set all line edit boxes and plain text boxes to read only
-    ui->leKitName->setReadOnly(true);
-
-    ui->leName1->setReadOnly(true);
-    ui->leWeaponType1->setReadOnly(true);
-    ui->leMagCap1->setReadOnly(true);
-    ui->leMaxRange1->setReadOnly(true);
-    ui->leVelocity1->setReadOnly(true);
-    ui->leRecoil1->setReadOnly(true);
-    ui->leAccuracy1->setReadOnly(true);
-    ui->leStabilization1->setReadOnly(true);
-    ui->leMaxZoom1->setReadOnly(true);
-    ui->leSilenced1->setReadOnly(true);
-    ui->pteFireModes1->setReadOnly(true);
     ui->pteFireModes1->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
-
-    ui->leName2->setReadOnly(true);
-    ui->leWeaponType2->setReadOnly(true);
-    ui->leMagCap2->setReadOnly(true);
-    ui->leMaxRange2->setReadOnly(true);
-    ui->leVelocity2->setReadOnly(true);
-    ui->leRecoil2->setReadOnly(true);
-    ui->leAccuracy2->setReadOnly(true);
-    ui->leStabilization2->setReadOnly(true);
-    ui->leMaxZoom2->setReadOnly(true);
-    ui->leSilenced2->setReadOnly(true);
-    ui->pteFireModes2->setReadOnly(true);
     ui->pteFireModes2->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
 
     //QTextStream(stdout) << "string to print" << endl;
@@ -260,6 +233,8 @@ void PlatoonSetup::on_lwSoldierPool_itemClicked()
     selectActorsKit();
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
+
+    updateSoldierDetails();
 }
 
 void PlatoonSetup::on_lwAlpha_itemClicked()
@@ -1082,4 +1057,16 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
         totalRoundsText = QString::number(totalRoundsNumber);
         ui->leName2->setText(strings.getString("WPN_EXTRAAMMO") + "   " + totalRoundsText + "/" + currentKit.getExtraAmmo());
     }
+}
+
+// updates the big soldier name box as well as soldier stats to the selected soldier
+void PlatoonSetup::updateSoldierDetails()
+{
+    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
+    QString soldierName{selectedActor.getClassName().toUpper() + " " + selectedActor.getName()};
+    ui->leSoldierName->setText(soldierName);
+    ui->leWeapon->setText("Weapon: " + selectedActor.getWeaponStat());
+    ui->leStamina->setText("Endurance: " + selectedActor.getStaminaStat());
+    ui->leStealth->setText("Stealth: " + selectedActor.getStealthStat());
+    ui->leLeadership->setText("Leadership: " + selectedActor.getLeadershipStat());
 }

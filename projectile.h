@@ -24,8 +24,8 @@ public:
     {
     }
 
-    QString getFileName() const {return m_fileName;}
-    QString getName() const {return m_name;}
+    const QString& getFileName() const {return m_fileName;}
+    const QString& getName() const {return m_name;}
 
     Projectile& operator= (const Projectile &projectile);
 

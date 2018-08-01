@@ -51,18 +51,18 @@ public:
     {
     }
 
-    QString getFileName() const {return m_fileName;}
-    QString getName() const {return m_name;}
-    QString getMagCap() const {return m_magCap;}
-    QString getMaxRange() const {return m_maxRange;}
-    QString getMuzzleVelocity() const {return m_muzzleVelocity;}
-    QString getRecoil() const {return m_recoil;}
-    QString getMaxAccuracy() const {return m_maxAccuracy;}
-    QString getStabilizationTime() const {return m_stabilizationTime;}
-    QString getWeaponType() const {return m_weaponType;}
-    QString getSilenced() const {return m_silenced;}
-    QString getMaxZoom() const {return m_maxZoom;}
-    std::vector<FireMode> getFireModes() const {return m_fireModes;}
+    const QString& getFileName() const {return m_fileName;}
+    const QString& getName() const {return m_name;}
+    const QString& getMagCap() const {return m_magCap;}
+    const QString& getMaxRange() const {return m_maxRange;}
+    const QString& getMuzzleVelocity() const {return m_muzzleVelocity;}
+    const QString& getRecoil() const {return m_recoil;}
+    const QString& getMaxAccuracy() const {return m_maxAccuracy;}
+    const QString& getStabilizationTime() const {return m_stabilizationTime;}
+    const QString& getWeaponType() const {return m_weaponType;}
+    const QString& getSilenced() const {return m_silenced;}
+    const QString& getMaxZoom() const {return m_maxZoom;}
+    const std::vector<FireMode>& getFireModes() const {return m_fireModes;}
 
     Gun& operator= (const Gun &gun);
 
