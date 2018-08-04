@@ -7,14 +7,20 @@
 #include "gun.h"
 #include "projectile.h"
 #include "item.h"
+#include "kit.h"
 #include <vector>
 #include <fstream>
 #include <QString>
 #include <QMessageBox>
 
+namespace fs = std::experimental::filesystem;
+
 long getRandomNumber(long min, long max);
 
 QString getFileExtension(const QString &fileName);
+
+// read in all kits from the passed in directory and it's subdirectories and store them in a kit vector
+void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector);
 
 // read in actor or kit files
 // pass in a directory where actor or kit files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
@@ -25,7 +31,7 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
     {
         std::ifstream currentFile;
         QString curFileName{QString::fromStdWString(element.path().filename())};
-        if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check this is an item file
+        if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check the extension of the current iteration file matches what was passed in
         {
             currentFile.open(element.path());
             if (!currentFile.good())
@@ -63,7 +69,7 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
     {
         std::ifstream currentFile;
         QString curFileName{QString::fromStdWString(element.path().filename())};
-        if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check this is an item file
+        if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check the extension of the current iteration file matches what was passed in
         {
             currentFile.open(element.path());
             if (!currentFile.good())

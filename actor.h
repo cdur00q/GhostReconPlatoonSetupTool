@@ -24,7 +24,7 @@ private:
     const QString m_leadershipStatTag{"<Leadership>"};
     QString m_leadershipStat{"1"};
 
-    fileReadResult getGameData(QString targetTag, QString &valueToFill, std::ifstream &actorFile);
+    fileReadResult getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &actorFile);
 
 public:
     Actor(QString fileName, std::ifstream &actorFile);
@@ -33,7 +33,7 @@ public:
     {
     }
 
-    const QString getFileName() const {return m_fileName;}
+    const QString& getFileName() const {return m_fileName;}
     const QString& getName() const {return m_name;}
     const QString& getClassName() const {return m_className;}
     QString getFirstInitialLastName() const;

@@ -19,7 +19,7 @@ Actor::Actor(QString fileName, std::ifstream &actorFile)
     getGameData(m_leadershipStatTag, m_leadershipStat, actorFile);
 }
 
-fileReadResult Actor::getGameData(QString targetTag, QString &valueToFill, std::ifstream &actorFile)
+fileReadResult Actor::getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &actorFile)
 {
     // only operate if the file stream is working
     while (actorFile.good())

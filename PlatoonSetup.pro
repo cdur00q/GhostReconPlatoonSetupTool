@@ -32,7 +32,8 @@ SOURCES += \
     gun.cpp \
     projectile.cpp \
     item.cpp \
-    strings.cpp
+    strings.cpp \
+    kitrestrictionlist.cpp
 
 HEADERS += \
         platoonsetup.h \
@@ -43,7 +44,8 @@ HEADERS += \
     gun.h \
     projectile.h \
     item.h \
-    strings.h
+    strings.h \
+    kitrestrictionlist.h
 
 FORMS += \
         platoonsetup.ui

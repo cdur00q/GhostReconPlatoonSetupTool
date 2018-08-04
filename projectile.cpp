@@ -15,7 +15,7 @@ Projectile::Projectile(QString fileName, std::ifstream &projectileFile, const St
     m_name = strings.getString(m_nameToken);
 }
 
-fileReadResult Projectile::getGameData(QString targetTag, QString &valueToFill, std::ifstream &projectileFile)
+fileReadResult Projectile::getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &projectileFile)
 {
     // only operate if the file stream is working
     while (projectileFile.good())

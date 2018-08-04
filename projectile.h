@@ -15,7 +15,7 @@ private:
     QString m_name{"Default name"};
 
     // extracts 1 piece of data from a .prj file. targetTag is the data tag to look for
-    fileReadResult getGameData(QString targetTag, QString &valueToFill, std::ifstream &projectileFile);
+    fileReadResult getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &projectileFile);
 
 public:
     Projectile(QString fileName, std::ifstream &projectileFile, const Strings &strings);
