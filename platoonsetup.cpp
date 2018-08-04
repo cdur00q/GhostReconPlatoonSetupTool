@@ -20,6 +20,7 @@
 #include "projectile.h"
 #include "item.h"
 #include "strings.h"
+#include "kitrestrictionlist.h"
 namespace fs = std::experimental::filesystem;
 
 static std::vector<Actor> rifleman;
@@ -133,11 +134,40 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         //element.print();
     }
 
-    // read in kits
+    // read in base kits for the four characters classes and store them into their respective kit vectors
     readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\rifleman", kitExtension, riflemanKits);
     readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\heavy-weapons", kitExtension, heavyWeaponsKits);
     readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\sniper", kitExtension, sniperKits);
     readInGameFiles("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\demolitions", kitExtension, demolitionsKits);
+
+    // read in all the kits and store them into a temporary kit vector
+    std::vector<Kit> tempKits;
+    readInAllKits("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits", tempKits);
+
+    // create the kit restriction list
+    currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\quick_missions.qmk");
+    KitRestrictionList kitList(currentFile);
+
+    // add kits from temporary kit list to final kit lists according to the kit restriction list
+    for (const auto &element : tempKits) // for every kit in the temporary kit vector
+    {
+        if (kitList.checkKitAgainstRestrictionList("rifleman", element.getFileName()) == true) // current kit belongs to current soldier class
+        {
+            bool replacedKit{false};
+            for (auto &element2 : riflemanKits) // check if current kit happens to already be in the permanent kit list for this soldier class
+            {
+                if (QString::compare(element.getFileName(), element2.getFileName(), Qt::CaseInsensitive) == 0) // it is, so update it with this new one
+                {
+                    element2 = element;
+                    replacedKit = true;
+                }
+            }
+            if (!replacedKit) // it isn't, so add in this new one
+            {
+                riflemanKits.push_back(element);
+            }
+        }
+    }
 
     // assign default kits to actors
     for (auto &element : actors)

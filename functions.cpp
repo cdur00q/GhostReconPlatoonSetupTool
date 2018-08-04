@@ -14,6 +14,7 @@
 #include "gun.h"
 #include "projectile.h"
 #include "item.h"
+#include "kit.h"
 
 namespace fs = std::experimental::filesystem;
 
@@ -51,6 +52,48 @@ QString getFileExtension(const QString &fileName)
     QMessageBox msgBox(QMessageBox::Critical, "Error", errorMessage);
     msgBox.exec();
     return "error";
+}
+
+void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector)
+{
+    for (const auto &element : fs::recursive_directory_iterator(kitsDirectoryPath))
+    {
+        std::ifstream currentFile;
+        // first check this is a regular file before proceeding
+        // using the error code version to avoid exceptions being thrown
+        // but no actual error handling will take place with this error code
+        std::error_code errorCode;
+        if (fs::is_regular_file(element.path(), errorCode))
+        {
+            QString curFileName{QString::fromStdWString(element.path().filename())};
+            if (QString::compare(getFileExtension(curFileName), kitExtension, Qt::CaseInsensitive) == 0)  // check this is a kit file
+            {
+                currentFile.open(element.path());
+                if (!currentFile.good())
+                {
+                    QString errorMsg{"Error in readInAllKits().  Failed to open file: "};
+                    errorMsg += QString::fromStdWString(element.path());
+                    QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+                    msgBox.exec();
+                    exit(EXIT_FAILURE);
+                }
+                bool replacedItem{false};
+                for (auto &element2 : kitVector)
+                {
+                    if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found a kit in the vector with same filename as this one, replace it with this new one
+                    {
+                        element2 = Kit(curFileName, currentFile);
+                        replacedItem = true;
+                    }
+                }
+                if (!replacedItem) // didn't find a kit in the vector with this name already so add in this new kit
+                {
+                    kitVector.push_back(Kit(curFileName, currentFile));
+                }
+            }
+        }
+        currentFile.close();
+    }
 }
 
 // randomly chooses actors from one vector and places them into another

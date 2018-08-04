@@ -35,8 +35,8 @@ private:
     //int m_itemCount{0};
     kitType m_type;
 
-    fileReadResult findGameData(QString targetSlotTag, std::ifstream &kitFile);
-    fileReadResult getGameData(QString targetSlotTag, QString targetTag, QString &valueToFill, std::ifstream &kitFile);
+    fileReadResult findGameData(const QString &targetSlotTag, std::ifstream &kitFile);
+    fileReadResult getGameData(const QString &targetSlotTag, const QString &targetTag, QString &valueToFill, std::ifstream &kitFile);
 
 public:
     Kit(QString fileName, std::ifstream &kitFile);

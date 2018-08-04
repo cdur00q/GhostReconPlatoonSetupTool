@@ -52,8 +52,8 @@ Kit::Kit(QString fileName, std::ifstream &kitFile)
     }
 }
 
-// returns fileReadResult::FOUND if the specified slot tag is exists in the specfied kit file
-fileReadResult Kit::findGameData(QString targetSlotTag, std::ifstream &kitFile)
+// returns fileReadResult::FOUND if the specified slot tag exists in the specfied kit file
+fileReadResult Kit::findGameData(const QString &targetSlotTag, std::ifstream &kitFile)
 {
     // only operate if the file stream is working
     while (kitFile.good())
@@ -102,7 +102,7 @@ fileReadResult Kit::findGameData(QString targetSlotTag, std::ifstream &kitFile)
 }
 
 // finds and fills one value based on specfied slot and specifed data tag
-fileReadResult Kit::getGameData(QString targetSlotTag, QString targetTag, QString &valueToFill, std::ifstream &kitFile)
+fileReadResult Kit::getGameData(const QString &targetSlotTag, const QString &targetTag, QString &valueToFill, std::ifstream &kitFile)
 {
     // only operate if the file stream is working
     while (kitFile.good())

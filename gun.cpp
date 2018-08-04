@@ -25,7 +25,7 @@ Gun::Gun(QString fileName, std::ifstream &gunFile, const Strings &strings)
     getMaxZoom(m_maxZoom, gunFile, 0);
 }
 
-fileReadResult Gun::getGameData(QString targetTag, QString &valueToFill, std::ifstream &gunFile)
+fileReadResult Gun::getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &gunFile)
 {
     // only operate if the file stream is working
     while (gunFile.good())
