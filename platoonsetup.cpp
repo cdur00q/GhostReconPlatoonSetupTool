@@ -21,6 +21,7 @@
 #include "item.h"
 #include "strings.h"
 #include "kitrestrictionlist.h"
+#include "assignedkitmap.h"
 namespace fs = std::experimental::filesystem;
 
 static std::vector<Actor> rifleman;
@@ -41,7 +42,8 @@ static std::vector<Gun> guns;
 static std::vector<Projectile> projectiles;
 static std::vector<Item> items;
 static Strings strings;
-static std::map<QString, int> assignedKitMap;
+//static std::map<QString, int> assignedKitMap;
+static AssignedKitMap assignedKitMap;
 
 // for debugging
 void printActorVector(const std::vector<Actor*> &vec)
@@ -66,6 +68,9 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 
     actors.reserve(76); // do this for all the vectors that store actors in the program?
 
+    //TODO - switch uses of "rifleman" and other three soldier classes with a variable
+    //TODO - use a const actor reference in the older functions that use an int
+
     std::ifstream currentFile;
 
     // read in all actors
@@ -84,7 +89,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     for (const auto &element : actors)
     {
         //element.print();
-        if (element.getClassName() == "demolitions")
+        if (element.getClassName() == classDemolitions)
         {
             new QListWidgetItem(element.getFirstInitialLastName() + "       " + "DEMO", ui->lwSoldierPool);
         }
@@ -149,9 +154,12 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     KitRestrictionList kitList(currentFile);
 
     // add kits from temporary kit list to final kit lists according to the kit restriction list
+    // kits should be checked one at a time and added to each soldier class that is a user of that kit
+    // a kit could be used by more than one soldier class
     for (const auto &element : tempKits) // for every kit in the temporary kit vector
     {
-        if (kitList.checkKitAgainstRestrictionList("rifleman", element.getFileName()) == true) // current kit belongs to current soldier class
+        // see if kit is for rifeman
+        if (kitList.checkKitAgainstRestrictionList("rifleman", element.getFileName()) == true) // current kit belongs to rifleman soldier class
         {
             bool replacedKit{false};
             for (auto &element2 : riflemanKits) // check if current kit happens to already be in the permanent kit list for this soldier class
@@ -167,9 +175,64 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
                 riflemanKits.push_back(element);
             }
         }
+
+        // see if kit is for support
+        if (kitList.checkKitAgainstRestrictionList("heavy-weapons", element.getFileName()) == true)
+        {
+            bool replacedKit{false};
+            for (auto &element2 : heavyWeaponsKits)
+            {
+                if (QString::compare(element.getFileName(), element2.getFileName(), Qt::CaseInsensitive) == 0)
+                {
+                    element2 = element;
+                    replacedKit = true;
+                }
+            }
+            if (!replacedKit)
+            {
+                heavyWeaponsKits.push_back(element);
+            }
+        }
+
+        // see if kit is for sniper
+        if (kitList.checkKitAgainstRestrictionList("sniper", element.getFileName()) == true)
+        {
+            bool replacedKit{false};
+            for (auto &element2 : sniperKits)
+            {
+                if (QString::compare(element.getFileName(), element2.getFileName(), Qt::CaseInsensitive) == 0)
+                {
+                    element2 = element;
+                    replacedKit = true;
+                }
+            }
+            if (!replacedKit)
+            {
+                sniperKits.push_back(element);
+            }
+        }
+
+        // see if kit is for demolitions
+        if (kitList.checkKitAgainstRestrictionList("demolitions", element.getFileName()) == true)
+        {
+            bool replacedKit{false};
+            for (auto &element2 : demolitionsKits)
+            {
+                if (QString::compare(element.getFileName(), element2.getFileName(), Qt::CaseInsensitive) == 0)
+                {
+                    element2 = element;
+                    replacedKit = true;
+                }
+            }
+            if (!replacedKit)
+            {
+                demolitionsKits.push_back(element);
+            }
+        }
     }
 
-    // assign default kits to actors
+    // assign default kits to actors.  the default kits are the first kits of all the availble kits
+    /*
     for (auto &element : actors)
     {
         if (element.getKitPath() == "rifleman")
@@ -201,11 +264,56 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
             exit(EXIT_FAILURE);
         }
     }
+    */
+
+    int defaultKitIndex{0};
+    for (auto &element : actors)
+    {
+        if (element.getKitPath() == classRifleman)
+        {
+            assignedKitMap.assignKitToActor(riflemanKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
+        }
+        else if (element.getKitPath() == classHeavyWeapons)
+        {
+            assignedKitMap.assignKitToActor(heavyWeaponsKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
+        }
+        else if (element.getKitPath() == classSniper)
+        {
+            assignedKitMap.assignKitToActor(sniperKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
+        }
+        else if (element.getKitPath() == classDemolitions)
+        {
+            assignedKitMap.assignKitToActor(demolitionsKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
+        }
+        else
+        {
+            QString errorMsg{"Error while assigning default kits.  Unrecognized kit path: '"};
+            errorMsg += element.getKitPath();
+            errorMsg += "' for actor: ";
+            errorMsg += element.getFirstInitialLastName();
+            errorMsg += " filename: ";
+            errorMsg += element.getFileName();
+            QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+            msgBox.exec();
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // these lines for testing
+    alpha.push_back(&actors[0]);
+    alpha.push_back(&actors[1]);
+    alpha.push_back(&actors[2]);
+    bravo.push_back(&actors[3]);
+    bravo.push_back(&actors[4]);
+    bravo.push_back(&actors[5]);
+    charlie.push_back(&actors[6]);
+    charlie.push_back(&actors[7]);
+    charlie.push_back(&actors[8]);
 
     // writing avatar file
     std::string coopAvatarPath{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Data\\Temp\\coop_avatar.toe"};
     std::ofstream coopAvatar(coopAvatarPath, std::ios::out|std::ios::trunc);
-    writeCoopAvatar(coopAvatar);
+    writeCoopAvatar(actors, alpha, bravo, charlie, assignedKitMap, coopAvatar);
 }
 
 PlatoonSetup::~PlatoonSetup()
@@ -668,6 +776,7 @@ void PlatoonSetup::updateUnassignButton()
 // assigns the selected kit to the selected actor
 void PlatoonSetup::setActorsKit()
 {
+    /*
     const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
     auto tempIterator{assignedKitMap.find(selectedActor.getFileName())};
     if (tempIterator != assignedKitMap.end())
@@ -680,11 +789,45 @@ void PlatoonSetup::setActorsKit()
         msgBox.exec();
         exit(EXIT_FAILURE);
     }
+    */
+
+    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
+    int kitIndex{ui->lwKits->currentRow()};
+    if (selectedActor.getKitPath() == classRifleman)
+    {
+        assignedKitMap.assignKitToActor(riflemanKits[kitIndex].getFileName(), kitIndex, selectedActor.getFileName());
+    }
+    else if (selectedActor.getKitPath() == classHeavyWeapons)
+    {
+        assignedKitMap.assignKitToActor(heavyWeaponsKits[kitIndex].getFileName(), kitIndex, selectedActor.getFileName());
+    }
+    else if (selectedActor.getKitPath() == classSniper)
+    {
+        assignedKitMap.assignKitToActor(sniperKits[kitIndex].getFileName(), kitIndex, selectedActor.getFileName());
+    }
+    else if (selectedActor.getKitPath() == classDemolitions)
+    {
+        assignedKitMap.assignKitToActor(demolitionsKits[kitIndex].getFileName(), kitIndex, selectedActor.getFileName());
+    }
+    else
+    {
+        QString errorMsg{"Error in PlatoonSetup::setActorsKit().  Unrecognized kit path: '"};
+        errorMsg += selectedActor.getKitPath();
+        errorMsg += "' for actor: ";
+        errorMsg += selectedActor.getFirstInitialLastName();
+        errorMsg += " filename: ";
+        errorMsg += selectedActor.getFileName();
+        QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+        msgBox.exec();
+        exit(EXIT_FAILURE);
+    }
+
 }
 
 // selects actor's current kit from the kit list
 void PlatoonSetup::selectActorsKit()
 {
+    /*
     const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
     auto tempIterator{assignedKitMap.find(selectedActor.getFileName())};
     if (tempIterator != assignedKitMap.end())
@@ -697,6 +840,11 @@ void PlatoonSetup::selectActorsKit()
         msgBox.exec();
         exit(EXIT_FAILURE);
     }
+    */
+
+    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
+    int kitIndex{assignedKitMap.getKitIndex(selectedActor.getFileName())};
+    ui->lwKits->setCurrentRow(kitIndex);
 }
 
 // returns a reference to the appropriate kit vector of the selected actor
@@ -800,6 +948,7 @@ void PlatoonSetup::buildKitPool(const std::vector<Kit> &kits)
         else
         {
             item2 = "error resolving item2 while building kit list";
+            // maybe put popup error and end program here?
         }
         //QString label{item1 + " + " item2};
         item1 += " + ";

@@ -8,6 +8,7 @@
 #include "projectile.h"
 #include "item.h"
 #include "kit.h"
+#include "assignedkitmap.h"
 #include <vector>
 #include <fstream>
 #include <QString>
@@ -100,6 +101,6 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
 
 void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Actor> &destination);
 
-int writeCoopAvatar(std::ofstream &file);
+int writeCoopAvatar(const std::vector<Actor> &actors, const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &file);
 
 #endif // FUNCTIONS_H
