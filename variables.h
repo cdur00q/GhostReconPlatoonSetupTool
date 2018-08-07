@@ -11,6 +11,10 @@ const QString gunExtension{".gun"};
 const QString projectileExtension{".prj"};
 const QString itemExtension{".itm"};
 const QString kitExtension{".kit"};
+const QString classRifleman{"rifleman"}; // class as in soldier's skill/role, not c++ class
+const QString classHeavyWeapons{"heavy-weapons"};
+const QString classSniper{"sniper"};
+const QString classDemolitions{"demolitions"};
 
 enum class uiLists
 {
