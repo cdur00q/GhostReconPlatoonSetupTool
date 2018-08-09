@@ -124,54 +124,31 @@ void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Act
     }
 }
 
-int writeCoopAvatar(const std::vector<Actor> &actors, const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &avatarFile)
+void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &avatarFile)
 {
+    // exit if there are no soldiers in any of the passed in fireteams
+    if (alpha.size() <= 0 && bravo.size() <= 0 && charlie.size() <= 0)
+    {
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error, three empty fireteams passed to writeCoopAvatar().");
+        msgBox.exec();
+        exit(EXIT_FAILURE);
+    }
+
+    bool done{false};
     // only operate if the file stream is working
-    while (avatarFile.good())
+    while (avatarFile.good() && !done)
     {
         QString toeFile{""};
         QString company{""};
         QString platoon{""};
         QString alphaTeam{""};
-        QString alpha1{""};
-        QString alpha2{""};
-        QString alpha3{""};
-        QString alphaStrings[3]; // 1 string per team member
+        QString alphaStrings[fireteamMaxMembers]; // 1 string per team member
         QString bravoTeam{""};
-        QString bravo1{""};
-        QString bravo2{""};
-        QString bravo3{""};
-        QString bravoStrings[3];
+        QString bravoStrings[fireteamMaxMembers];
         QString charlieTeam{""};
-        QString charlie1{""};
-        QString charlie2{""};
-        QString charlie3{""};
-        QString charlieStrings[3];
+        QString charlieStrings[fireteamMaxMembers];
         bool firstSoldier{true}; // the first soldier in the file will have the "owner" value added to it
-        // working with quotes
-        // printf(R"(She said "time flies like an arrow, but fruit flies like a banana".)");
-        // https://stackoverflow.com/questions/12338818/how-to-get-double-quotes-into-a-string-literal#12338826
-        /*
-        std::string data{R"(<TOEFile>
-                <VersionNumber>2.000000</VersionNumber>
-                <Company IgorId = "4" ScriptId = "0" Name = "_---" MultiplayerCompany = "2">
-                    <Platoon IgorId = "3" ScriptId = "0" Name = "_Platoon1" MultiplayerPlatoon = "1">
-                        <Team IgorId = "2" ScriptId = "0" Name = "_Alpha">
-                            <Actor IgorId = "1" ScriptId = "0" Name = "_Actor" File = "mp_plt1_asl.atr" Kit = "rifleman-01.kit" Owner = "0"/>
-                        </Team>
-                    </Platoon>
-                </Company>
-            </TOEFile>")"};
-            */
         int idNumber{0};
-        /*
-        QString data{"<TOEFile>"
-                     "<VersionNumber>2.000000"
-                     "</VersionNumber> <Company IgorId = "};
-        (data += '"') += QString::number(idNumber) += '"';
-        */
-        //data += QString::number(IdNumber);
-        //data += '"';
 
         // create alpha team members
         for (int i{0}; i < alpha.size(); ++i)
@@ -227,98 +204,6 @@ int writeCoopAvatar(const std::vector<Actor> &actors, const std::vector<Actor*> 
             else charlieStrings[i] += R"("/>)";
         }
 
-        /*
-        // create alpha team member #1
-        if (alpha.size() >= 1)
-        {
-            alpha1 = "\n\t\t\t\t";
-            alpha1 += R"(<Actor IgorId = ")";
-            alpha1 += QString::number(++idNumber);
-            alpha1 += R"(" ScriptId = "0" File = ")";
-            alpha1 += alpha[0]->getFileName();
-            alpha1 += R"(" Kit = ")";
-            alpha1 += assignedKitMap.getKitFileName(alpha[0]->getFileName());
-            if (firstSoldier)
-            {
-                alpha1 += R"(" Owner = "0"/>)";
-                firstSoldier = false;
-            }
-            else alpha1 += R"("/>)";
-        }
-
-        // create alpha team member #2
-        if (alpha.size() >= 2)
-        {
-            alpha2 = "\n\t\t\t\t";
-            alpha2 += R"(<Actor IgorId = ")";
-            alpha2 += QString::number(++idNumber);
-            alpha2 += R"(" ScriptId = "0" File = ")";
-            alpha2 += alpha[1]->getFileName();
-            alpha2 += R"(" Kit = ")";
-            alpha2 += assignedKitMap.getKitFileName(alpha[1]->getFileName());
-            alpha2 += R"("/>)";
-        }
-
-        // create alpha team member #3
-        if (alpha.size() == 3)
-        {
-            alpha3 = "\n\t\t\t\t";
-            alpha3 += R"(<Actor IgorId = ")";
-            alpha3 += QString::number(++idNumber);
-            alpha3 += R"(" ScriptId = "0" File = ")";
-            alpha3 += alpha[2]->getFileName();
-            alpha3 += R"(" Kit = ")";
-            alpha3 += assignedKitMap.getKitFileName(alpha[2]->getFileName());
-            alpha3 += R"("/>)";
-        }
-
-
-        // create bravo team member #1
-        if (bravo.size() >= 1)
-        {
-            bravo1 = "\n\t\t\t\t";
-            bravo1 += R"(<Actor IgorId = ")";
-            bravo1 += QString::number(++idNumber);
-            bravo1 += R"(" ScriptId = "0" File = ")";
-            bravo1 += bravo[0]->getFileName();
-            bravo1 += R"(" Kit = ")";
-            bravo1 += assignedKitMap.getKitFileName(bravo[0]->getFileName());
-            if (firstSoldier)
-            {
-                bravo1 += R"(" Owner = "0"/>)";
-                firstSoldier = false;
-            }
-            else bravo1 += R"("/>)";
-        }
-
-        // create bravo team member #2
-        if (bravo.size() >= 2)
-        {
-            bravo2 = "\n\t\t\t\t";
-            bravo2 += R"(<Actor IgorId = ")";
-            bravo2 += QString::number(++idNumber);
-            bravo2 += R"(" ScriptId = "0" File = ")";
-            bravo2 += bravo[1]->getFileName();
-            bravo2 += R"(" Kit = ")";
-            bravo2 += assignedKitMap.getKitFileName(bravo[1]->getFileName());
-            bravo2 += R"("/>)";
-        }
-
-        // create bravo team member #3
-        if (bravo.size() == 3)
-        {
-            bravo3 = "\n\t\t\t\t";
-            bravo3 += R"(<Actor IgorId = ")";
-            bravo3 += QString::number(++idNumber);
-            bravo3 += R"(" ScriptId = "0" File = ")";
-            bravo3 += bravo[2]->getFileName();
-            bravo3 += R"(" Kit = ")";
-            bravo3 += assignedKitMap.getKitFileName(bravo[2]->getFileName());
-            bravo3 += R"("/>)";
-        }
-
-        */
-
         // create alpha team
         if (alpha.size() > 0)
         {
@@ -327,8 +212,6 @@ int writeCoopAvatar(const std::vector<Actor> &actors, const std::vector<Actor*> 
             idNumber = alpha.size() + bravo.size() + charlie.size() + 1;
             (alphaTeam += '"') += QString::number(idNumber);
             alphaTeam += R"(" ScriptId = "0" Name = "_Alpha">)";
-
-            //alphaTeam += alpha1 += alpha2 += alpha3 += "\n\t\t\t</Team>";
             alphaTeam += alphaStrings[0] += alphaStrings[1] += alphaStrings[2] += "\n\t\t\t</Team>";
         }
 
@@ -341,7 +224,6 @@ int writeCoopAvatar(const std::vector<Actor> &actors, const std::vector<Actor*> 
             if (alpha.size() > 0) { ++idNumber;}
             (bravoTeam += '"') += QString::number(idNumber);
             bravoTeam += R"(" ScriptId = "0" Name = "_Bravo">)";
-
             bravoTeam += bravoStrings[0] += bravoStrings[1] += bravoStrings[2] += "\n\t\t\t</Team>";
         }
 
@@ -355,7 +237,6 @@ int writeCoopAvatar(const std::vector<Actor> &actors, const std::vector<Actor*> 
             if (bravo.size() > 0) { ++idNumber;}
             (charlieTeam += '"') += QString::number(idNumber);
             charlieTeam += R"(" ScriptId = "0" Name = "_Charlie">)";
-
             charlieTeam += charlieStrings[0] += charlieStrings[1] += charlieStrings[2] += "\n\t\t\t</Team>";
         }
 
@@ -368,7 +249,6 @@ int writeCoopAvatar(const std::vector<Actor> &actors, const std::vector<Actor*> 
         if (charlie.size() > 0) { ++idNumber;}
         (platoon += '"') += QString::number(idNumber) += '"';
         platoon += R"( ScriptId = "0" Name = "_Platoon1" MultiplayerPlatoon = "1">)";
-
         platoon += alphaTeam += bravoTeam += charlieTeam += "\n\t\t</Platoon>";
 
         // create company
@@ -377,21 +257,22 @@ int writeCoopAvatar(const std::vector<Actor> &actors, const std::vector<Actor*> 
         ++idNumber; // assumes idNumber hasn't been touched since platoon
         (company += '"') += QString::number(idNumber) += '"';
         company += R"( ScriptId = "0" Name = "_---" MultiplayerCompany = "2">)";
-
         company += platoon += "\n\t</Company>";
 
         // create toe file
         toeFile += "<TOEFile>\n\t<VersionNumber>2.000000</VersionNumber>";
         toeFile += company += "\n</TOEFile>";
 
-
+        // write prepared string to file
         avatarFile << toeFile.toStdString();
-        return 0;
+        done = true;
     }
 
     // something went wrong with the file stream
-    QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in writeCoopAvatar().");
-    msgBox.exec();
-    return -1;
-    //return fileReadResult::FILESTREAMERROR;
+    if (!avatarFile.good())
+    {
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in writeCoopAvatar().");
+        msgBox.exec();
+        exit(EXIT_FAILURE);
+    }
 }

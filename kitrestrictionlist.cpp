@@ -1,5 +1,6 @@
 #include "kitrestrictionlist.h"
 
+#include "variables.h"
 #include <fstream>
 #include <set>
 #include <QString>
@@ -86,22 +87,22 @@ KitRestrictionList::getGameDataResult KitRestrictionList::getGameData(const QStr
 
 // checks if the passed in kit filename is on the list of the passed in soldier class
 // possible soldier classes are: "rifleman", "heavy-weapons", "sniper", and "demolitions"
-bool KitRestrictionList::checkKitAgainstRestrictionList(const QString &soldierClass, const QString &kitName)
+bool KitRestrictionList::checkKitAgainstRestrictionList(const QString &soldierClass, const QString &kitName) const
 {
     const std::set<QString>* listToCheck{nullptr};
-    if (soldierClass == "rifleman")
+    if (soldierClass == classRifleman)
     {
         listToCheck = &m_riflemanList;
     }
-    else if (soldierClass == "demolitions")
+    else if (soldierClass == classDemolitions)
     {
         listToCheck = &m_demolitionsList;
     }
-    else if (soldierClass == "heavy-weapons")
+    else if (soldierClass == classHeavyWeapons)
     {
         listToCheck = &m_heavyWeaponsList;
     }
-    else if (soldierClass == "sniper")
+    else if (soldierClass == classSniper)
     {
         listToCheck = &m_sniperList;
     }
@@ -126,7 +127,7 @@ bool KitRestrictionList::checkKitAgainstRestrictionList(const QString &soldierCl
     }
 }
 
-void KitRestrictionList::print()
+void KitRestrictionList::print() const
 {
     QTextStream(stdout) << "Rifleman Kits: " << '\n';
     std::set<QString>::iterator it{m_riflemanList.begin()};

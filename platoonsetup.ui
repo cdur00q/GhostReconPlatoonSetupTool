@@ -800,6 +800,22 @@
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QPushButton" name="pbApply">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>580</y>
+      <width>111</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Apply</string>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">

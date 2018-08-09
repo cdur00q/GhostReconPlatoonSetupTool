@@ -16,6 +16,7 @@ const QString classHeavyWeapons{"heavy-weapons"};
 const QString classSniper{"sniper"};
 const QString classDemolitions{"demolitions"};
 
+/*
 enum class uiLists
 {
     NONE,
@@ -24,6 +25,7 @@ enum class uiLists
     BRAVO,
     CHARLIE
 };
+*/
 
 enum class fileReadResult
 {
