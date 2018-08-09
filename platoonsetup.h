@@ -46,6 +46,8 @@ private slots:
 
     void on_pbKitRight_clicked();
 
+    void on_pbApply_clicked();
+
 private:
     Ui::PlatoonSetup *ui;
 

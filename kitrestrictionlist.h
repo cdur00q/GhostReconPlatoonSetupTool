@@ -34,9 +34,9 @@ public:
 
     // checks if the passed in kit filename is on the list of the passed in soldier class
     // possible soldier classes are: "rifleman", "heavy-weapons", "sniper", and "demolitions"
-    bool checkKitAgainstRestrictionList(const QString &soldierClass, const QString &kitName);
+    bool checkKitAgainstRestrictionList(const QString &soldierClass, const QString &kitName) const;
 
-    void print();
+    void print() const;
 };
 
 #endif // KITRESTRICTIONLIST_H
