@@ -22,7 +22,7 @@
      <rect>
       <x>10</x>
       <y>471</y>
-      <width>256</width>
+      <width>251</width>
       <height>150</height>
      </rect>
     </property>
@@ -205,9 +205,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>610</x>
+      <x>590</x>
       <y>30</y>
-      <width>113</width>
+      <width>151</width>
       <height>20</height>
      </rect>
     </property>
@@ -218,7 +218,7 @@
    <widget class="QPushButton" name="pbKitLeft">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>550</x>
       <y>30</y>
       <width>41</width>
       <height>23</height>
@@ -231,7 +231,7 @@
    <widget class="QPushButton" name="pbKitRight">
     <property name="geometry">
      <rect>
-      <x>720</x>
+      <x>740</x>
       <y>30</y>
       <width>41</width>
       <height>23</height>
@@ -801,6 +801,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="pbApply">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>670</x>
@@ -814,6 +817,32 @@
     </property>
     <property name="flat">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbKitFireteam">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>570</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Assign Kit To Fireteam</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbKitSquad">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>600</y>
+      <width>111</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Assign Kit To Squad</string>
     </property>
    </widget>
   </widget>

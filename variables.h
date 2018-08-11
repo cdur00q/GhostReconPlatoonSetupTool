@@ -16,17 +16,6 @@ const QString classHeavyWeapons{"heavy-weapons"};
 const QString classSniper{"sniper"};
 const QString classDemolitions{"demolitions"};
 
-/*
-enum class uiLists
-{
-    NONE,
-    SOLDIERPOOL,
-    ALPHA,
-    BRAVO,
-    CHARLIE
-};
-*/
-
 enum class fileReadResult
 {
     FOUND,

@@ -29,10 +29,9 @@ static std::vector<Actor> heavyWeapons;
 static std::vector<Actor> sniper;
 static std::vector<Actor> demolitions;
 static std::vector<Actor> actors;
-static std::vector<Actor*> alpha; // should these pointer vectors be const in some way?
+static std::vector<Actor*> alpha; // these point to elements in actors, which lasts until the end of the program so no need to worry about dangling pointers // should these pointer vectors be const in some way?
 static std::vector<Actor*> bravo;
 static std::vector<Actor*> charlie;
-//static uiLists lastSelection{uiLists::NONE};
 static std::vector<Kit> riflemanKits;
 static std::vector<Kit> heavyWeaponsKits;
 static std::vector<Kit> sniperKits;
@@ -68,11 +67,13 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // printf(R"(She said "time flies like an arrow, but fruit flies like a banana".)");
     // https://stackoverflow.com/questions/12338818/how-to-get-double-quotes-into-a-string-literal#12338826
 
-    //TODO - apply kit to all members of fireteam and all members of squad
-    //TODO - enable / disable apply button
+    //TODO - move global variables into private space in the PlatoonSetup class header
     //TODO - relative file paths
     //TODO - mod support
     //TODO - interface styling
+    //TODO - add 'is regular file' check to readingamefiles()?
+    //TODO - first available soldier is automatically selected when program loads?
+    //TODO - unassign all button?
     //TODO - music?
 
     actors.reserve(76); // do this for all the vectors that store actors in the program?
@@ -90,20 +91,6 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     if (heavyWeapons.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(heavyWeapons, actors); }
     if (sniper.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(sniper, actors); }
     if (demolitions.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(demolitions, actors); }
-
-    // build solider pool from actors
-    for (const auto &element : actors)
-    {
-        //element.print();
-        if (element.getClassName() == classDemolitions)
-        {
-            new QListWidgetItem(element.getFirstInitialLastName() + "       " + "DEMO", ui->lwSoldierPool);
-        }
-        else
-        {
-            new QListWidgetItem(element.getFirstInitialLastName() + "       " + element.getClassName().toUpper(), ui->lwSoldierPool);
-        }
-    }
 
     // read in strings
     currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Data\\Shell\\strings.txt");
@@ -155,22 +142,17 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     std::vector<Kit> tempKits;
     readInAllKits("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits", tempKits);
 
-    // should all the kits be compared to the permenant kit lists to potentally update kits?
-    // for example:
-    // base game kit restriction list adds rifleman-05.kit
-    // mp1 has a rifleman-05.kit file in it, but which doesn't appear in it's kit restriction list
-    // this update wouldn't be applied
-
     // create the kit restriction list
     currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\quick_missions.qmk");
     KitRestrictionList kitList(currentFile);
 
+    /*
     // add kits from temporary kit list to final kit lists according to the kit restriction list
     // kits should be checked one at a time and added to each soldier class that is a user of that kit
     // a kit could be used by more than one soldier class
     for (const auto &element : tempKits) // for every kit in the temporary kit vector
     {
-        // see if kit is for rifeman
+        // see if kit is for rifleman
         if (kitList.checkKitAgainstRestrictionList(classRifleman, element.getFileName()) == true) // current kit belongs to rifleman soldier class
         {
             bool replacedKit{false};
@@ -242,6 +224,28 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
             }
         }
     }
+    */
+
+    updateKitVectorPerRestrictionList(tempKits, kitList, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
+
+    // load mods
+    loadMod("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Mp1", actors, strings, guns, projectiles, items, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
+    //loadMod("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Mp2", actors, strings, guns, projectiles, items, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
+    //loadMod("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\TestMod1", actors, strings, guns, projectiles, items, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
+
+    // build solider pool from actors (must do after loading mods as mods may change actor names)
+    for (const auto &element : actors)
+    {
+        //element.print();
+        if (element.getClassName() == classDemolitions)
+        {
+            new QListWidgetItem(element.getFirstInitialLastName() + "       " + "DEMO", ui->lwSoldierPool);
+        }
+        else
+        {
+            new QListWidgetItem(element.getFirstInitialLastName() + "       " + element.getClassName().toUpper(), ui->lwSoldierPool);
+        }
+    }
 
     // assign default kits to actors.  the default kits are the first kits of all the availble kits
     int defaultKitIndex{0};
@@ -293,6 +297,7 @@ void PlatoonSetup::on_pbAlpha_clicked()
     updateTeamButton(bravo, ui->pbBravo);
     updateTeamButton(charlie, ui->pbCharlie);
     updateUnassignButton();
+    updateApplyButton();
 }
 
 void PlatoonSetup::on_pbBravo_clicked()
@@ -305,6 +310,7 @@ void PlatoonSetup::on_pbBravo_clicked()
     updateTeamButton(bravo, ui->pbBravo);
     updateTeamButton(charlie, ui->pbCharlie);
     updateUnassignButton();
+    updateApplyButton();
 }
 
 void PlatoonSetup::on_pbCharlie_clicked()
@@ -317,6 +323,7 @@ void PlatoonSetup::on_pbCharlie_clicked()
     updateTeamButton(bravo, ui->pbBravo);
     updateTeamButton(charlie, ui->pbCharlie);
     updateUnassignButton();
+    updateApplyButton();
 }
 
 void PlatoonSetup::on_lwSoldierPool_itemClicked()
@@ -351,6 +358,8 @@ void PlatoonSetup::on_lwAlpha_itemClicked()
     selectActorsKit();
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
+
+    updateSoldierDetails();
 }
 
 void PlatoonSetup::on_lwBravo_itemClicked()
@@ -367,6 +376,8 @@ void PlatoonSetup::on_lwBravo_itemClicked()
     selectActorsKit();
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
+
+    updateSoldierDetails();
 }
 
 void PlatoonSetup::on_lwCharlie_itemClicked()
@@ -383,6 +394,8 @@ void PlatoonSetup::on_lwCharlie_itemClicked()
     selectActorsKit();
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
+
+    updateSoldierDetails();
 }
 
 void PlatoonSetup::on_pbUnassign_clicked()
@@ -394,13 +407,14 @@ void PlatoonSetup::on_pbUnassign_clicked()
     updateTeamButton(bravo, ui->pbBravo);
     updateTeamButton(charlie, ui->pbCharlie);
     updateUnassignButton();
+    updateApplyButton();
 }
 
 void PlatoonSetup::on_lwKits_itemClicked()
 {
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
-    setActorsKit();
+    setActorsKit(actors[ui->lwSoldierPool->currentRow()]);
 }
 
 void PlatoonSetup::on_pbKitLeft_clicked()
@@ -423,7 +437,7 @@ void PlatoonSetup::on_pbKitLeft_clicked()
 
         updateKitNameBox();
         updateSelectedKitInfo(getSelectedActorsKits());
-        setActorsKit();
+        setActorsKit(actors[ui->lwSoldierPool->currentRow()]);
     }
 }
 
@@ -447,7 +461,63 @@ void PlatoonSetup::on_pbKitRight_clicked()
 
         updateKitNameBox();
         updateSelectedKitInfo(getSelectedActorsKits());
-        setActorsKit();
+        setActorsKit(actors[ui->lwSoldierPool->currentRow()]);
+    }
+}
+
+void PlatoonSetup::on_pbKitFireteam_clicked()
+{
+    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
+    std::vector<Actor*> *fireteamPtr{nullptr};
+
+    // check if selected actor is on fireteam alpha
+    for (const auto &element : alpha)
+    {
+        if (selectedActor == *element) // they are
+            fireteamPtr = &alpha; // set temporary pointer to alpha
+    }
+
+    for (const auto &element : bravo)
+    {
+        if (selectedActor == *element)
+            fireteamPtr = &bravo;
+    }
+
+    for (const auto &element : charlie)
+    {
+        if (selectedActor == *element)
+            fireteamPtr = &charlie;
+    }
+
+    // iterate through whatever fireteam the selected actor is on and assign their kit to any other actors that share the same kit path
+    for (const auto &element : *fireteamPtr)
+    {
+        if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+            setActorsKit(*element);
+    }
+}
+
+void PlatoonSetup::on_pbKitSquad_clicked()
+{
+    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
+
+    // iterate through all three fireteams and assign the selected actor's kit to any other actors that share the same kit path
+    for (const auto &element : alpha)
+    {
+        if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+            setActorsKit(*element);
+    }
+
+    for (const auto &element : bravo)
+    {
+        if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+            setActorsKit(*element);
+    }
+
+    for (const auto &element : charlie)
+    {
+        if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+            setActorsKit(*element);
     }
 }
 
@@ -533,7 +603,7 @@ void PlatoonSetup::fireteamButtonClicked(std::vector<Actor *> &fireteam, QListWi
 
     // check if actor is on fireteam already
     bool onTeam{false};
-    for (auto &element : fireteam)
+    for (const auto &element : fireteam)
     {
         if (selectedActor == *element)
         onTeam = true;
@@ -608,7 +678,7 @@ void PlatoonSetup::unassignButtonClicked(std::vector<Actor*> &fireteam, QListWid
 
     // check if actor is on specified team already
     bool onTeam{false};
-    for (auto &element : fireteam)
+    for (const auto &element : fireteam)
     {
         if (selectedActor == *element)
         onTeam = true;
@@ -675,7 +745,7 @@ void PlatoonSetup::updateTeamButton(std::vector<Actor*> &fireteam, QPushButton *
 {
     // check if actor is on specified team already
     bool onTeam{false};
-    for (auto &element : fireteam)
+    for (const auto &element : fireteam)
     {
         if (actors[ui->lwSoldierPool->currentRow()] == *element)
         onTeam = true;
@@ -712,7 +782,7 @@ void PlatoonSetup::updateUnassignButton()
     bool onAnyTeam{false};
 
     // check if actor is on alpha team
-    for (auto &element : alpha)
+    for (const auto &element : alpha)
     {
         if (actors[ui->lwSoldierPool->currentRow()] == *element)
         {
@@ -722,7 +792,7 @@ void PlatoonSetup::updateUnassignButton()
     }
 
     // check if actor is on bravo team
-    for (auto &element : bravo)
+    for (const auto &element : bravo)
     {
         if (actors[ui->lwSoldierPool->currentRow()] == *element)
         {
@@ -732,7 +802,7 @@ void PlatoonSetup::updateUnassignButton()
     }
 
     // check if actor is on charlie team
-    for (auto &element : charlie)
+    for (const auto &element : charlie)
     {
         if (actors[ui->lwSoldierPool->currentRow()] == *element)
         {
@@ -746,50 +816,34 @@ void PlatoonSetup::updateUnassignButton()
         ui->pbUnassign->setEnabled(false);
 }
 
-// assigns the selected kit to the selected actor
-void PlatoonSetup::setActorsKit()
+// assigns the selected kit to the passed in actor
+void PlatoonSetup::setActorsKit(const Actor &actor)
 {
-    /*
-    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
-    auto tempIterator{assignedKitMap.find(selectedActor.getFileName())};
-    if (tempIterator != assignedKitMap.end())
-    {
-        tempIterator->second = ui->lwKits->currentRow();
-    }
-    else
-    {
-        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in PlatoonSetup::setActorsKit().  Actor not found.");
-        msgBox.exec();
-        exit(EXIT_FAILURE);
-    }
-    */
-
-    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
     int kitIndex{ui->lwKits->currentRow()};
-    if (selectedActor.getKitPath() == classRifleman)
+    if (actor.getKitPath() == classRifleman)
     {
-        assignedKitMap.assignKitToActor(riflemanKits[kitIndex].getFileName(), kitIndex, selectedActor.getFileName());
+        assignedKitMap.assignKitToActor(riflemanKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
-    else if (selectedActor.getKitPath() == classHeavyWeapons)
+    else if (actor.getKitPath() == classHeavyWeapons)
     {
-        assignedKitMap.assignKitToActor(heavyWeaponsKits[kitIndex].getFileName(), kitIndex, selectedActor.getFileName());
+        assignedKitMap.assignKitToActor(heavyWeaponsKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
-    else if (selectedActor.getKitPath() == classSniper)
+    else if (actor.getKitPath() == classSniper)
     {
-        assignedKitMap.assignKitToActor(sniperKits[kitIndex].getFileName(), kitIndex, selectedActor.getFileName());
+        assignedKitMap.assignKitToActor(sniperKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
-    else if (selectedActor.getKitPath() == classDemolitions)
+    else if (actor.getKitPath() == classDemolitions)
     {
-        assignedKitMap.assignKitToActor(demolitionsKits[kitIndex].getFileName(), kitIndex, selectedActor.getFileName());
+        assignedKitMap.assignKitToActor(demolitionsKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
     else
     {
         QString errorMsg{"Error in PlatoonSetup::setActorsKit().  Unrecognized kit path: '"};
-        errorMsg += selectedActor.getKitPath();
+        errorMsg += actor.getKitPath();
         errorMsg += "' for actor: ";
-        errorMsg += selectedActor.getFirstInitialLastName();
+        errorMsg += actor.getFirstInitialLastName();
         errorMsg += " filename: ";
-        errorMsg += selectedActor.getFileName();
+        errorMsg += actor.getFileName();
         QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
         msgBox.exec();
         exit(EXIT_FAILURE);
@@ -800,21 +854,6 @@ void PlatoonSetup::setActorsKit()
 // selects actor's current kit from the kit list
 void PlatoonSetup::selectActorsKit()
 {
-    /*
-    const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
-    auto tempIterator{assignedKitMap.find(selectedActor.getFileName())};
-    if (tempIterator != assignedKitMap.end())
-    {
-        ui->lwKits->setCurrentRow(tempIterator->second);
-    }
-    else
-    {
-        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in PlatoonSetup::selectActorsKit().  Actor not found.");
-        msgBox.exec();
-        exit(EXIT_FAILURE);
-    }
-    */
-
     const Actor &selectedActor{actors[ui->lwSoldierPool->currentRow()]};
     int kitIndex{assignedKitMap.getKitIndex(selectedActor.getFileName())};
     ui->lwKits->setCurrentRow(kitIndex);
@@ -1221,4 +1260,13 @@ void PlatoonSetup::updateSoldierDetails()
     ui->leStamina->setText("Endurance: " + selectedActor.getStaminaStat());
     ui->leStealth->setText("Stealth: " + selectedActor.getStealthStat());
     ui->leLeadership->setText("Leadership: " + selectedActor.getLeadershipStat());
+}
+
+// enables / disables the apply button
+void PlatoonSetup::updateApplyButton()
+{
+    if (alpha.size() <= 0 && bravo.size() <= 0 && charlie.size() <= 0)
+        ui->pbApply->setDisabled(true);
+    else
+        ui->pbApply->setEnabled(true);
 }

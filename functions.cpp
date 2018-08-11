@@ -15,6 +15,7 @@
 #include "projectile.h"
 #include "item.h"
 #include "kit.h"
+#include "kitrestrictionlist.h"
 #include "assignedkitmap.h"
 
 namespace fs = std::experimental::filesystem;
@@ -97,6 +98,38 @@ void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVe
     }
 }
 
+void updateKitVectorPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits)
+{
+    std::vector<QString> soldierClasses{classRifleman, classHeavyWeapons, classSniper, classDemolitions}; // the order of these two vectors have to match so if the first element is rifleman here
+    std::vector<std::vector<Kit>*> allClassesKits{&riflemanKits, &heavyWeaponsKits, &sniperKits, &demolitionsKits}; // then the first element has to be riflemen here
+    // this goes three deep
+    // first loop is every single kit
+    // second loop is every soldier class
+    // third loop is every kit of loop two's soldier class
+    for (const auto &potentialKit : allKits) // for every kit
+    {
+        for (int currentClass{0} ; currentClass < soldierClasses.size(); ++currentClass) // iterating through one of the four soldier classes at a time
+        {
+            if (kitList.checkKitAgainstRestrictionList(soldierClasses[currentClass], potentialKit.getFileName()) == true) // current kit belongs to current soldier class
+            {
+                bool replacedKit{false};
+                for (auto &existingKit : *allClassesKits[currentClass]) // check if current kit happens to already be in the permanent kit list for current soldier class
+                {
+                    if (QString::compare(potentialKit.getFileName(), existingKit.getFileName(), Qt::CaseInsensitive) == 0) // it is, so update it with this new one
+                    {
+                        existingKit = potentialKit;
+                        replacedKit = true;
+                    }
+                }
+                if (!replacedKit) // it isn't, so add in this new one
+                {
+                    allClassesKits[currentClass]->push_back(potentialKit);
+                }
+            }
+        }
+    }
+}
+
 // randomly chooses actors from one vector and places them into another
 // vector if that actor isn't already in there.
 // loops until it can find an actor from the source that isn't in the destination
@@ -121,6 +154,102 @@ void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Act
             destination.push_back(*actorPtr);
             done = true;
         }
+    }
+}
+
+void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> &actors)
+{
+    for (const auto &element : fs::directory_iterator(actorDirectoryPath))
+    {
+        std::ifstream currentFile;
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        if (QString::compare(getFileExtension(curFileName), actorExtension, Qt::CaseInsensitive) == 0)  // check the extension of the current iteration file is an actor file extension
+        {
+            currentFile.open(element.path());
+            if (!currentFile.good())
+            {
+                QString errorMsg{"Error in updateActorFiles().  Failed to open file: "};
+                errorMsg += QString::fromStdWString(element.path());
+                QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+                msgBox.exec();
+                exit(EXIT_FAILURE);
+            }
+            for (auto &element2 : actors)
+            {
+                if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found an actor in the vector with same filename as this one, replace it with this new one
+                {
+                    element2 = Actor(curFileName, currentFile);
+                }
+            }
+        }
+        currentFile.close();
+    }
+}
+
+void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits)
+{
+    std::ifstream currentFile;
+    std::error_code errorCode; // no actual error handling will take place with this error code
+
+    // update any discovered actors
+    if (fs::is_directory(modPath + "\\Actor\\rifleman", errorCode)) // if there is a actor\rifleman directory in this mod
+        updateActorFiles(modPath + "\\Actor\\rifleman", actors); // read from it and update the actors vector
+    if (fs::is_directory(modPath + "\\Actor\\heavy-weapons", errorCode))
+        updateActorFiles(modPath + "\\Actor\\heavy-weapons", actors);
+    if (fs::is_directory(modPath + "\\Actor\\sniper", errorCode))
+        updateActorFiles(modPath + "\\Actor\\sniper", actors);
+    if (fs::is_directory(modPath + "\\Actor\\demolitions", errorCode))
+        updateActorFiles(modPath + "\\Actor\\demolitions", actors);
+
+    // update and add strings if mod contains a strings file
+    if (fs::is_regular_file(modPath + "\\Shell\\strings.txt", errorCode))
+    {
+        currentFile.open(modPath + "\\Shell\\strings.txt");
+        strings.readFromFile(currentFile);
+        currentFile.close();
+    }
+
+    // read in guns, projectiles, and items if there is an "equip" folder
+    if (fs::is_directory(modPath + "\\Equip", errorCode))
+    {
+        readInGameFiles(modPath + "\\Equip", gunExtension, guns, strings);
+        readInGameFiles(modPath + "\\Equip", projectileExtension, projectiles, strings);
+        readInGameFiles(modPath + "\\Equip", itemExtension, items, strings);
+    }
+
+    std::vector<Kit> tempKits;
+    // read in all the kits and store them into a temporary kit vector if there is a "kits" folder
+    if (fs::is_directory(modPath + "\\Kits", errorCode))
+    {
+        readInAllKits(modPath + "\\Kits", tempKits);
+    }
+
+    std::vector<std::vector<Kit>*> allClassesKits{&riflemanKits, &heavyWeaponsKits, &sniperKits, &demolitionsKits};
+    // compare any new kits to existing soldier class kit vectors and update if necessary (no adding - updating only)
+    // this is here to catch a situation like:
+    // base game kit restriction list adds rifleman-05.kit
+    // mod has a rifleman-05.kit file in it, but which doesn't appear in it's kit restriction list
+    // which means that update to rifleman-05.kit wouldn't be applied
+    // real example: desert seige(mp1) updates demolitions-01.kit and demolitions-02.kit which would be missed without this code here
+    for (const auto &potentialKit : tempKits) // for every kit in the temporary kit vector
+    {
+        for (auto &currentClassKitVector : allClassesKits) // working on one of the four class kit vectors at a time (riflemanKits, etc)
+        {
+            for (auto &currentClassKit : *currentClassKitVector) // check if current kit happens to already be in the permanent kit list for current solider class
+            {
+                if (QString::compare(potentialKit.getFileName(), currentClassKit.getFileName(), Qt::CaseInsensitive) == 0) // it is, so update it with this new one
+                    currentClassKit = potentialKit;
+            }
+        }
+    }
+
+    // if this mod has a kit restriction list file read it and add it's kits to the appropriate soldier class kit vectors
+    if (fs::is_regular_file(modPath + "\\Kits\\quick_missions.qmk", errorCode))
+    {
+        currentFile.open(modPath + "\\Kits\\quick_missions.qmk");
+        KitRestrictionList kitList(currentFile);
+        currentFile.close();
+        updateKitVectorPerRestrictionList(tempKits, kitList, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
     }
 }
 

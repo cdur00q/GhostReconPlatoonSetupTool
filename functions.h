@@ -9,6 +9,7 @@
 #include "item.h"
 #include "kit.h"
 #include "assignedkitmap.h"
+#include "kitrestrictionlist.h"
 #include <vector>
 #include <fstream>
 #include <QString>
@@ -22,6 +23,11 @@ QString getFileExtension(const QString &fileName);
 
 // read in all kits from the passed in directory and it's subdirectories and store them in a kit vector
 void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector);
+
+// adds/updates kits from passed in kit list to passed in soldier class specific kit lists according to the passed in kit restriction list
+// kits are checked one at a time and added to each soldier class that is a user of that kit
+// a kit could be used by more than one soldier class
+void updateKitVectorPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits);
 
 // read in actor or kit files
 // pass in a directory where actor or kit files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
@@ -98,6 +104,11 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
         currentFile.close();
     }
 }
+
+// pass in a directory where actor files are held and a vector of actors.  will update the passed in vector with newer versions of the files it finds
+void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> &actors);
+
+void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits);
 
 void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Actor> &destination);
 

@@ -46,6 +46,10 @@ private slots:
 
     void on_pbKitRight_clicked();
 
+    void on_pbKitFireteam_clicked();
+
+    void on_pbKitSquad_clicked();
+
     void on_pbApply_clicked();
 
 private:
@@ -62,7 +66,7 @@ private:
 
     void updateUnassignButton();
 
-    void setActorsKit();
+    void setActorsKit(const Actor &actor);
 
     void selectActorsKit();
 
@@ -75,6 +79,8 @@ private:
     void updateSelectedKitInfo(const std::vector<Kit> &kits);
 
     void updateSoldierDetails();
+
+    void updateApplyButton();
 };
 
 #endif // PLATOONSETUP_H
