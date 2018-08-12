@@ -22,6 +22,7 @@
 #include "strings.h"
 #include "kitrestrictionlist.h"
 #include "assignedkitmap.h"
+#include "modlist.h"
 namespace fs = std::experimental::filesystem;
 
 static std::vector<Actor> rifleman;
@@ -71,6 +72,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     //TODO - relative file paths
     //TODO - mod support
     //TODO - interface styling
+    //TODO - return value of various get game data functions in the classes - switch them to void and call a function on error?
     //TODO - add 'is regular file' check to readingamefiles()?
     //TODO - first available soldier is automatically selected when program loads?
     //TODO - unassign all button?
@@ -145,91 +147,22 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // create the kit restriction list
     currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Origmiss\\Kits\\quick_missions.qmk");
     KitRestrictionList kitList(currentFile);
-
-    /*
-    // add kits from temporary kit list to final kit lists according to the kit restriction list
-    // kits should be checked one at a time and added to each soldier class that is a user of that kit
-    // a kit could be used by more than one soldier class
-    for (const auto &element : tempKits) // for every kit in the temporary kit vector
-    {
-        // see if kit is for rifleman
-        if (kitList.checkKitAgainstRestrictionList(classRifleman, element.getFileName()) == true) // current kit belongs to rifleman soldier class
-        {
-            bool replacedKit{false};
-            for (auto &element2 : riflemanKits) // check if current kit happens to already be in the permanent kit list for this soldier class
-            {
-                if (QString::compare(element.getFileName(), element2.getFileName(), Qt::CaseInsensitive) == 0) // it is, so update it with this new one
-                {
-                    element2 = element;
-                    replacedKit = true;
-                }
-            }
-            if (!replacedKit) // it isn't, so add in this new one
-            {
-                riflemanKits.push_back(element);
-            }
-        }
-
-        // see if kit is for support
-        if (kitList.checkKitAgainstRestrictionList(classHeavyWeapons, element.getFileName()) == true)
-        {
-            bool replacedKit{false};
-            for (auto &element2 : heavyWeaponsKits)
-            {
-                if (QString::compare(element.getFileName(), element2.getFileName(), Qt::CaseInsensitive) == 0)
-                {
-                    element2 = element;
-                    replacedKit = true;
-                }
-            }
-            if (!replacedKit)
-            {
-                heavyWeaponsKits.push_back(element);
-            }
-        }
-
-        // see if kit is for sniper
-        if (kitList.checkKitAgainstRestrictionList(classSniper, element.getFileName()) == true)
-        {
-            bool replacedKit{false};
-            for (auto &element2 : sniperKits)
-            {
-                if (QString::compare(element.getFileName(), element2.getFileName(), Qt::CaseInsensitive) == 0)
-                {
-                    element2 = element;
-                    replacedKit = true;
-                }
-            }
-            if (!replacedKit)
-            {
-                sniperKits.push_back(element);
-            }
-        }
-
-        // see if kit is for demolitions
-        if (kitList.checkKitAgainstRestrictionList(classDemolitions, element.getFileName()) == true)
-        {
-            bool replacedKit{false};
-            for (auto &element2 : demolitionsKits)
-            {
-                if (QString::compare(element.getFileName(), element2.getFileName(), Qt::CaseInsensitive) == 0)
-                {
-                    element2 = element;
-                    replacedKit = true;
-                }
-            }
-            if (!replacedKit)
-            {
-                demolitionsKits.push_back(element);
-            }
-        }
-    }
-    */
+    currentFile.close();
 
     updateKitVectorPerRestrictionList(tempKits, kitList, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
 
+    // read in the mod list
+    currentFile.open("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\modsset.txt");
+    ModList modList(currentFile);
+    currentFile.close();
+    modList.print();
+
     // load mods
-    loadMod("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Mp1", actors, strings, guns, projectiles, items, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
+    for (const auto &currentMod : modList.getModList())
+    {
+        loadMod("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon" + currentMod, actors, strings, guns, projectiles, items, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
+    }
+    //loadMod("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Mp1", actors, strings, guns, projectiles, items, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
     //loadMod("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\Mp2", actors, strings, guns, projectiles, items, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
     //loadMod("C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon\\Mods\\TestMod1", actors, strings, guns, projectiles, items, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
 

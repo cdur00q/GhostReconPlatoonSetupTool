@@ -34,7 +34,8 @@ SOURCES += \
     item.cpp \
     strings.cpp \
     kitrestrictionlist.cpp \
-    assignedkitmap.cpp
+    assignedkitmap.cpp \
+    modlist.cpp
 
 HEADERS += \
         platoonsetup.h \
@@ -47,7 +48,8 @@ HEADERS += \
     item.h \
     strings.h \
     kitrestrictionlist.h \
-    assignedkitmap.h
+    assignedkitmap.h \
+    modlist.h
 
 FORMS += \
         platoonsetup.ui
