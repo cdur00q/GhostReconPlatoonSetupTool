@@ -14,12 +14,15 @@
 #include <fstream>
 #include <QString>
 #include <QMessageBox>
+#include <QUrl>
 
 namespace fs = std::experimental::filesystem;
 
 long getRandomNumber(long min, long max);
 
 QString getFileExtension(const QString &fileName);
+
+QUrl stringToQUrl(const std::string &string);
 
 // read in all kits from the passed in directory and it's subdirectories and store them in a kit vector
 void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector);
@@ -108,7 +111,7 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
 // pass in a directory where actor files are held and a vector of actors.  will update the passed in vector with newer versions of the files it finds
 void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> &actors);
 
-void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits);
+void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3);
 
 void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Actor> &destination);
 
