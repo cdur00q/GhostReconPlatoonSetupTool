@@ -62,6 +62,7 @@ void ModList::readFromFile(std::ifstream &modsSetFile)
     {
         QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in ModList::readFromFile.");
         msgBox.exec();
+        exit(EXIT_FAILURE);
     }
 }
 

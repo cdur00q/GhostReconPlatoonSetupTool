@@ -1,7 +1,7 @@
 #ifndef VARIABLES_H
 #define VARIABLES_H
 
-//#include <string>
+#include <string>
 #include <QString>
 
 
@@ -15,6 +15,8 @@ const QString classRifleman{"rifleman"}; // class as in soldier's skill/role, no
 const QString classHeavyWeapons{"heavy-weapons"};
 const QString classSniper{"sniper"};
 const QString classDemolitions{"demolitions"};
+const std::string mainGameDirectory{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon"};
+// ***switch main game directory to realitive path for release build***
 
 enum class fileReadResult
 {

@@ -5,6 +5,7 @@
 #include <cstdlib> // for rand() and srand()
 #include <QString>
 #include <QMessageBox>
+#include <QUrl>
 #include <QTextStream> // for printing to console
 
 #include "variables.h"
@@ -54,6 +55,24 @@ QString getFileExtension(const QString &fileName)
     QMessageBox msgBox(QMessageBox::Critical, "Error", errorMessage);
     msgBox.exec();
     return "error";
+}
+
+QUrl stringToQUrl(const std::string &string)
+{
+    std::string tempStringOut{""};
+    for (const auto &element : string)
+    {
+        if (element == '\\')
+        {
+            tempStringOut += '/';
+        }
+        else
+        {
+            tempStringOut += element;
+        }
+    }
+    QUrl qUrl{QUrl::fromLocalFile(QString::fromStdString(tempStringOut))};
+    return qUrl;
 }
 
 void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector)
@@ -186,7 +205,7 @@ void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> 
     }
 }
 
-void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits)
+void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3)
 {
     std::ifstream currentFile;
     std::error_code errorCode; // no actual error handling will take place with this error code
@@ -251,6 +270,14 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
         currentFile.close();
         updateKitVectorPerRestrictionList(tempKits, kitList, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
     }
+
+    // update the music track if there are newer versions of them
+    if (fs::is_regular_file(modPath + "\\Sound\\Music\\action3.wav", errorCode))
+        musicAction3 = modPath + "\\Sound\\Music\\action3.wav";
+    if (fs::is_regular_file(modPath + "\\Sound\\Music\\load1.wav", errorCode))
+        musicLoad1 = modPath + "\\Sound\\Music\\load1.wav";
+    if (fs::is_regular_file(modPath + "\\Sound\\Music\\load3.wav", errorCode))
+        musicLoad3 = modPath + "\\Sound\\Music\\load3.wav";
 }
 
 void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &avatarFile)
