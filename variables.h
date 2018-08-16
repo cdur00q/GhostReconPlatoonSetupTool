@@ -12,7 +12,8 @@ const QString projectileExtension{".prj"};
 const QString itemExtension{".itm"};
 const QString kitExtension{".kit"};
 const QString classRifleman{"rifleman"}; // class as in soldier's skill/role, not c++ class
-const QString classHeavyWeapons{"heavy-weapons"};
+const QString classHeavyWeapons{"heavy-weapons"}; // heavy-weapons and support are used somewhat interchangebly in the game files
+const QString classSupport{"support"}; // heavy-weapons and support are used somewhat interchangebly in the game files
 const QString classSniper{"sniper"};
 const QString classDemolitions{"demolitions"};
 const std::string mainGameDirectory{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon"};

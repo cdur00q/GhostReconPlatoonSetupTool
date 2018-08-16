@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
     PlatoonSetup w;
-    //connect(a, SIGNAL(a.applicationStateChanged(Qt::ApplicationInactive)), w, SLOT(w.close()));
     w.show();
 
     return a.exec();
