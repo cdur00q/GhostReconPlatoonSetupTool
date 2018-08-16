@@ -54,12 +54,13 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // https://stackoverflow.com/questions/12338818/how-to-get-double-quotes-into-a-string-literal#12338826
 
     //TODO - interface styling
+    //TODO - fix indentation between soldier name and class in soldier pool
+    //TODO - create two different versions of wirteAvatar() - one for SP and one for MP
     //TODO - return value of various get game data functions in the classes - switch them to void and call a function on error?
     //TODO - add 'is regular file' check to readingamefiles()?
     //TODO - weapon types for support kits showing "rifle" - any way to fix?
     //TODO - first available soldier is automatically selected when program loads?
     //TODO - unassign all button?
-    //TODO - music?
 
     m_actors.reserve(76); // do this for all the vectors that store actors in the program?
 
@@ -117,7 +118,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         //element.print();
     }
 
-    // read in base kits for the four characters classes and store them into their respective kit vectors
+    // read in base kits for the four character classes and store them into their respective kit vectors
     readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\rifleman", kitExtension, m_riflemanKits);
     readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\heavy-weapons", kitExtension, m_heavyWeaponsKits);
     readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\sniper", kitExtension, m_sniperKits);
@@ -200,11 +201,25 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 
     // connect signals and slots
     QCoreApplication *coreApp{QCoreApplication::instance()};
-    QObject::connect(coreApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(on_QApplication_StateChanged(Qt::ApplicationState)));
-    QObject::connect(m_mediaPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(on_MediaPlayer_StateChanged(QMediaPlayer::State)));
+    QObject::connect(coreApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(qApplicationStateChanged(Qt::ApplicationState)));
+    QObject::connect(m_mediaPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(mediaPlayerStateChanged(QMediaPlayer::State)));
 
     // start music playback
-    m_mediaPlayer->setMedia(stringToQUrl(musicLoad3));
+    switch (getRandomNumber(0, 2))
+    {
+    case 0:
+        m_mediaPlayer->setMedia(stringToQUrl(musicAction3));
+        break;
+    case 1:
+        m_mediaPlayer->setMedia(stringToQUrl(musicLoad1));
+        break;
+    case 2:
+        m_mediaPlayer->setMedia(stringToQUrl(musicLoad3));
+        break;
+    default:
+        QMessageBox msgBox(QMessageBox::Warning, "Warning", "Warning, unhandled case when selecting random music track in PlatoonSetup::PlatoonSetup().");
+        msgBox.exec();
+    }
     m_mediaPlayer->play();
 }
 
@@ -450,22 +465,28 @@ void PlatoonSetup::on_pbKitSquad_clicked()
 
 void PlatoonSetup::on_pbApply_clicked()
 {
-    // write avatar file
-    std::string coopAvatarPath{mainGameDirectory + "\\Data\\Temp\\coop_avatar.toe"};
-    std::ofstream coopAvatar(coopAvatarPath, std::ios::out|std::ios::trunc);
-    writeCoopAvatar(m_alpha, m_bravo, m_charlie, m_assignedKitMap, coopAvatar);
+    // write avatar files
+    //std::string avatarPath{mainGameDirectory + "\\Data\\Temp\\avatar.toe"};
+    //std::string coopAvatarPath{mainGameDirectory + "\\Data\\Temp\\coop_avatar.toe"};
+    std::ofstream avatar(mainGameDirectory + "\\Data\\Temp\\avatar.toe", std::ios::out|std::ios::trunc);
+    writeAvatarFile(m_alpha, m_bravo, m_charlie, m_assignedKitMap, avatar, false);
+    avatar.close();
+
+    std::ofstream coopAvatar(mainGameDirectory + "\\Data\\Temp\\coop_avatar.toe", std::ios::out|std::ios::trunc);
+    writeAvatarFile(m_alpha, m_bravo, m_charlie, m_assignedKitMap, coopAvatar, true);
     coopAvatar.close();
+
     QMessageBox msgBox(QMessageBox::Information, "Info", "Done");
     msgBox.exec();
 }
 
-void PlatoonSetup::on_MediaPlayer_StateChanged(QMediaPlayer::State state)
+void PlatoonSetup::mediaPlayerStateChanged(QMediaPlayer::State state)
 {
     if (state == QMediaPlayer::StoppedState)
         m_mediaPlayer->play();
 }
 
-void PlatoonSetup::on_QApplication_StateChanged(Qt::ApplicationState state)
+void PlatoonSetup::qApplicationStateChanged(Qt::ApplicationState state)
 {
     if (state == Qt::ApplicationInactive)
     {

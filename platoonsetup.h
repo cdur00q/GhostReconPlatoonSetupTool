@@ -58,9 +58,9 @@ private slots:
 
     void on_pbApply_clicked();
 
-    void on_MediaPlayer_StateChanged(QMediaPlayer::State state);
+    void mediaPlayerStateChanged(QMediaPlayer::State state);
 
-    void on_QApplication_StateChanged(Qt::ApplicationState state);
+    void qApplicationStateChanged(Qt::ApplicationState state);
 
 private:
     Ui::PlatoonSetup *ui;

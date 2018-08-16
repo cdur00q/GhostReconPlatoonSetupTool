@@ -115,6 +115,6 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
 
 void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Actor> &destination);
 
-void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &file);
+void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &file, bool forCooperative);
 
 #endif // FUNCTIONS_H

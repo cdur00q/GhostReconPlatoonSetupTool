@@ -236,6 +236,16 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
         readInGameFiles(modPath + "\\Equip", itemExtension, items, strings);
     }
 
+    // if there is a directory for it, read in base kits for the four character classes and update / add them into their respective kit vectors
+    if (fs::is_directory(modPath + "\\Kits\\rifleman", errorCode))
+        readInGameFiles(modPath + "\\Kits\\rifleman", kitExtension, riflemanKits);
+    if (fs::is_directory(modPath + "\\Kits\\heavy-weapons", errorCode))
+        readInGameFiles(modPath + "\\Kits\\heavy-weapons", kitExtension, heavyWeaponsKits);
+    if (fs::is_directory(modPath + "\\Kits\\sniper", errorCode))
+        readInGameFiles(modPath + "\\Kits\\sniper", kitExtension, sniperKits);
+    if (fs::is_directory(modPath + "\\Kits\\demolitions", errorCode))
+        readInGameFiles(modPath + "\\Kits\\demolitions", kitExtension, demolitionsKits);
+
     std::vector<Kit> tempKits;
     // read in all the kits and store them into a temporary kit vector if there is a "kits" folder
     if (fs::is_directory(modPath + "\\Kits", errorCode))
@@ -246,10 +256,10 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
     std::vector<std::vector<Kit>*> allClassesKits{&riflemanKits, &heavyWeaponsKits, &sniperKits, &demolitionsKits};
     // compare any new kits to existing soldier class kit vectors and update if necessary (no adding - updating only)
     // this is here to catch a situation like:
-    // base game kit restriction list adds rifleman-05.kit
-    // mod has a rifleman-05.kit file in it, but which doesn't appear in it's kit restriction list
-    // which means that update to rifleman-05.kit wouldn't be applied
-    // real example: desert seige(mp1) updates demolitions-01.kit and demolitions-02.kit which would be missed without this code here
+    // base game kit restriction list adds multiplayer\somekitname.kit
+    // mod has a multiplayer\somekitname.kit file in it, but which doesn't appear in it's kit restriction list
+    // which means that update to somekitname.kit wouldn't be applied because outside this code only the
+    // rifleman/heavy-weapons/sniper/demolitions directories are checked, and whatever the kit restriction list includes
     for (const auto &potentialKit : tempKits) // for every kit in the temporary kit vector
     {
         for (auto &currentClassKitVector : allClassesKits) // working on one of the four class kit vectors at a time (riflemanKits, etc)
@@ -280,12 +290,12 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
         musicLoad3 = modPath + "\\Sound\\Music\\load3.wav";
 }
 
-void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &avatarFile)
+void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &avatarFile, bool forCooperative)
 {
     // exit if there are no soldiers in any of the passed in fireteams
     if (alpha.size() <= 0 && bravo.size() <= 0 && charlie.size() <= 0)
     {
-        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error, three empty fireteams passed to writeCoopAvatar().");
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error, three empty fireteams passed to writeAvatarFile().");
         msgBox.exec();
         exit(EXIT_FAILURE);
     }
@@ -313,7 +323,21 @@ void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*>
             alphaStrings[i] += R"(<Actor IgorId = ")";
             alphaStrings[i] += QString::number(++idNumber);
             alphaStrings[i] += R"(" ScriptId = "0" File = ")";
-            alphaStrings[i] += alpha[i]->getFileName();
+            if (forCooperative) // switch the single player actors the multiplayer actors
+            {
+                if (alpha[i]->getClassName() == classRifleman) {alphaStrings[i] += "mp_plt1_asl.atr";}
+                else if (alpha[i]->getClassName() == classSupport) {alphaStrings[i] += "mp_plt1_hvywep.atr";}
+                else if (alpha[i]->getClassName() == classSniper) {alphaStrings[i] += "mp_plt1_snip.atr";}
+                else if (alpha[i]->getClassName() == classDemolitions) {alphaStrings[i] += "mp_plt1_dem.atr";}
+                else
+                {
+                    QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in writeAvatarFile(), unrecognized soldier class encountered in Alpha Team.");
+                    msgBox.exec();
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else
+                alphaStrings[i] += alpha[i]->getFileName();
             alphaStrings[i] += R"(" Kit = ")";
             alphaStrings[i] += assignedKitMap.getKitFileName(alpha[i]->getFileName());
             if (firstSoldier)
@@ -331,7 +355,21 @@ void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*>
             bravoStrings[i] += R"(<Actor IgorId = ")";
             bravoStrings[i] += QString::number(++idNumber);
             bravoStrings[i] += R"(" ScriptId = "0" File = ")";
-            bravoStrings[i] += bravo[i]->getFileName();
+            if (forCooperative)
+            {
+                if (bravo[i]->getClassName() == classRifleman) {bravoStrings[i] += "mp_plt1_asl.atr";}
+                else if (bravo[i]->getClassName() == classSupport) {bravoStrings[i] += "mp_plt1_hvywep.atr";}
+                else if (bravo[i]->getClassName() == classSniper) {bravoStrings[i] += "mp_plt1_snip.atr";}
+                else if (bravo[i]->getClassName() == classDemolitions) {bravoStrings[i] += "mp_plt1_dem.atr";}
+                else
+                {
+                    QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in writeAvatarFile(), unrecognized soldier class encountered in Bravo Team.");
+                    msgBox.exec();
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else
+                bravoStrings[i] += bravo[i]->getFileName();
             bravoStrings[i] += R"(" Kit = ")";
             bravoStrings[i] += assignedKitMap.getKitFileName(bravo[i]->getFileName());
             if (firstSoldier)
@@ -349,7 +387,21 @@ void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*>
             charlieStrings[i] += R"(<Actor IgorId = ")";
             charlieStrings[i] += QString::number(++idNumber);
             charlieStrings[i] += R"(" ScriptId = "0" File = ")";
-            charlieStrings[i] += charlie[i]->getFileName();
+            if (forCooperative)
+            {
+                if (charlie[i]->getClassName() == classRifleman) {charlieStrings[i] += "mp_plt1_asl.atr";}
+                else if (charlie[i]->getClassName() == classSupport) {charlieStrings[i] += "mp_plt1_hvywep.atr";}
+                else if (charlie[i]->getClassName() == classSniper) {charlieStrings[i] += "mp_plt1_snip.atr";}
+                else if (charlie[i]->getClassName() == classDemolitions) {charlieStrings[i] += "mp_plt1_dem.atr";}
+                else
+                {
+                    QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in writeAvatarFile(), unrecognized soldier class encountered in Charlie Team.");
+                    msgBox.exec();
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else
+                charlieStrings[i] += charlie[i]->getFileName();
             charlieStrings[i] += R"(" Kit = ")";
             charlieStrings[i] += assignedKitMap.getKitFileName(charlie[i]->getFileName());
             if (firstSoldier)
@@ -404,7 +456,10 @@ void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*>
         if (bravo.size() > 0) { ++idNumber;}
         if (charlie.size() > 0) { ++idNumber;}
         (platoon += '"') += QString::number(idNumber) += '"';
-        platoon += R"( ScriptId = "0" Name = "_Platoon1" MultiplayerPlatoon = "1">)";
+        if (forCooperative)
+            platoon += R"( ScriptId = "0" Name = "_Platoon1" MultiplayerPlatoon = "1">)";
+        else
+            platoon += R"( ScriptId = "0" Name = "_Platoon">)";
         platoon += alphaTeam += bravoTeam += charlieTeam += "\n\t\t</Platoon>";
 
         // create company
@@ -412,7 +467,10 @@ void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*>
         company += "<Company IgorId = ";
         ++idNumber; // assumes idNumber hasn't been touched since platoon
         (company += '"') += QString::number(idNumber) += '"';
-        company += R"( ScriptId = "0" Name = "_---" MultiplayerCompany = "2">)";
+        if (forCooperative)
+            company += R"( ScriptId = "0" Name = "_---" MultiplayerCompany = "2">)";
+        else
+            company += R"( ScriptId = "0" Name = "_Company">)";
         company += platoon += "\n\t</Company>";
 
         // create toe file
@@ -427,7 +485,7 @@ void writeCoopAvatar(const std::vector<Actor*> &alpha, const std::vector<Actor*>
     // something went wrong with the file stream
     if (!avatarFile.good())
     {
-        QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in writeCoopAvatar().");
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in writeAvatarFile().");
         msgBox.exec();
         exit(EXIT_FAILURE);
     }

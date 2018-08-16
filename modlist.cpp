@@ -20,28 +20,16 @@ void ModList::readFromFile(std::ifstream &modsSetFile)
         {
             modsSetFile.get(curChar);
             // found the open quotation mark of a mod path
+            // now read in all data until the closing quotation is found
             if (curChar == '"')
             {
-                value += '\\'; // add this extra slash now because this will be used in a file path
                 modsSetFile.get(curChar);
-                value += curChar;
-                modsSetFile.get(curChar);
-                // read until the next backslash
-                while (curChar != '\\')
-                {
-                    value += curChar;
-                    modsSetFile.get(curChar);
-                }
-                value += curChar;
-                value += '\\'; // add this extra slash now because this will be used in a file path
-                modsSetFile.get(curChar);
-                // read until the closing quotation mark is found
                 while (curChar != '"')
                 {
                     value += curChar;
                     modsSetFile.get(curChar);
                 }
-                // found it
+                // found closing quotation mark
                 if (curChar == '"')
                 {
                     m_modList.push_back(value); // add mod path to the vector
