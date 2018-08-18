@@ -54,12 +54,9 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // https://stackoverflow.com/questions/12338818/how-to-get-double-quotes-into-a-string-literal#12338826
 
     //TODO - interface styling
-    //TODO - fix indentation between soldier name and class in soldier pool
-    //TODO - create two different versions of wirteAvatar() - one for SP and one for MP
     //TODO - return value of various get game data functions in the classes - switch them to void and call a function on error?
-    //TODO - add 'is regular file' check to readingamefiles()?
-    //TODO - weapon types for support kits showing "rifle" - any way to fix?
-    //TODO - first available soldier is automatically selected when program loads?
+    //TODO - suppressed weapons with a suppressed value greater than 1 showing up unsuppressed in interface (seen in centcom mod)
+    //TODO - check there is at least 1 actor and 1 kit for him before showing the main window
     //TODO - unassign all button?
 
     m_actors.reserve(76); // do this for all the vectors that store actors in the program?
@@ -157,11 +154,11 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         //element.print();
         if (element.getClassName() == classDemolitions)
         {
-            new QListWidgetItem(element.getFirstInitialLastName() + "       " + "DEMO", ui->lwSoldierPool);
+            new QListWidgetItem(element.getFirstInitialLastName() + "\t\t" + "DEMO", ui->lwSoldierPool);
         }
         else
         {
-            new QListWidgetItem(element.getFirstInitialLastName() + "       " + element.getClassName().toUpper(), ui->lwSoldierPool);
+            new QListWidgetItem(element.getFirstInitialLastName() + "\t\t" + element.getClassName().toUpper(), ui->lwSoldierPool);
         }
     }
 
@@ -199,6 +196,10 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         }
     }
 
+    // select first soldier (can only do this after actors and kits are loaded and processed)
+    ui->lwSoldierPool->setCurrentRow(0);
+    on_lwSoldierPool_itemClicked();
+
     // connect signals and slots
     QCoreApplication *coreApp{QCoreApplication::instance()};
     QObject::connect(coreApp, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this, SLOT(qApplicationStateChanged(Qt::ApplicationState)));
@@ -227,6 +228,11 @@ PlatoonSetup::~PlatoonSetup()
 {
     delete ui;
     delete m_mediaPlayer;
+
+    // remove read only from avatar files
+    std::error_code errorCode; // no error handling will take place with this error code
+    fs::permissions(mainGameDirectory + "\\Data\\Temp\\avatar.toe", fs::perms::add_perms | fs::perms::owner_write | fs::perms::group_write | fs::perms::others_write, errorCode);
+    fs::permissions(mainGameDirectory + "\\Data\\Temp\\coop_avatar.toe", fs::perms::add_perms | fs::perms::owner_write | fs::perms::group_write | fs::perms::others_write, errorCode);
 }
 
 void PlatoonSetup::on_pbAlpha_clicked()
@@ -465,16 +471,22 @@ void PlatoonSetup::on_pbKitSquad_clicked()
 
 void PlatoonSetup::on_pbApply_clicked()
 {
-    // write avatar files
-    //std::string avatarPath{mainGameDirectory + "\\Data\\Temp\\avatar.toe"};
-    //std::string coopAvatarPath{mainGameDirectory + "\\Data\\Temp\\coop_avatar.toe"};
-    std::ofstream avatar(mainGameDirectory + "\\Data\\Temp\\avatar.toe", std::ios::out|std::ios::trunc);
+    // write single player avatar file
+    std::error_code errorCode; // no error handling will take place with this error code
+    std::string avatarPath{mainGameDirectory + "\\Data\\Temp\\avatar.toe"};
+    fs::permissions(avatarPath, fs::perms::add_perms | fs::perms::owner_write | fs::perms::group_write | fs::perms::others_write, errorCode);
+    std::ofstream avatar(avatarPath, std::ios::out|std::ios::trunc);
     writeAvatarFile(m_alpha, m_bravo, m_charlie, m_assignedKitMap, avatar, false);
     avatar.close();
+    fs::permissions(avatarPath, fs::perms::remove_perms & fs::perms::owner_write & fs::perms::group_write & fs::perms::others_write, errorCode);
 
-    std::ofstream coopAvatar(mainGameDirectory + "\\Data\\Temp\\coop_avatar.toe", std::ios::out|std::ios::trunc);
+    // write cooperative avatar file
+    std::string coopAvatarPath{mainGameDirectory + "\\Data\\Temp\\coop_avatar.toe"};
+    fs::permissions(coopAvatarPath, fs::perms::add_perms | fs::perms::owner_write | fs::perms::group_write | fs::perms::others_write, errorCode);
+    std::ofstream coopAvatar(coopAvatarPath, std::ios::out|std::ios::trunc);
     writeAvatarFile(m_alpha, m_bravo, m_charlie, m_assignedKitMap, coopAvatar, true);
     coopAvatar.close();
+    fs::permissions(coopAvatarPath, fs::perms::remove_perms & fs::perms::owner_write & fs::perms::group_write & fs::perms::others_write, errorCode);
 
     QMessageBox msgBox(QMessageBox::Information, "Info", "Done");
     msgBox.exec();
@@ -1020,11 +1032,11 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
     if (weaponType == "0")
         weaponTypeText = "Pistol";
     else if (weaponType == "1")
-        weaponTypeText = "Rifle";
+        weaponTypeText = "AR / LMG / SMG";
     else if (weaponType == "2")
         weaponTypeText = "Sniper Rifle";
     else if (weaponType == "3")
-        weaponTypeText = "Bolt Action";
+        weaponTypeText = "Bolt Action Rifle";
     else if (weaponType == "4")
         weaponTypeText = "Grenade Launcher";
     else if (weaponType == "5")
@@ -1105,11 +1117,11 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
         if (weaponType == "0")
             weaponTypeText = "Pistol";
         else if (weaponType == "1")
-            weaponTypeText = "Rifle";
+            weaponTypeText = "AR / LMG / SMG";
         else if (weaponType == "2")
             weaponTypeText = "Sniper Rifle";
         else if (weaponType == "3")
-            weaponTypeText = "Bolt Action";
+            weaponTypeText = "Bolt Action Rifle";
         else if (weaponType == "4")
             weaponTypeText = "Grenade Launcher";
         else if (weaponType == "5")

@@ -40,30 +40,34 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
     for (const auto &element : fs::directory_iterator(directoryPath))
     {
         std::ifstream currentFile;
-        QString curFileName{QString::fromStdWString(element.path().filename())};
-        if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check the extension of the current iteration file matches what was passed in
+        std::error_code errorCode; // no actual error handling will take place with this error code
+        if (fs::is_regular_file(element.path(), errorCode))
         {
-            currentFile.open(element.path());
-            if (!currentFile.good())
+            QString curFileName{QString::fromStdWString(element.path().filename())};
+            if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check the extension of the current iteration file matches what was passed in
             {
-                QString errorMsg{"Error in readInGameFiles().  Failed to open file: "};
-                errorMsg += QString::fromStdWString(element.path());
-                QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
-                msgBox.exec();
-                exit(EXIT_FAILURE);
-            }
-            bool replacedItem{false};
-            for (auto &element2 : gameDataVector)
-            {
-                if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found an item in the vector with same filename as this one, replace it with this new one
+                currentFile.open(element.path());
+                if (!currentFile.good())
                 {
-                    element2 = typename T::value_type(curFileName, currentFile);
-                    replacedItem = true;
+                    QString errorMsg{"Error in readInGameFiles().  Failed to open file: "};
+                    errorMsg += QString::fromStdWString(element.path());
+                    QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+                    msgBox.exec();
+                    exit(EXIT_FAILURE);
                 }
-            }
-            if (!replacedItem) // didn't find an item in the vector with this name already so add in this new item
-            {
-                gameDataVector.push_back(typename T::value_type(curFileName, currentFile));
+                bool replacedItem{false};
+                for (auto &element2 : gameDataVector)
+                {
+                    if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found an item in the vector with same filename as this one, replace it with this new one
+                    {
+                        element2 = typename T::value_type(curFileName, currentFile);
+                        replacedItem = true;
+                    }
+                }
+                if (!replacedItem) // didn't find an item in the vector with this name already so add in this new item
+                {
+                    gameDataVector.push_back(typename T::value_type(curFileName, currentFile));
+                }
             }
         }
         currentFile.close();
@@ -78,30 +82,34 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
     for (const auto &element : fs::directory_iterator(directoryPath))
     {
         std::ifstream currentFile;
-        QString curFileName{QString::fromStdWString(element.path().filename())};
-        if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check the extension of the current iteration file matches what was passed in
+        std::error_code errorCode; // no actual error handling will take place with this error code
+        if (fs::is_regular_file(element.path(), errorCode))
         {
-            currentFile.open(element.path());
-            if (!currentFile.good())
+            QString curFileName{QString::fromStdWString(element.path().filename())};
+            if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check the extension of the current iteration file matches what was passed in
             {
-                QString errorMsg{"Error in readInGameFiles().  Failed to open file: "};
-                errorMsg += QString::fromStdWString(element.path());
-                QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
-                msgBox.exec();
-                exit(EXIT_FAILURE);
-            }
-            bool replacedItem{false};
-            for (auto &element2 : gameDataVector)
-            {
-                if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found an item in the vector with same filename as this one, replace it with this new one
+                currentFile.open(element.path());
+                if (!currentFile.good())
                 {
-                    element2 = typename T::value_type(curFileName, currentFile, strings);
-                    replacedItem = true;
+                    QString errorMsg{"Error in readInGameFiles().  Failed to open file: "};
+                    errorMsg += QString::fromStdWString(element.path());
+                    QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+                    msgBox.exec();
+                    exit(EXIT_FAILURE);
                 }
-            }
-            if (!replacedItem) // didn't find an item in the vector with this name already so add in this new item
-            {
-                gameDataVector.push_back(typename T::value_type(curFileName, currentFile, strings));
+                bool replacedItem{false};
+                for (auto &element2 : gameDataVector)
+                {
+                    if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found an item in the vector with same filename as this one, replace it with this new one
+                    {
+                        element2 = typename T::value_type(curFileName, currentFile, strings);
+                        replacedItem = true;
+                    }
+                }
+                if (!replacedItem) // didn't find an item in the vector with this name already so add in this new item
+                {
+                    gameDataVector.push_back(typename T::value_type(curFileName, currentFile, strings));
+                }
             }
         }
         currentFile.close();
