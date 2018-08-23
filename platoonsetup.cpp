@@ -54,6 +54,8 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // https://stackoverflow.com/questions/12338818/how-to-get-double-quotes-into-a-string-literal#12338826
 
     //TODO - interface styling
+    //TODO - troubleshoot space between actor name and class in soldier pool list widget
+    //TODO - use focusPolicy() and set it to none to remove keyboard input to list widgets?
     //TODO - return value of various get game data functions in the classes - switch them to void and call a function on error?
     //TODO - suppressed weapons with a suppressed value greater than 1 showing up unsuppressed in interface (seen in centcom mod)
     //TODO - check there is at least 1 actor and 1 kit for him before showing the main window
@@ -437,11 +439,14 @@ void PlatoonSetup::on_pbKitFireteam_clicked()
             fireteamPtr = &m_charlie;
     }
 
-    // iterate through whatever fireteam the selected actor is on and assign their kit to any other actors that share the same kit path
-    for (const auto &element : *fireteamPtr)
+    if (fireteamPtr) // if fireteam pointer is not null (as in there is a soldier on at least one of the fireteams)
     {
-        if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
-            setActorsKit(*element);
+        // iterate through whatever fireteam the selected actor is on and assign their kit to any other actors that share the same kit path
+        for (const auto &element : *fireteamPtr)
+        {
+            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+                setActorsKit(*element);
+        }
     }
 }
 
@@ -1054,8 +1059,13 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
     }
     ui->leMaxZoom1->setText(gun->getMaxZoom() + "x");
     QString fireModesForBox{""};
+    bool firstFireMode{true};
     for (auto &element : gun->getFireModes())
     {
+        if (!firstFireMode)
+            fireModesForBox += '\n';
+        else
+            firstFireMode = false;
         fireModesForBox += element.rpm;
         fireModesForBox += " rpm ";
         if (element.mode == "Full Auto")
@@ -1071,9 +1081,8 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
         else
         {
             fireModesForBox += element.mode;
-            fireModesForBox += " Round Burst";
+            fireModesForBox += " Rnd Burst";
         }
-        fireModesForBox += '\n';
     }
     ui->pteFireModes1->setPlainText(fireModesForBox);
 
@@ -1139,8 +1148,13 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
         }
         ui->leMaxZoom2->setText(gun2->getMaxZoom() + "x");
         fireModesForBox = "";
+        bool firstFireMode{true};
         for (auto &element : gun2->getFireModes())
         {
+            if (!firstFireMode)
+                fireModesForBox += '\n';
+            else
+                firstFireMode = false;
             fireModesForBox += element.rpm;
             fireModesForBox += " rpm ";
             if (element.mode == "Full Auto")
@@ -1154,9 +1168,8 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
             else
             {
                 fireModesForBox += element.mode;
-                fireModesForBox += " Round Burst";
+                fireModesForBox += " Rnd Burst";
             }
-            fireModesForBox += '\n';
         }
         ui->pteFireModes2->setPlainText(fireModesForBox);
     }
