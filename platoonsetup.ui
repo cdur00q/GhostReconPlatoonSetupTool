@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>PlatoonSetup</class>
  <widget class="QMainWindow" name="PlatoonSetup">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -10,8 +13,17 @@
     <height>678</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <family>Roboto Medium</family>
+   </font>
+  </property>
   <property name="windowTitle">
-   <string>PlatoonSetup</string>
+   <string>PLATOON SETUP</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(45, 69, 100);
+color: rgb(122, 162, 208);</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QListWidget" name="lwSoldierPool">
@@ -26,6 +38,40 @@
       <height>150</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QListView{
+	background-color: #060d19;
+	color: #7aa2d0;
+	border-style: solid;
+    border-width: 2px;
+	border-color: rgb(128, 170, 218);
+}
+
+QListView::item:selected:!active {
+    background: #253b53;
+    color: #678ab3;
+}
+
+QListView::item:selected:active {
+    background: #80aada;
+    color: #000000;
+}
+
+QListView::item:hover {
+	background-color: #060d19;
+	color: #7aa2d0;
+}
+</string>
+    </property>
    </widget>
    <widget class="QPushButton" name="pbAlpha">
     <property name="enabled">
@@ -38,6 +84,43 @@
       <width>51</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+      <underline>false</underline>
+      <strikeout>false</strikeout>
+      <kerning>true</kerning>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: 1px solid #678ab3;
+    background-color: #2d4564;
+}
+
+QPushButton:hover {
+    border-color:  #80aada;
+	background-color: #324e70;
+}
+
+QPushButton:pressed {
+    border-color:  #80aada;
+	color: #000000;
+	background-color: #80aada;
+}
+
+QPushButton:disabled {
+    background-color:  #1e2f42;
+}
+</string>
     </property>
     <property name="text">
      <string>A</string>
@@ -55,6 +138,37 @@
       <height>41</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: 1px solid #678ab3;
+    background-color: #2d4564;
+}
+
+QPushButton:hover {
+    border-color:  #80aada;
+	background-color: #324e70;
+}
+
+QPushButton:pressed {
+    border-color:  #80aada;
+	color: #000000;
+	background-color: #80aada;
+}
+
+QPushButton:disabled {
+    background-color:  #1e2f42;
+}
+</string>
+    </property>
     <property name="text">
      <string>B</string>
     </property>
@@ -70,6 +184,37 @@
       <width>51</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: 1px solid #678ab3;
+    background-color: #2d4564;
+}
+
+QPushButton:hover {
+    border-color:  #80aada;
+	background-color: #324e70;
+}
+
+QPushButton:pressed {
+    border-color:  #80aada;
+	color: #000000;
+	background-color: #80aada;
+}
+
+QPushButton:disabled {
+    background-color:  #1e2f42;
+}
+</string>
     </property>
     <property name="text">
      <string>C</string>
@@ -87,6 +232,37 @@
       <height>41</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: 1px solid #678ab3;
+    background-color: #2d4564;
+}
+
+QPushButton:hover {
+    border-color:  #80aada;
+	background-color: #324e70;
+}
+
+QPushButton:pressed {
+    border-color:  #80aada;
+	color: #000000;
+	background-color: #80aada;
+}
+
+QPushButton:disabled {
+    background-color:  #1e2f42;
+}
+</string>
+    </property>
     <property name="text">
      <string>X</string>
     </property>
@@ -100,18 +276,57 @@
       <height>71</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QListView{
+	background-color: #060d19;
+	color: #7aa2d0;
+	border-style: solid;
+    border-width: 2px;
+	border-color: rgb(128, 170, 218);
+}
+
+QListView::item:selected:!active {
+    background: #253b53;
+    color: #678ab3;
+}
+
+QListView::item:selected:active {
+    background: #80aada;
+    color: #000000;
+}
+
+QListView::item:hover {
+	background-color: #060d19;
+	color: #7aa2d0;
+}
+</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>150</y>
-      <width>47</width>
-      <height>13</height>
+      <width>61</width>
+      <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
-     <string>Alpha</string>
+     <string>ALPHA</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -119,12 +334,17 @@
      <rect>
       <x>10</x>
       <y>250</y>
-      <width>47</width>
-      <height>13</height>
+      <width>61</width>
+      <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
-     <string>Bravo</string>
+     <string>BRAVO</string>
     </property>
    </widget>
    <widget class="QListWidget" name="lwBravo">
@@ -136,18 +356,57 @@
       <height>71</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QListView{
+	background-color: #060d19;
+	color: #7aa2d0;
+	border-style: solid;
+    border-width: 2px;
+	border-color: rgb(128, 170, 218);
+}
+
+QListView::item:selected:!active {
+    background: #253b53;
+    color: #678ab3;
+}
+
+QListView::item:selected:active {
+    background: #80aada;
+    color: #000000;
+}
+
+QListView::item:hover {
+	background-color: #060d19;
+	color: #7aa2d0;
+}
+</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>350</y>
-      <width>47</width>
-      <height>13</height>
+      <width>61</width>
+      <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
-     <string>Charlie</string>
+     <string>CHARLIE</string>
     </property>
    </widget>
    <widget class="QListWidget" name="lwCharlie">
@@ -158,6 +417,40 @@
       <width>251</width>
       <height>71</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QListView{
+	background-color: #060d19;
+	color: #7aa2d0;
+	border-style: solid;
+    border-width: 2px;
+	border-color: rgb(128, 170, 218);
+}
+
+QListView::item:selected:!active {
+    background: #253b53;
+    color: #678ab3;
+}
+
+QListView::item:selected:active {
+    background: #80aada;
+    color: #000000;
+}
+
+QListView::item:hover {
+	background-color: #060d19;
+	color: #7aa2d0;
+}
+</string>
     </property>
    </widget>
    <widget class="QListWidget" name="lwKits">
@@ -172,6 +465,40 @@
       <height>591</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QListView{
+	background-color: #060d19;
+	color: #7aa2d0;
+	border-style: solid;
+    border-width: 2px;
+	border-color: rgb(128, 170, 218);
+}
+
+QListView::item:selected:!active {
+    background: #253b53;
+    color: #678ab3;
+}
+
+QListView::item:selected:active {
+    background: #80aada;
+    color: #000000;
+}
+
+QListView::item:hover {
+	background-color: #060d19;
+	color: #7aa2d0;
+}
+</string>
+    </property>
    </widget>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
@@ -182,8 +509,13 @@
       <height>13</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
-     <string>Kits</string>
+     <string>KITS</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
@@ -191,25 +523,42 @@
      <rect>
       <x>10</x>
       <y>450</y>
-      <width>71</width>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
-     <string>Soldier Pool</string>
+     <string>SOLDIER POOL</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leKitName">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>590</x>
+      <x>591</x>
       <y>30</y>
       <width>151</width>
-      <height>20</height>
+      <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -224,6 +573,33 @@
       <height>23</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: 1px solid #678ab3;
+    background-color: #2d4564;
+}
+
+QPushButton:hover {
+    border-color:  #80aada;
+	background-color: #324e70;
+}
+
+QPushButton:pressed {
+    border-color:  #80aada;
+	color: #000000;
+	background-color: #80aada;
+}
+</string>
+    </property>
     <property name="text">
      <string>&lt;</string>
     </property>
@@ -231,24 +607,66 @@
    <widget class="QPushButton" name="pbKitRight">
     <property name="geometry">
      <rect>
-      <x>740</x>
+      <x>742</x>
       <y>30</y>
       <width>41</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: 1px solid #678ab3;
+    background-color: #2d4564;
+}
+
+QPushButton:hover {
+    border-color:  #80aada;
+	background-color: #324e70;
+}
+
+QPushButton:pressed {
+    border-color:  #80aada;
+	color: #000000;
+	background-color: #80aada;
+}
+</string>
     </property>
     <property name="text">
      <string>&gt;</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leName1">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>60</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -263,21 +681,38 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Magazine Capacity</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leMagCap1">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>140</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -292,18 +727,38 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Max Range</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leMaxRange1">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>180</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -318,18 +773,38 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Muzzle Velocity</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leVelocity1">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>220</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -344,18 +819,38 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Recoil</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leRecoil1">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>260</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -370,18 +865,38 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Max Accuracy</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leAccuracy1">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>300</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -396,18 +911,38 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Stabilization Time</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leStabilization1">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>340</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -422,18 +957,38 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Max Zoom</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leMaxZoom1">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>380</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -448,18 +1003,38 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Silenced</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leSilenced1">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>420</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -474,24 +1049,38 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Fire Modes</string>
     </property>
    </widget>
    <widget class="QPlainTextEdit" name="pteFireModes1">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>460</y>
-      <width>111</width>
-      <height>91</height>
+      <width>117</width>
+      <height>54</height>
      </rect>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPlainTextEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
@@ -512,34 +1101,66 @@
       <height>16</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+     </font>
+    </property>
     <property name="text">
      <string>Weapon Type</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leWeaponType1">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
       <x>550</x>
       <y>100</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leName2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>60</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -547,15 +1168,27 @@
    </widget>
    <widget class="QLineEdit" name="leWeaponType2">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>100</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -563,106 +1196,223 @@
    </widget>
    <widget class="QLineEdit" name="leMagCap2">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>140</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leMaxRange2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>180</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leVelocity2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>220</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leRecoil2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>260</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leAccuracy2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>300</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leMaxZoom2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>380</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leSilenced2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>420</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
     </property>
    </widget>
    <widget class="QLineEdit" name="leStabilization2">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>340</y>
-      <width>113</width>
+      <width>117</width>
       <height>20</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="readOnly">
      <bool>true</bool>
@@ -670,18 +1420,27 @@
    </widget>
    <widget class="QPlainTextEdit" name="pteFireModes2">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>666</x>
       <y>460</y>
-      <width>111</width>
-      <height>91</height>
+      <width>117</width>
+      <height>54</height>
      </rect>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPlainTextEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="frameShape">
      <enum>QFrame::StyledPanel</enum>
@@ -694,6 +1453,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leSoldierName">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -702,8 +1464,17 @@
       <height>20</height>
      </rect>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="frame">
      <bool>true</bool>
@@ -713,16 +1484,28 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leWeapon">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
-      <width>121</width>
+      <y>29</y>
+      <width>126</width>
       <height>20</height>
      </rect>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="frame">
      <bool>true</bool>
@@ -735,16 +1518,28 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leStealth">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
-      <width>121</width>
+      <y>48</y>
+      <width>126</width>
       <height>20</height>
      </rect>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="frame">
      <bool>true</bool>
@@ -757,16 +1552,28 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leStamina">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>30</y>
-      <width>121</width>
+      <x>135</x>
+      <y>29</y>
+      <width>126</width>
       <height>20</height>
      </rect>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="frame">
      <bool>true</bool>
@@ -779,16 +1586,28 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="leLeadership">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>50</y>
-      <width>121</width>
+      <x>135</x>
+      <y>48</y>
+      <width>126</width>
       <height>20</height>
      </rect>
     </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: 1px solid #7aa2d0;
+    background-color: #060d19;
+}</string>
     </property>
     <property name="frame">
      <bool>true</bool>
@@ -806,11 +1625,42 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>670</x>
-      <y>580</y>
-      <width>111</width>
+      <x>550</x>
+      <y>600</y>
+      <width>231</width>
       <height>41</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: 1px solid #678ab3;
+    background-color: #2d4564;
+}
+
+QPushButton:hover {
+    border-color:  #80aada;
+	background-color: #324e70;
+}
+
+QPushButton:pressed {
+    border-color:  #80aada;
+	color: #000000;
+	background-color: #80aada;
+}
+
+QPushButton:disabled {
+    background-color:  #1e2f42;
+}
+</string>
     </property>
     <property name="text">
      <string>Apply</string>
@@ -823,10 +1673,37 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>570</y>
-      <width>111</width>
+      <y>530</y>
+      <width>231</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: 1px solid #678ab3;
+    background-color: #2d4564;
+}
+
+QPushButton:hover {
+    border-color:  #80aada;
+	background-color: #324e70;
+}
+
+QPushButton:pressed {
+    border-color:  #80aada;
+	color: #000000;
+	background-color: #80aada;
+}
+</string>
     </property>
     <property name="text">
      <string>Assign Kit To Fireteam</string>
@@ -836,25 +1713,42 @@
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>600</y>
-      <width>111</width>
+      <y>560</y>
+      <width>231</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Roboto Medium</family>
+      <pointsize>8</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QPushButton {
+    border: 1px solid #678ab3;
+    background-color: #2d4564;
+}
+
+QPushButton:hover {
+    border-color:  #80aada;
+	background-color: #324e70;
+}
+
+QPushButton:pressed {
+    border-color:  #80aada;
+	color: #000000;
+	background-color: #80aada;
+}
+</string>
     </property>
     <property name="text">
      <string>Assign Kit To Squad</string>
     </property>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>841</width>
-     <height>21</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
