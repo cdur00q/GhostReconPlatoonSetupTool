@@ -53,13 +53,8 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // printf(R"(She said "time flies like an arrow, but fruit flies like a banana".)");
     // https://stackoverflow.com/questions/12338818/how-to-get-double-quotes-into-a-string-literal#12338826
 
-    //TODO - interface styling
-    //TODO - troubleshoot space between actor name and class in soldier pool list widget
-    //TODO - use focusPolicy() and set it to none to remove keyboard input to list widgets?
     //TODO - return value of various get game data functions in the classes - switch them to void and call a function on error?
-    //TODO - suppressed weapons with a suppressed value greater than 1 showing up unsuppressed in interface (seen in centcom mod)
     //TODO - check there is at least 1 actor and 1 kit for him before showing the main window
-    //TODO - unassign all button?
 
     m_actors.reserve(76); // do this for all the vectors that store actors in the program?
 
@@ -76,6 +71,13 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     if (m_heavyWeapons.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_heavyWeapons, m_actors); }
     if (m_sniper.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_sniper, m_actors); }
     if (m_demolitions.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_demolitions, m_actors); }
+
+    /* // add all actors for testing
+    for (const auto &element : m_rifleman) { m_actors.push_back(element); }
+    for (const auto &element : m_heavyWeapons) { m_actors.push_back(element); }
+    for (const auto &element : m_sniper) { m_actors.push_back(element); }
+    for (const auto &element : m_demolitions) { m_actors.push_back(element); }
+    */
 
     // read in strings
     currentFile.open(mainGameDirectory + "\\Data\\Shell\\strings.txt");
@@ -156,11 +158,17 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         //element.print();
         if (element.getClassName() == classDemolitions)
         {
-            new QListWidgetItem(element.getFirstInitialLastName() + "\t\t" + "DEMO", ui->lwSoldierPool);
+            if (element.getFirstInitialLastName().size() >= 13) // for longer names
+                new QListWidgetItem(element.getFirstInitialLastName().leftJustified(30) + '\t' + "DEMO", ui->lwSoldierPool); // pad them with single spaces and add a single tab
+            else
+                new QListWidgetItem(element.getFirstInitialLastName() + "\t\t" + "DEMO", ui->lwSoldierPool); // otherwise just add two tabs
         }
         else
         {
-            new QListWidgetItem(element.getFirstInitialLastName() + "\t\t" + element.getClassName().toUpper(), ui->lwSoldierPool);
+            if (element.getFirstInitialLastName().size() >= 13)
+                new QListWidgetItem(element.getFirstInitialLastName().leftJustified(30) + '\t' + element.getClassName().toUpper(), ui->lwSoldierPool);
+            else
+                new QListWidgetItem(element.getFirstInitialLastName() + "\t\t" + element.getClassName().toUpper(), ui->lwSoldierPool);
         }
     }
 
@@ -200,7 +208,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 
     // select first soldier (can only do this after actors and kits are loaded and processed)
     ui->lwSoldierPool->setCurrentRow(0);
-    on_lwSoldierPool_itemClicked();
+    on_lwSoldierPool_itemPressed();
 
     // connect signals and slots
     QCoreApplication *coreApp{QCoreApplication::instance()};
@@ -247,6 +255,8 @@ void PlatoonSetup::on_pbAlpha_clicked()
     updateTeamButton(m_bravo, ui->pbBravo);
     updateTeamButton(m_charlie, ui->pbCharlie);
     updateUnassignButton();
+    updateApplyKitToFireteamButton();
+    updateApplyKitToSquadButton();
     updateApplyButton();
 }
 
@@ -260,6 +270,8 @@ void PlatoonSetup::on_pbBravo_clicked()
     updateTeamButton(m_bravo, ui->pbBravo);
     updateTeamButton(m_charlie, ui->pbCharlie);
     updateUnassignButton();
+    updateApplyKitToFireteamButton();
+    updateApplyKitToSquadButton();
     updateApplyButton();
 }
 
@@ -273,10 +285,12 @@ void PlatoonSetup::on_pbCharlie_clicked()
     updateTeamButton(m_bravo, ui->pbBravo);
     updateTeamButton(m_charlie, ui->pbCharlie);
     updateUnassignButton();
+    updateApplyKitToFireteamButton();
+    updateApplyKitToSquadButton();
     updateApplyButton();
 }
 
-void PlatoonSetup::on_lwSoldierPool_itemClicked()
+void PlatoonSetup::on_lwSoldierPool_itemPressed()
 {
     syncSoldierPoolWithFireteam(m_alpha, ui->lwAlpha);
     syncSoldierPoolWithFireteam(m_bravo, ui->lwBravo);
@@ -290,11 +304,13 @@ void PlatoonSetup::on_lwSoldierPool_itemClicked()
     selectActorsKit();
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
+    updateApplyKitToFireteamButton();
+    updateApplyKitToSquadButton();
 
     updateSoldierDetails();
 }
 
-void PlatoonSetup::on_lwAlpha_itemClicked()
+void PlatoonSetup::on_lwAlpha_itemPressed()
 {
     syncFireteamWithSoldierPool(m_alpha, ui->lwAlpha);
     updateTeamButton(m_alpha, ui->pbAlpha);
@@ -308,11 +324,13 @@ void PlatoonSetup::on_lwAlpha_itemClicked()
     selectActorsKit();
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
+    updateApplyKitToFireteamButton();
+    updateApplyKitToSquadButton();
 
     updateSoldierDetails();
 }
 
-void PlatoonSetup::on_lwBravo_itemClicked()
+void PlatoonSetup::on_lwBravo_itemPressed()
 {
     syncFireteamWithSoldierPool(m_bravo, ui->lwBravo);
     updateTeamButton(m_alpha, ui->pbAlpha);
@@ -326,11 +344,13 @@ void PlatoonSetup::on_lwBravo_itemClicked()
     selectActorsKit();
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
+    updateApplyKitToFireteamButton();
+    updateApplyKitToSquadButton();
 
     updateSoldierDetails();
 }
 
-void PlatoonSetup::on_lwCharlie_itemClicked()
+void PlatoonSetup::on_lwCharlie_itemPressed()
 {
     syncFireteamWithSoldierPool(m_charlie, ui->lwCharlie);
     updateTeamButton(m_alpha, ui->pbAlpha);
@@ -344,6 +364,8 @@ void PlatoonSetup::on_lwCharlie_itemClicked()
     selectActorsKit();
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
+    updateApplyKitToFireteamButton();
+    updateApplyKitToSquadButton();
 
     updateSoldierDetails();
 }
@@ -357,10 +379,12 @@ void PlatoonSetup::on_pbUnassign_clicked()
     updateTeamButton(m_bravo, ui->pbBravo);
     updateTeamButton(m_charlie, ui->pbCharlie);
     updateUnassignButton();
+    updateApplyKitToFireteamButton();
+    updateApplyKitToSquadButton();
     updateApplyButton();
 }
 
-void PlatoonSetup::on_lwKits_itemClicked()
+void PlatoonSetup::on_lwKits_itemPressed()
 {
     updateKitNameBox();
     updateSelectedKitInfo(getSelectedActorsKits());
@@ -439,7 +463,7 @@ void PlatoonSetup::on_pbKitFireteam_clicked()
             fireteamPtr = &m_charlie;
     }
 
-    if (fireteamPtr) // if fireteam pointer is not null (as in there is a soldier on at least one of the fireteams)
+    if (fireteamPtr) // if fireteam pointer is not null (as in the selected actor is on one of the fireteams)
     {
         // iterate through whatever fireteam the selected actor is on and assign their kit to any other actors that share the same kit path
         for (const auto &element : *fireteamPtr)
@@ -528,30 +552,13 @@ void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<Actor*> &firete
         if (m_actors[ui->lwSoldierPool->currentRow()] == *fireteam[i])
         {
             // they are, now check if the current rows are in sync
-            QTextStream(stdout) << "found " << m_actors[ui->lwSoldierPool->currentRow()].getFirstInitialLastName() << " at row " << fireteamList->currentRow() << endl;
             fireteamList->setCurrentRow(i);
             done = true;
             noMatch = false;
-            /*
-            if (fireteamList->currentRow() != i)
-            {
-                QTextStream(stdout) << "found " << actors[ui->lwSoldierPool->currentRow()].getFirstInitialLastName() << " at row " << fireteamList->currentRow() << endl;
-                fireteamList->setCurrentRow(i);
-                done = true;
-                noMatch = false;
-            }
-            else if (fireteamList->currentRow() == i)
-            {
-                QTextStream(stdout) << "already in sync. found " << actors[ui->lwSoldierPool->currentRow()].getFirstInitialLastName() << " at row " << fireteamList->currentRow() << endl;
-                done = true;
-                noMatch = false;
-            }
-            */
         }
     }
     if (noMatch)
     {
-        QTextStream(stdout) << "didn't find " << m_actors[ui->lwSoldierPool->currentRow()].getFirstInitialLastName() << endl;
         fireteamList->clearSelection();
     }
 }
@@ -636,7 +643,6 @@ void PlatoonSetup::fireteamButtonClicked(std::vector<Actor *> &fireteam, QListWi
     while (fireteamList->count() > 0)
     {
         delete fireteamList->takeItem(0);
-        QTextStream(stdout) << "frontend item count: " << fireteamList->count() << endl;
     }
 
     // and recreate list based on new backend
@@ -647,11 +653,6 @@ void PlatoonSetup::fireteamButtonClicked(std::vector<Actor *> &fireteam, QListWi
             new QListWidgetItem(element->getFirstInitialLastName(), fireteamList);
         }
     }
-
-    // debug info
-    //QTextStream(stdout) << "new backend" << endl;
-    //printActorVector(fireteam);
-    //QTextStream(stdout) << "frontend item count: " << fireteamList->count() << endl;
 }
 
 // removes an actor from the specified fireteam
@@ -680,8 +681,6 @@ void PlatoonSetup::unassignButtonClicked(std::vector<Actor*> &fireteam, QListWid
                 if (i == fireteam.size() - 1)
                 {
                     fireteam.pop_back();
-                    //QTextStream(stdout) << "actor last" << endl;
-                    //printActorVector(fireteam);
                 }
                 // actor not last
                 else
@@ -692,8 +691,6 @@ void PlatoonSetup::unassignButtonClicked(std::vector<Actor*> &fireteam, QListWid
                         fireteam[j] = fireteam[j + 1];
                     }
                     fireteam.pop_back(); // and remove last
-                    //QTextStream(stdout) << "actor not last" << endl;
-                    //printActorVector(fireteam);
                 }
             }
         }
@@ -714,13 +711,6 @@ void PlatoonSetup::unassignButtonClicked(std::vector<Actor*> &fireteam, QListWid
             new QListWidgetItem(element->getFirstInitialLastName(), fireteamList);
         }
     }
-
-    // debug info
-    /*
-    QTextStream(stdout) << "new backend" << endl;
-    printActorVector(fireteam);
-    QTextStream(stdout) << "frontend item count: " << fireteamList->count() << endl;
-    */
 }
 
 // enables / disables the the specfied fireteam button based on the selected actor
@@ -946,7 +936,6 @@ void PlatoonSetup::buildKitPool(const std::vector<Kit> &kits)
             item2 = "error resolving item2 while building kit list";
             // maybe put popup error and end program here?
         }
-        //QString label{item1 + " + " item2};
         item1 += " + ";
         item1 += item2; // add item2 to item1 to create the final label for the list widget
         new QListWidgetItem(item1, ui->lwKits);
@@ -1049,7 +1038,7 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
     else if (weaponType == "6")
         weaponTypeText = "Shotgun";
     ui->leWeaponType1->setText(weaponTypeText);
-    if (gun->getSilenced() == "1")
+    if (gun->getSilenced().toInt() >= 1) // 0 means no, 1 means yes, but in centcom mod(and others?) 2 is used for yes, which GR engine accepts
     {
         ui->leSilenced1->setText("Yes");
     }
@@ -1081,7 +1070,7 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
         else
         {
             fireModesForBox += element.mode;
-            fireModesForBox += " Rnd Burst";
+            fireModesForBox += " Round Burst";
         }
     }
     ui->pteFireModes1->setPlainText(fireModesForBox);
@@ -1138,7 +1127,7 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
         else if (weaponType == "6")
             weaponTypeText = "Shotgun";
         ui->leWeaponType2->setText(weaponTypeText);
-        if (gun2->getSilenced() == "1")
+        if (gun2->getSilenced().toInt() >= 1)
         {
             ui->leSilenced2->setText("Yes");
         }
@@ -1168,7 +1157,7 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
             else
             {
                 fireModesForBox += element.mode;
-                fireModesForBox += " Rnd Burst";
+                fireModesForBox += " Round Burst";
             }
         }
         ui->pteFireModes2->setPlainText(fireModesForBox);
@@ -1252,6 +1241,94 @@ void PlatoonSetup::updateSoldierDetails()
     ui->leStamina->setText("Endurance: " + selectedActor.getStaminaStat());
     ui->leStealth->setText("Stealth: " + selectedActor.getStealthStat());
     ui->leLeadership->setText("Leadership: " + selectedActor.getLeadershipStat());
+}
+
+// enables / disables the apply kit to fireteam button
+void PlatoonSetup::updateApplyKitToFireteamButton()
+{
+    const Actor &selectedActor{m_actors[ui->lwSoldierPool->currentRow()]};
+    std::vector<Actor*> *fireteamPtr{nullptr};
+
+    // check if selected actor is on fireteam alpha
+    for (const auto &element : m_alpha)
+    {
+        if (selectedActor == *element) // they are
+            fireteamPtr = &m_alpha; // set temporary pointer to alpha
+    }
+
+    for (const auto &element : m_bravo)
+    {
+        if (selectedActor == *element)
+            fireteamPtr = &m_bravo;
+    }
+
+    for (const auto &element : m_charlie)
+    {
+        if (selectedActor == *element)
+            fireteamPtr = &m_charlie;
+    }
+
+    if (fireteamPtr) // if fireteam pointer is not null (as in the selected actor is on one of the fireteams)
+    {
+        // iterate through whatever fireteam the selected actor is on and count the number of team members with the same kit path as the selected actor
+        int soldiersWithSameKitPath{0};
+        for (const auto &element : *fireteamPtr)
+        {
+            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+                ++soldiersWithSameKitPath;
+        }
+        if (soldiersWithSameKitPath >= 1) // counted 1 or more actors on the same fireteam with the same kit path
+            ui->pbKitFireteam->setEnabled(true);
+        else
+            ui->pbKitFireteam->setDisabled(true);
+    }
+    else
+    {
+        ui->pbKitFireteam->setDisabled(true);
+    }
+}
+
+// enables / disables the apply kit to squad button
+void PlatoonSetup::updateApplyKitToSquadButton()
+{
+    const Actor &selectedActor{m_actors[ui->lwSoldierPool->currentRow()]};
+
+    // first check if selected actor is on the squad (on any fireteam)
+    bool selectedActorOnSquad{false};
+    for (const auto &element : m_alpha) { if (selectedActor == *element) selectedActorOnSquad = true; }
+    for (const auto &element : m_bravo) { if (selectedActor == *element) selectedActorOnSquad = true; }
+    for (const auto &element : m_charlie) { if (selectedActor == *element) selectedActorOnSquad = true; }
+
+    if (selectedActorOnSquad)
+    {
+        // iterate through all three fireteams and compare the kit path of the selected actor against all the other actors
+        // and tally up how many matches there are
+        int soldiersWithSameKitPath{0};
+        for (const auto &element : m_alpha)
+        {
+            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+                ++soldiersWithSameKitPath;
+        }
+
+        for (const auto &element : m_bravo)
+        {
+            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+                ++soldiersWithSameKitPath;
+        }
+
+        for (const auto &element : m_charlie)
+        {
+            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+                ++soldiersWithSameKitPath;
+        }
+
+        if (soldiersWithSameKitPath >= 1) // counted 1 or more actor accross all three fireteams with the same kit path
+            ui->pbKitSquad->setEnabled(true);
+        else
+            ui->pbKitSquad->setDisabled(true);
+    }
+    else
+        ui->pbKitSquad->setDisabled(true);
 }
 
 // enables / disables the apply button
