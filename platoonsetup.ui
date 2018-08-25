@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>841</width>
-    <height>678</height>
+    <width>790</width>
+    <height>630</height>
    </rect>
   </property>
   <property name="font">
@@ -45,7 +45,7 @@ color: rgb(122, 162, 208);</string>
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QListView{
@@ -98,7 +98,7 @@ QListView::item:hover {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton {
@@ -145,7 +145,7 @@ QPushButton:disabled {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton {
@@ -192,7 +192,7 @@ QPushButton:disabled {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton {
@@ -239,7 +239,7 @@ QPushButton:disabled {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton {
@@ -283,7 +283,7 @@ QPushButton:disabled {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QListView{
@@ -363,7 +363,7 @@ QListView::item:hover {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QListView{
@@ -425,7 +425,7 @@ QListView::item:hover {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QListView{
@@ -460,9 +460,9 @@ QListView::item:hover {
     <property name="geometry">
      <rect>
       <x>280</x>
-      <y>30</y>
+      <y>27</y>
       <width>251</width>
-      <height>591</height>
+      <height>594</height>
      </rect>
     </property>
     <property name="font">
@@ -472,7 +472,7 @@ QListView::item:hover {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QListView{
@@ -543,7 +543,7 @@ QListView::item:hover {
     <property name="geometry">
      <rect>
       <x>591</x>
-      <y>30</y>
+      <y>10</y>
       <width>151</width>
       <height>23</height>
      </rect>
@@ -568,7 +568,7 @@ QListView::item:hover {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>30</y>
+      <y>10</y>
       <width>41</width>
       <height>23</height>
      </rect>
@@ -580,7 +580,7 @@ QListView::item:hover {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton {
@@ -608,7 +608,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>742</x>
-      <y>30</y>
+      <y>10</y>
       <width>41</width>
       <height>23</height>
      </rect>
@@ -620,7 +620,7 @@ QPushButton:pressed {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton {
@@ -651,7 +651,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>60</y>
+      <y>40</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -676,7 +676,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>120</y>
+      <y>100</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -697,7 +697,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>140</y>
+      <y>120</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -722,7 +722,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>160</y>
+      <y>140</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -743,7 +743,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>180</y>
+      <y>160</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -768,7 +768,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>200</y>
+      <y>180</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -789,7 +789,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>220</y>
+      <y>200</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -814,7 +814,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>240</y>
+      <y>220</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -835,7 +835,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>260</y>
+      <y>240</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -860,7 +860,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>280</y>
+      <y>260</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -881,7 +881,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>300</y>
+      <y>280</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -906,7 +906,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>320</y>
+      <y>300</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -927,7 +927,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>340</y>
+      <y>320</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -952,7 +952,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>360</y>
+      <y>340</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -973,7 +973,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>380</y>
+      <y>360</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -998,7 +998,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>400</y>
+      <y>380</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -1019,7 +1019,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>420</y>
+      <y>400</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1044,7 +1044,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>440</y>
+      <y>420</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -1065,7 +1065,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>460</y>
+      <y>440</y>
       <width>117</width>
       <height>54</height>
      </rect>
@@ -1073,13 +1073,27 @@ QPushButton:pressed {
     <property name="font">
      <font>
       <family>Roboto Medium</family>
-      <pointsize>8</pointsize>
+      <pointsize>7</pointsize>
      </font>
     </property>
     <property name="styleSheet">
      <string notr="true">QPlainTextEdit {
     border: 1px solid #7aa2d0;
     background-color: #060d19;
+}
+
+QScrollBar:horizontal {
+
+}
+QScrollBar::handle:horizontal {
+
+}
+QScrollBar::add-line:horizontal {
+
+}
+
+QScrollBar::sub-line:horizontal {
+
 }</string>
     </property>
     <property name="frameShape">
@@ -1096,7 +1110,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>80</y>
+      <y>60</y>
       <width>121</width>
       <height>16</height>
      </rect>
@@ -1117,7 +1131,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>100</y>
+      <y>80</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1145,7 +1159,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>60</y>
+      <y>40</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1173,7 +1187,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>100</y>
+      <y>80</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1201,7 +1215,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>140</y>
+      <y>120</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1229,7 +1243,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>180</y>
+      <y>160</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1257,7 +1271,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>220</y>
+      <y>200</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1285,7 +1299,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>260</y>
+      <y>240</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1313,7 +1327,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>300</y>
+      <y>280</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1341,7 +1355,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>380</y>
+      <y>360</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1369,7 +1383,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>420</y>
+      <y>400</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1397,7 +1411,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>340</y>
+      <y>320</y>
       <width>117</width>
       <height>20</height>
      </rect>
@@ -1425,7 +1439,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>666</x>
-      <y>460</y>
+      <y>440</y>
       <width>117</width>
       <height>54</height>
      </rect>
@@ -1433,7 +1447,7 @@ QPushButton:pressed {
     <property name="font">
      <font>
       <family>Roboto Medium</family>
-      <pointsize>8</pointsize>
+      <pointsize>7</pointsize>
      </font>
     </property>
     <property name="styleSheet">
@@ -1626,7 +1640,7 @@ QPushButton:pressed {
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>600</y>
+      <y>580</y>
       <width>231</width>
       <height>41</height>
      </rect>
@@ -1638,7 +1652,7 @@ QPushButton:pressed {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton {
@@ -1670,10 +1684,13 @@ QPushButton:disabled {
     </property>
    </widget>
    <widget class="QPushButton" name="pbKitFireteam">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>530</y>
+      <y>510</y>
       <width>231</width>
       <height>23</height>
      </rect>
@@ -1685,7 +1702,7 @@ QPushButton:disabled {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton {
@@ -1702,6 +1719,10 @@ QPushButton:pressed {
     border-color:  #80aada;
 	color: #000000;
 	background-color: #80aada;
+}
+
+QPushButton:disabled {
+    background-color:  #1e2f42;
 }
 </string>
     </property>
@@ -1710,10 +1731,13 @@ QPushButton:pressed {
     </property>
    </widget>
    <widget class="QPushButton" name="pbKitSquad">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>550</x>
-      <y>560</y>
+      <y>540</y>
       <width>231</width>
       <height>23</height>
      </rect>
@@ -1725,7 +1749,7 @@ QPushButton:pressed {
      </font>
     </property>
     <property name="focusPolicy">
-     <enum>Qt::NoFocus</enum>
+     <enum>Qt::ClickFocus</enum>
     </property>
     <property name="styleSheet">
      <string notr="true">QPushButton {
@@ -1743,6 +1767,10 @@ QPushButton:pressed {
 	color: #000000;
 	background-color: #80aada;
 }
+
+QPushButton:disabled {
+    background-color:  #1e2f42;
+}
 </string>
     </property>
     <property name="text">
@@ -1750,7 +1778,6 @@ QPushButton:pressed {
     </property>
    </widget>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

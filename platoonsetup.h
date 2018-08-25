@@ -36,17 +36,17 @@ private slots:
 
     void on_pbCharlie_clicked();
 
-    void on_lwSoldierPool_itemClicked();
+    void on_lwSoldierPool_itemPressed();
 
-    void on_lwAlpha_itemClicked();
+    void on_lwAlpha_itemPressed();
 
-    void on_lwBravo_itemClicked();
+    void on_lwBravo_itemPressed();
 
-    void on_lwCharlie_itemClicked();
+    void on_lwCharlie_itemPressed();
 
     void on_pbUnassign_clicked();
 
-    void on_lwKits_itemClicked();
+    void on_lwKits_itemPressed();
 
     void on_pbKitLeft_clicked();
 
@@ -108,6 +108,10 @@ private:
     void updateSelectedKitInfo(const std::vector<Kit> &kits);
 
     void updateSoldierDetails();
+
+    void updateApplyKitToFireteamButton();
+
+    void updateApplyKitToSquadButton();
 
     void updateApplyButton();
 };
