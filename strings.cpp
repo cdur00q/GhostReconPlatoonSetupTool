@@ -17,10 +17,11 @@ Strings::Strings(std::ifstream &stringsFile)
 }
 
 // reads all strings in from a strings.txt file and stores them in the strings map
-Strings::stringFileReadResult Strings::readFromFile(std::ifstream &stringsFile)
+void Strings::readFromFile(std::ifstream &stringsFile)
 {
+    bool done{false};
     // only operate if the file stream is working
-    while (stringsFile.good())
+    while (stringsFile.good() && !done)
     {
         QString key{""};
         QString value{""};
@@ -67,13 +68,16 @@ Strings::stringFileReadResult Strings::readFromFile(std::ifstream &stringsFile)
         {
             stringsFile.clear(); // this function works on a stream reference so clear the eof bit so the stream is left in good standing
         }
-        return stringFileReadResult::DONE;
+        done = true;
     }
 
     // something went wrong with the file stream
-    QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Strings::readFromFile().");
-    msgBox.exec();
-    return stringFileReadResult::FILESTREAMERROR;
+    if (!stringsFile.good())
+    {
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Strings::readFromFile().");
+        msgBox.exec();
+        exit(EXIT_FAILURE);
+    }
 }
 
 // returns a string from the string map or "string not found" if supplied key doesn't exist

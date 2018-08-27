@@ -12,14 +12,17 @@ class ModList
 private:
     std::vector<std::string> m_modList;
 
-    void readFromFile(std::ifstream &modsSetFile);
 public:
+    ModList();
+
     ModList(std::ifstream &modsSetFile);
 
     ~ModList()
     {
 
     }
+
+    void readFromFile(std::ifstream &modsSetFile);
 
     const std::vector<std::string>& getModList() const {return m_modList;}
 

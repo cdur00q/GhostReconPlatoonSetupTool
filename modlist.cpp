@@ -2,6 +2,11 @@
 
 #include <QMessageBox>
 
+ModList::ModList()
+{
+
+}
+
 ModList::ModList(std::ifstream &modsSetFile)
 {
     readFromFile(modsSetFile);

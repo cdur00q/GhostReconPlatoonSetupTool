@@ -1,8 +1,6 @@
 #include "platoonsetup.h"
 #include "ui_platoonsetup.h"
 
-//#include <QFileSystemModel>
-//#include <QTreeView>
 #include <string>
 #include <filesystem>
 #include <fstream>
@@ -11,8 +9,6 @@
 #include <utility> // for std::make_pair
 #include <QMessageBox>
 #include <QtMultimedia/QMediaPlayer>
-//#include <QUrl>
-//#include <QtMultimedia/QMediaContent>
 #include <QTextStream> // for printing to console
 
 #include "variables.h"
@@ -43,6 +39,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     ui(new Ui::PlatoonSetup)
 {
     ui->setupUi(this);
+    this->setWindowFlags(Qt::MSWindowsFixedSizeDialogHint); // removes resize arrows when hovering over the border
     PlatoonSetup::grabKeyboard(); // send all keboard input to the main window to prevent messing up the selection logic of the fireteam/soldier pool boxes
     ui->pteFireModes1->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     ui->pteFireModes2->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -53,18 +50,58 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // printf(R"(She said "time flies like an arrow, but fruit flies like a banana".)");
     // https://stackoverflow.com/questions/12338818/how-to-get-double-quotes-into-a-string-literal#12338826
 
-    //TODO - return value of various get game data functions in the classes - switch them to void and call a function on error?
     //TODO - check there is at least 1 actor and 1 kit for him before showing the main window
+    //TODO - switch the media player pointer to be a smart pointer?
+    //TODO - add sound effects when pressing buttons like in the game
 
-    m_actors.reserve(76); // do this for all the vectors that store actors in the program?
+    // reserve space in the actor vectors
+    m_rifleman.reserve(76);
+    m_heavyWeapons.reserve(60);
+    m_sniper.reserve(40);
+    m_demolitions.reserve(59);
+    m_actors.reserve(36);
 
     std::ifstream currentFile;
+    std::error_code errorCode; // no actual error handling will take place with this error code
+    bool errorLoadingBaseGameData{false};
+    QString errorMessage{""};
 
     // read in all actors
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\rifleman", actorExtension, m_rifleman);
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\heavy-weapons", actorExtension, m_heavyWeapons);
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\sniper", actorExtension, m_sniper);
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\demolitions", actorExtension, m_demolitions);
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\rifleman", errorCode) && !errorLoadingBaseGameData)
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\rifleman", actorExtension, m_rifleman);
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Actor\\rifleman";
+    }
+
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\heavy-weapons", errorCode) && !errorLoadingBaseGameData)
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\heavy-weapons", actorExtension, m_heavyWeapons);
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Actor\\heavy-weapons";
+    }
+
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\sniper", errorCode) && !errorLoadingBaseGameData)
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\sniper", actorExtension, m_sniper);
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Actor\\sniper";
+    }
+
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\demolitions", errorCode) && !errorLoadingBaseGameData)
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\demolitions", actorExtension, m_demolitions);
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Actor\\demolitions";
+    }
 
     // randomly choose nine actors of each class and put them into the actors pool
     if (m_rifleman.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_rifleman, m_actors); }
@@ -80,9 +117,18 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     */
 
     // read in strings
-    currentFile.open(mainGameDirectory + "\\Data\\Shell\\strings.txt");
-    m_strings.readFromFile(currentFile);
-    currentFile.close();
+    if (fs::is_regular_file(mainGameDirectory + "\\Data\\Shell\\strings.txt", errorCode) && !errorLoadingBaseGameData)
+    {
+        currentFile.open(mainGameDirectory + "\\Data\\Shell\\strings.txt");
+        m_strings.readFromFile(currentFile);
+        currentFile.close();
+    }
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find file: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Data\\Shell\\strings.txt";
+    }
 
     // print strings
     /*
@@ -92,8 +138,19 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
     */
 
-    // read in guns
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", gunExtension, m_guns, m_strings);
+    // read in guns, projectiles, and items
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Equip", errorCode) && !errorLoadingBaseGameData)
+    {
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", gunExtension, m_guns, m_strings);
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", projectileExtension, m_projectiles, m_strings);
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", itemExtension, m_items, m_strings);
+    }
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Equip";
+    }
 
     // print guns
     for (const auto &element : m_guns)
@@ -101,17 +158,11 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         //element.print();
     }
 
-    // read in projectiles
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", projectileExtension, m_projectiles, m_strings);
-
     // print projectiles
     for (const auto &element : m_projectiles)
     {
         //element.print();
     }
-
-    // read in items
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", itemExtension, m_items, m_strings);
 
     // print items
     for (const auto &element : m_items)
@@ -120,31 +171,125 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // read in base kits for the four character classes and store them into their respective kit vectors
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\rifleman", kitExtension, m_riflemanKits);
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\heavy-weapons", kitExtension, m_heavyWeaponsKits);
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\sniper", kitExtension, m_sniperKits);
-    readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\demolitions", kitExtension, m_demolitionsKits);
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\rifleman", errorCode) && !errorLoadingBaseGameData)
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\rifleman", kitExtension, m_riflemanKits);
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\rifleman";
+    }
+
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\heavy-weapons", errorCode) && !errorLoadingBaseGameData)
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\heavy-weapons", kitExtension, m_heavyWeaponsKits);
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\heavy-weapons";
+    }
+
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\sniper", errorCode) && !errorLoadingBaseGameData)
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\sniper", kitExtension, m_sniperKits);
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\sniper";
+    }
+
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\demolitions", errorCode) && !errorLoadingBaseGameData)
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\demolitions", kitExtension, m_demolitionsKits);
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\demolitions";
+    }
 
     // read in all the kits and store them into a temporary kit vector
     std::vector<Kit> tempKits;
-    readInAllKits(mainGameDirectory + "\\Mods\\Origmiss\\Kits", tempKits);
+    tempKits.reserve(71); // 71 kits in Mods\Origmiss\Kits
+    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits", errorCode) && !errorLoadingBaseGameData) // this check is redundant as the checks above would have failed if the Kits directory didn't exist
+        readInAllKits(mainGameDirectory + "\\Mods\\Origmiss\\Kits", tempKits);
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits";
+    }
 
     // create the kit restriction list
-    currentFile.open(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\quick_missions.qmk");
-    KitRestrictionList kitList(currentFile);
-    currentFile.close();
-
-    updateKitVectorPerRestrictionList(tempKits, kitList, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits);
+    if (fs::is_regular_file(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\quick_missions.qmk", errorCode) && !errorLoadingBaseGameData)
+    {
+        currentFile.open(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\quick_missions.qmk");
+        KitRestrictionList kitList(currentFile);
+        currentFile.close();
+        updateKitVectorPerRestrictionList(tempKits, kitList, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits);
+    }
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find file: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\quick_missions.qmk";
+    }
 
     // create music tracks
     std::string musicAction3{mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\action3.wav"};
     std::string musicLoad1{mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\load1.wav"};
     std::string musicLoad3{mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\load3.wav"};
 
+    // check music tracks exist
+    bool errorLoadingBaseGameMusic{false};
+    QString musicErrorMessage{""};
+    if (!fs::is_regular_file(mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\action3.wav", errorCode) && !errorLoadingBaseGameMusic)
+    {
+        errorLoadingBaseGameMusic = true;
+        musicErrorMessage = "Warning in PlatoonSetup::PlatoonSetup().  Failed to find music file: ";
+        musicErrorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Sound\\Music\\action3.wav";
+    }
+    if (!fs::is_regular_file(mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\load1.wav", errorCode) && !errorLoadingBaseGameMusic)
+    {
+        errorLoadingBaseGameMusic = true;
+        musicErrorMessage = "Warning in PlatoonSetup::PlatoonSetup().  Failed to find music file: ";
+        musicErrorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Sound\\Music\\load1.wav";
+    }
+    if (!fs::is_regular_file(mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\load3.wav", errorCode) && !errorLoadingBaseGameMusic)
+    {
+        errorLoadingBaseGameMusic = true;
+        musicErrorMessage = "Warning in PlatoonSetup::PlatoonSetup().  Failed to find music file: ";
+        musicErrorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Sound\\Music\\load3.wav";
+    }
+
+    // report warnings if music is missing
+    if (errorLoadingBaseGameMusic)
+    {
+        QMessageBox msgBox(QMessageBox::Warning, "Warning", musicErrorMessage);
+        msgBox.exec();
+    }
+
     // read in the mod list
-    currentFile.open(mainGameDirectory + "\\modsset.txt");
-    ModList modList(currentFile);
-    currentFile.close();
+    ModList modList;
+    if (fs::is_regular_file(mainGameDirectory + "\\modsset.txt", errorCode) && !errorLoadingBaseGameData)
+    {
+        currentFile.open(mainGameDirectory + "\\modsset.txt");
+        modList.readFromFile(currentFile);
+        currentFile.close();
+    }
+    else if (!errorLoadingBaseGameData)
+    {
+        errorLoadingBaseGameData = true;
+        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find file: ";
+        errorMessage += QString::fromStdString(mainGameDirectory) + "\\modsset.txt";
+    }
+
+    // report errors and end program if any base game data is missing
+    if (errorLoadingBaseGameData)
+    {
+        QMessageBox msgBox(QMessageBox::Critical, "Error", errorMessage);
+        msgBox.exec();
+        exit(EXIT_FAILURE);
+    }
 
     // load mods
     for (const auto &currentMod : modList.getModList())
@@ -155,7 +300,6 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // build solider pool from actors (must do after loading mods as mods may change actor names)
     for (const auto &element : m_actors)
     {
-        //element.print();
         if (element.getClassName() == classDemolitions)
         {
             if (element.getFirstInitialLastName().size() >= 13) // for longer names

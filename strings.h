@@ -20,13 +20,7 @@ public:
     {
     }
 
-    enum class stringFileReadResult
-    {
-        DONE,
-        FILESTREAMERROR
-    };
-
-    stringFileReadResult readFromFile(std::ifstream &stringsFile);
+    void readFromFile(std::ifstream &stringsFile);
 
     QString getString(const QString &key) const;
 };
