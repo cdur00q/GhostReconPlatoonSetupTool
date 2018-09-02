@@ -3,8 +3,8 @@
 
 #include "variables.h"
 #include "strings.h"
+#include <vector>
 #include <QString>
-#include <QTextStream> // for printing to console
 
 class Gun
 {
@@ -37,11 +37,11 @@ private:
     std::vector<FireMode> m_fireModes;
     QString m_maxZoom{"0"};
 
-    // extracts 1 piece of data from a .gun file. targetTag is the data tag to look for
+    // reads and stores one item of game data from a gun file
     fileReadResult getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &gunFile);
-    // uses recursion to extract all listed fire selection options from a .gun file
+    // uses recursion to extract all listed fire selection options from a gun file
     fileReadResult getFireModes(std::vector<FireMode> &fireModes, std::ifstream &gunFile, int startReadingPos);
-    // uses recursion to find and extract the maximum zoom value from a .gun file
+    // uses recursion to find and extract the maximum zoom value from a gun file
     fileReadResult getMaxZoom(QString &valueToFill, std::ifstream &gunFile, int startReadingPos);
 
 public:

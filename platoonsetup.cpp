@@ -1,15 +1,14 @@
 #include "platoonsetup.h"
 #include "ui_platoonsetup.h"
 
+#include <vector>
 #include <string>
 #include <filesystem>
 #include <fstream>
-#include <vector>
 #include <map>
 #include <utility> // for std::make_pair
 #include <QMessageBox>
 #include <QtMultimedia/QMediaPlayer>
-#include <QTextStream> // for printing to console
 
 #include "variables.h"
 #include "functions.h"
@@ -19,20 +18,12 @@
 #include "projectile.h"
 #include "item.h"
 #include "strings.h"
-#include "kitrestrictionlist.h"
 #include "assignedkitmap.h"
+#include "kitrestrictionlist.h"
 #include "modlist.h"
+
 namespace fs = std::experimental::filesystem;
 
-// for debugging
-void printActorVector(const std::vector<Actor*> &vec)
-{
-    for (auto &element : vec)
-    {
-        //element->print();
-        QTextStream(stdout) << element->getName() << endl;
-    }
-}
 
 PlatoonSetup::PlatoonSetup(QWidget *parent) :
     QMainWindow(parent),
@@ -43,16 +34,6 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     PlatoonSetup::grabKeyboard(); // send all keboard input to the main window to prevent messing up the selection logic of the fireteam/soldier pool boxes
     ui->pteFireModes1->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     ui->pteFireModes2->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
-
-    //QTextStream(stdout) << "string to print" << endl;
-
-    // working with quotes
-    // printf(R"(She said "time flies like an arrow, but fruit flies like a banana".)");
-    // https://stackoverflow.com/questions/12338818/how-to-get-double-quotes-into-a-string-literal#12338826
-
-    //TODO - check there is at least 1 actor and 1 kit for him before showing the main window
-    //TODO - switch the media player pointer to be a smart pointer?
-    //TODO - add sound effects when pressing buttons like in the game
 
     // reserve space in the actor vectors
     m_rifleman.reserve(76);
@@ -109,13 +90,6 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     if (m_sniper.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_sniper, m_actors); }
     if (m_demolitions.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_demolitions, m_actors); }
 
-    /* // add all actors for testing
-    for (const auto &element : m_rifleman) { m_actors.push_back(element); }
-    for (const auto &element : m_heavyWeapons) { m_actors.push_back(element); }
-    for (const auto &element : m_sniper) { m_actors.push_back(element); }
-    for (const auto &element : m_demolitions) { m_actors.push_back(element); }
-    */
-
     // read in strings
     if (fs::is_regular_file(mainGameDirectory + "\\Data\\Shell\\strings.txt", errorCode) && !errorLoadingBaseGameData)
     {
@@ -130,14 +104,6 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         errorMessage += QString::fromStdString(mainGameDirectory) + "\\Data\\Shell\\strings.txt";
     }
 
-    // print strings
-    /*
-    for (const auto &element : strings)
-    {
-        //QTextStream(stdout) << element. << endl;
-    }
-    */
-
     // read in guns, projectiles, and items
     if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Equip", errorCode) && !errorLoadingBaseGameData)
     {
@@ -150,24 +116,6 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         errorLoadingBaseGameData = true;
         errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
         errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Equip";
-    }
-
-    // print guns
-    for (const auto &element : m_guns)
-    {
-        //element.print();
-    }
-
-    // print projectiles
-    for (const auto &element : m_projectiles)
-    {
-        //element.print();
-    }
-
-    // print items
-    for (const auto &element : m_items)
-    {
-        //element.print();
     }
 
     // read in base kits for the four character classes and store them into their respective kit vectors
@@ -219,13 +167,13 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits";
     }
 
-    // create the kit restriction list
+    // create the kit restriction list and add the kits it specfies to the apppropriate soldier class kit vectors
     if (fs::is_regular_file(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\quick_missions.qmk", errorCode) && !errorLoadingBaseGameData)
     {
         currentFile.open(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\quick_missions.qmk");
         KitRestrictionList kitList(currentFile);
         currentFile.close();
-        updateKitVectorPerRestrictionList(tempKits, kitList, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits);
+        updateKitVectorsPerRestrictionList(tempKits, kitList, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits);
     }
     else if (!errorLoadingBaseGameData)
     {
@@ -234,34 +182,54 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\quick_missions.qmk";
     }
 
-    // create music tracks
+    // create music tracks and sfx
     std::string musicAction3{mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\action3.wav"};
     std::string musicLoad1{mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\load1.wav"};
     std::string musicLoad3{mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\load3.wav"};
+    std::string soundButton{mainGameDirectory + "\\Mods\\Origmiss\\Sound\\I_main1.wav"};
+    std::string soundApply{mainGameDirectory + "\\Mods\\Origmiss\\Sound\\I_launch5.wav"};
 
-    // check music tracks exist
+    // check music tracks and sfx exist
     bool errorLoadingBaseGameMusic{false};
     QString musicErrorMessage{""};
-    if (!fs::is_regular_file(mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\action3.wav", errorCode) && !errorLoadingBaseGameMusic)
+    if (!fs::is_regular_file(musicAction3, errorCode))
     {
-        errorLoadingBaseGameMusic = true;
         musicErrorMessage = "Warning in PlatoonSetup::PlatoonSetup().  Failed to find music file: ";
-        musicErrorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Sound\\Music\\action3.wav";
+        musicErrorMessage += QString::fromStdString(musicAction3);
+        QMessageBox msgBox(QMessageBox::Warning, "Warning", musicErrorMessage);
+        msgBox.exec();
     }
-    if (!fs::is_regular_file(mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\load1.wav", errorCode) && !errorLoadingBaseGameMusic)
+    if (!fs::is_regular_file(musicLoad1, errorCode))
     {
-        errorLoadingBaseGameMusic = true;
         musicErrorMessage = "Warning in PlatoonSetup::PlatoonSetup().  Failed to find music file: ";
-        musicErrorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Sound\\Music\\load1.wav";
+        musicErrorMessage += QString::fromStdString(musicLoad1);
+        QMessageBox msgBox(QMessageBox::Warning, "Warning", musicErrorMessage);
+        msgBox.exec();
     }
-    if (!fs::is_regular_file(mainGameDirectory + "\\Mods\\Origmiss\\Sound\\Music\\load3.wav", errorCode) && !errorLoadingBaseGameMusic)
+    if (!fs::is_regular_file(musicLoad3, errorCode))
     {
-        errorLoadingBaseGameMusic = true;
         musicErrorMessage = "Warning in PlatoonSetup::PlatoonSetup().  Failed to find music file: ";
-        musicErrorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Sound\\Music\\load3.wav";
+        musicErrorMessage += QString::fromStdString(musicLoad3);
+        QMessageBox msgBox(QMessageBox::Warning, "Warning", musicErrorMessage);
+        msgBox.exec();
     }
 
-    // report warnings if music is missing
+    if (!fs::is_regular_file(soundButton, errorCode))
+    {
+        musicErrorMessage = "Warning in PlatoonSetup::PlatoonSetup().  Failed to find sound file: ";
+        musicErrorMessage += QString::fromStdString(soundButton);
+        QMessageBox msgBox(QMessageBox::Warning, "Warning", musicErrorMessage);
+        msgBox.exec();
+    }
+    if (!fs::is_regular_file(soundApply, errorCode))
+    {
+        musicErrorMessage = "Warning in PlatoonSetup::PlatoonSetup().  Failed to find sound file: ";
+        musicErrorMessage += QString::fromStdString(soundApply);
+        QMessageBox msgBox(QMessageBox::Warning, "Warning", musicErrorMessage);
+        msgBox.exec();
+    }
+
+    // report warnings if music or sfx is missing
     if (errorLoadingBaseGameMusic)
     {
         QMessageBox msgBox(QMessageBox::Warning, "Warning", musicErrorMessage);
@@ -291,10 +259,26 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         exit(EXIT_FAILURE);
     }
 
+    // check if any actors were actually loaded as the checks above only guarantee the actor directories exist but don't ensure there are actor files within those directories
+    if (m_actors.size() <= 0)
+    {
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in PlatoonSetup::PlatoonSetup().  Failed to find any actor files.");
+        msgBox.exec();
+        exit(EXIT_FAILURE);
+    }
+
     // load mods
     for (const auto &currentMod : modList.getModList())
     {
-        loadMod(mainGameDirectory + currentMod, m_actors, m_strings, m_guns, m_projectiles, m_items, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits, musicAction3, musicLoad1, musicLoad3);
+        loadMod(mainGameDirectory + currentMod, m_actors, m_strings, m_guns, m_projectiles, m_items, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits, musicAction3, musicLoad1, musicLoad3, soundButton, soundApply);
+    }
+
+    // check that each soldier class has at least one kit in their kit vector and close program if not (must do after loading mods and mods may add kits)
+    if (m_riflemanKits.size() <= 0 || m_heavyWeaponsKits.size() <= 0 || m_sniperKits.size() <= 0 || m_demolitionsKits.size() <= 0)
+    {
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in PlatoonSetup::PlatoonSetup().  Failed to find at least one kit for each soldier class.");
+        msgBox.exec();
+        exit(EXIT_FAILURE);
     }
 
     // build solider pool from actors (must do after loading mods as mods may change actor names)
@@ -340,9 +324,9 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         {
             QString errorMsg{"Error while assigning default kits.  Unrecognized kit path: '"};
             errorMsg += element.getKitPath();
-            errorMsg += "' for actor: ";
+            errorMsg += "' for actor: '";
             errorMsg += element.getFirstInitialLastName();
-            errorMsg += " filename: ";
+            errorMsg += "' filename: ";
             errorMsg += element.getFileName();
             QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
             msgBox.exec();
@@ -376,6 +360,12 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         msgBox.exec();
     }
     m_mediaPlayer->play();
+
+    // assign button sfx to button media players
+    m_mediaPlayerButtonClick->setVolume(33);
+    m_mediaPlayerButtonClick->setMedia(stringToQUrl(soundButton));
+    m_mediaPlayerApplyClick->setVolume(33);
+    m_mediaPlayerApplyClick->setMedia(stringToQUrl(soundApply));
 }
 
 PlatoonSetup::~PlatoonSetup()
@@ -402,6 +392,7 @@ void PlatoonSetup::on_pbAlpha_clicked()
     updateApplyKitToFireteamButton();
     updateApplyKitToSquadButton();
     updateApplyButton();
+    m_mediaPlayerButtonClick->play();
 }
 
 void PlatoonSetup::on_pbBravo_clicked()
@@ -417,6 +408,7 @@ void PlatoonSetup::on_pbBravo_clicked()
     updateApplyKitToFireteamButton();
     updateApplyKitToSquadButton();
     updateApplyButton();
+    m_mediaPlayerButtonClick->play();
 }
 
 void PlatoonSetup::on_pbCharlie_clicked()
@@ -432,6 +424,7 @@ void PlatoonSetup::on_pbCharlie_clicked()
     updateApplyKitToFireteamButton();
     updateApplyKitToSquadButton();
     updateApplyButton();
+    m_mediaPlayerButtonClick->play();
 }
 
 void PlatoonSetup::on_lwSoldierPool_itemPressed()
@@ -526,6 +519,7 @@ void PlatoonSetup::on_pbUnassign_clicked()
     updateApplyKitToFireteamButton();
     updateApplyKitToSquadButton();
     updateApplyButton();
+    m_mediaPlayerButtonClick->play();
 }
 
 void PlatoonSetup::on_lwKits_itemPressed()
@@ -557,6 +551,7 @@ void PlatoonSetup::on_pbKitLeft_clicked()
         updateSelectedKitInfo(getSelectedActorsKits());
         setActorsKit(m_actors[ui->lwSoldierPool->currentRow()]);
     }
+    m_mediaPlayerButtonClick->play();
 }
 
 void PlatoonSetup::on_pbKitRight_clicked()
@@ -581,6 +576,7 @@ void PlatoonSetup::on_pbKitRight_clicked()
         updateSelectedKitInfo(getSelectedActorsKits());
         setActorsKit(m_actors[ui->lwSoldierPool->currentRow()]);
     }
+    m_mediaPlayerButtonClick->play();
 }
 
 void PlatoonSetup::on_pbKitFireteam_clicked()
@@ -616,6 +612,8 @@ void PlatoonSetup::on_pbKitFireteam_clicked()
                 setActorsKit(*element);
         }
     }
+
+    m_mediaPlayerButtonClick->play();
 }
 
 void PlatoonSetup::on_pbKitSquad_clicked()
@@ -640,6 +638,8 @@ void PlatoonSetup::on_pbKitSquad_clicked()
         if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
             setActorsKit(*element);
     }
+
+    m_mediaPlayerButtonClick->play();
 }
 
 void PlatoonSetup::on_pbApply_clicked()
@@ -661,8 +661,7 @@ void PlatoonSetup::on_pbApply_clicked()
     coopAvatar.close();
     fs::permissions(coopAvatarPath, fs::perms::remove_perms & fs::perms::owner_write & fs::perms::group_write & fs::perms::others_write, errorCode);
 
-    QMessageBox msgBox(QMessageBox::Information, "Info", "Done");
-    msgBox.exec();
+    m_mediaPlayerApplyClick->play();
 }
 
 void PlatoonSetup::mediaPlayerStateChanged(QMediaPlayer::State state)
@@ -684,7 +683,7 @@ void PlatoonSetup::qApplicationStateChanged(Qt::ApplicationState state)
 }
 
 // sync a selection from the soldier pool with the specified fireteam
-// check if selected soldier is on any of the specified team and select them there if so
+// check if selected soldier is on the specified team and select them there if so
 void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<Actor*> &fireteam, QListWidget *fireteamList)
 {
     bool done{false};
@@ -708,7 +707,6 @@ void PlatoonSetup::syncSoldierPoolWithFireteam(const std::vector<Actor*> &firete
 }
 
 // sync a selection from the specified fireteam with the soldier pool
-// check if selected soldier is on any of the specified team and select them there if so
 void PlatoonSetup::syncFireteamWithSoldierPool(const std::vector<Actor*> &fireteam, const QListWidget *fireteamList)
 {
     bool done{false};
@@ -724,7 +722,7 @@ void PlatoonSetup::syncFireteamWithSoldierPool(const std::vector<Actor*> &firete
             noMatch = false;
         }
     }
-    if (noMatch)
+    if (noMatch) // there should always be a match
     {
         ui->lwSoldierPool->clearSelection();
     }
@@ -966,7 +964,6 @@ void PlatoonSetup::setActorsKit(const Actor &actor)
         msgBox.exec();
         exit(EXIT_FAILURE);
     }
-
 }
 
 // selects actor's current kit from the kit list
@@ -1011,7 +1008,7 @@ std::vector<Kit>& PlatoonSetup::getSelectedActorsKits()
     }
 }
 
-// build kit pool from kits
+// builds kit pool from passed in kit vector
 void PlatoonSetup::buildKitPool(const std::vector<Kit> &kits)
 {
     // first delete all current entries in the kit pool
@@ -1023,7 +1020,6 @@ void PlatoonSetup::buildKitPool(const std::vector<Kit> &kits)
     QString item2{""};
     for (const auto &element : kits)
     {
-
         // the first item in a kit is always a gun
         item1 = element.getSlot1FileName();
         for (const auto &element2 : m_guns)
@@ -1074,11 +1070,15 @@ void PlatoonSetup::buildKitPool(const std::vector<Kit> &kits)
         {
             item2 = m_strings.getString("WPN_EXTRAAMMO");
         }
+
         // nothing else matched - must be an error
         else
         {
-            item2 = "error resolving item2 while building kit list";
-            // maybe put popup error and end program here?
+            QString errorMsg{"Error in PlatoonSetup::buildKitPool().  Failed to resolve item two in kit: "};
+            errorMsg += element.getFileName();
+            QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+            msgBox.exec();
+            exit(EXIT_FAILURE);
         }
         item1 += " + ";
         item1 += item2; // add item2 to item1 to create the final label for the list widget
@@ -1086,7 +1086,7 @@ void PlatoonSetup::buildKitPool(const std::vector<Kit> &kits)
     }
 }
 
-// updates the box that displays the currently selected kits name
+// updates the box that displays the currently selected kit's name
 void PlatoonSetup::updateKitNameBox()
 {
     const Actor &selectedActor{m_actors[ui->lwSoldierPool->currentRow()]};
@@ -1103,7 +1103,7 @@ void PlatoonSetup::updateKitNameBox()
     ui->leKitName->setText(kitName + kitNumber);
 }
 
-// updates all the kit detail boxs (mag cap, range, etc) to the currently selected kit when called
+// updates all the kit detail boxes (mag cap, range, etc) to the currently selected kit
 void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
 {
     // first clear all the boxes of any info
@@ -1145,9 +1145,10 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
 
     if (!gun)
     {
-        QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find first item of selected kit.");
+        QString errorMsg{"Error in PlatoonSetup::updateSelectedKitInfo().  Unable to find first item of selected kit '"};
+        (errorMsg += currentKit.getFileName()) += "'";
+        QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
         msgBox.exec();
-        //QCoreApplication::exit(-1);
         exit(EXIT_FAILURE);
     }
 
@@ -1203,12 +1204,10 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
         fireModesForBox += " rpm ";
         if (element.mode == "Full Auto")
         {
-            //fireModesForBox += " ";
             fireModesForBox += "Full Auto";
         }
         else if (element.mode == "1")
         {
-            //fireModesForBox += " ";
             fireModesForBox += "Single Shot";
         }
         else
@@ -1233,11 +1232,11 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
 
         if (!gun2)
         {
-            QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find second item of selected kit.");
+            QString errorMsg{"Error in PlatoonSetup::updateSelectedKitInfo().  Unable to find second item of selected kit '"};
+            (errorMsg += currentKit.getFileName()) += "'";
+            QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
             msgBox.exec();
-            //QCoreApplication::exit(-1);
             exit(EXIT_FAILURE);
-
         }
 
         // get total ammo / number of magazines and display it along with the gun name
@@ -1321,9 +1320,10 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
 
         if (!projectile)
         {
-            QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find second item of selected kit.");
+            QString errorMsg{"Error in PlatoonSetup::updateSelectedKitInfo().  Unable to find second item of selected kit '"};
+            (errorMsg += currentKit.getFileName()) += "'";
+            QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
             msgBox.exec();
-            //QCoreApplication::exit(-1);
             exit(EXIT_FAILURE);
         }
 
@@ -1346,9 +1346,10 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
 
         if (!item)
         {
-            QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in updateSelectedKitInfo().  Unable to find second item of selected kit.");
+            QString errorMsg{"Error in PlatoonSetup::updateSelectedKitInfo().  Unable to find second item of selected kit '"};
+            (errorMsg += currentKit.getFileName()) += "'";
+            QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
             msgBox.exec();
-            //QCoreApplication::exit(-1);
             exit(EXIT_FAILURE);
         }
 
@@ -1399,18 +1400,8 @@ void PlatoonSetup::updateApplyKitToFireteamButton()
         if (selectedActor == *element) // they are
             fireteamPtr = &m_alpha; // set temporary pointer to alpha
     }
-
-    for (const auto &element : m_bravo)
-    {
-        if (selectedActor == *element)
-            fireteamPtr = &m_bravo;
-    }
-
-    for (const auto &element : m_charlie)
-    {
-        if (selectedActor == *element)
-            fireteamPtr = &m_charlie;
-    }
+    for (const auto &element : m_bravo) { if (selectedActor == *element) fireteamPtr = &m_bravo; }
+    for (const auto &element : m_charlie) { if (selectedActor == *element) fireteamPtr = &m_charlie; }
 
     if (fireteamPtr) // if fireteam pointer is not null (as in the selected actor is on one of the fireteams)
     {
@@ -1466,7 +1457,7 @@ void PlatoonSetup::updateApplyKitToSquadButton()
                 ++soldiersWithSameKitPath;
         }
 
-        if (soldiersWithSameKitPath >= 1) // counted 1 or more actor accross all three fireteams with the same kit path
+        if (soldiersWithSameKitPath >= 1) // counted 1 or more actors accross all three fireteams with the same kit path
             ui->pbKitSquad->setEnabled(true);
         else
             ui->pbKitSquad->setDisabled(true);

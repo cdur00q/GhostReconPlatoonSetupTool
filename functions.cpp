@@ -1,23 +1,23 @@
+#include "functions.h"
+
 #include <fstream>
-#include <filesystem>
 #include <vector>
 #include <string>
+#include <filesystem>
 #include <cstdlib> // for rand() and srand()
 #include <QString>
 #include <QMessageBox>
 #include <QUrl>
-#include <QTextStream> // for printing to console
 
 #include "variables.h"
-#include "functions.h"
 #include "actor.h"
 #include "strings.h"
 #include "gun.h"
 #include "projectile.h"
 #include "item.h"
 #include "kit.h"
-#include "kitrestrictionlist.h"
 #include "assignedkitmap.h"
+#include "kitrestrictionlist.h"
 
 namespace fs = std::experimental::filesystem;
 
@@ -57,6 +57,7 @@ QString getFileExtension(const QString &fileName)
     return "error";
 }
 
+// takes a file path as a std::string and returns it as a QUrl
 QUrl stringToQUrl(const std::string &string)
 {
     std::string tempStringOut{""};
@@ -75,6 +76,7 @@ QUrl stringToQUrl(const std::string &string)
     return qUrl;
 }
 
+// reads in all kits from the passed in directory and it's subdirectories and stores them in a kit vector
 void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector)
 {
     for (const auto &element : fs::recursive_directory_iterator(kitsDirectoryPath))
@@ -117,7 +119,10 @@ void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVe
     }
 }
 
-void updateKitVectorPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits)
+// adds/updates kits from passed in kit list to passed in soldier class specific kit vectors according to the passed in kit restriction list
+// kits are checked one at a time and added to each soldier class that is a user of that kit
+// a kit could be used by more than one soldier class
+void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits)
 {
     std::vector<QString> soldierClasses{classRifleman, classHeavyWeapons, classSniper, classDemolitions}; // the order of these two vectors have to match so if the first element is rifleman here
     std::vector<std::vector<Kit>*> allClassesKits{&riflemanKits, &heavyWeaponsKits, &sniperKits, &demolitionsKits}; // then the first element has to be riflemen here
@@ -149,33 +154,7 @@ void updateKitVectorPerRestrictionList(const std::vector<Kit> &allKits, const Ki
     }
 }
 
-// randomly chooses actors from one vector and places them into another
-// vector if that actor isn't already in there.
-// loops until it can find an actor from the source that isn't in the destination
-void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Actor> &destination)
-{
-    bool actorAlreadyPresent{false};
-    bool done{false};
-    const Actor *actorPtr{nullptr};
-    while (!done)
-    {
-        actorAlreadyPresent = false;
-        actorPtr = &source[getRandomNumber(0, source.size() - 1)];
-        for (auto &element : destination)
-        {
-            if (element == *actorPtr)
-            {
-                actorAlreadyPresent = true;
-            }
-        }
-        if (!actorAlreadyPresent)
-        {
-            destination.push_back(*actorPtr);
-            done = true;
-        }
-    }
-}
-
+// pass in a directory where actor files are held and a vector of actors.  will update the passed in vector with newer versions of the files it finds
 void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> &actors)
 {
     for (const auto &element : fs::directory_iterator(actorDirectoryPath))
@@ -205,7 +184,8 @@ void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> 
     }
 }
 
-void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3)
+// updates/adds game data that is relevant to this program(actor data, kit data, etc) from a passed in ghost recon mod directory
+void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3, std::string &soundButton, std::string &soundApply)
 {
     std::ifstream currentFile;
     std::error_code errorCode; // no actual error handling will take place with this error code
@@ -278,7 +258,7 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
         currentFile.open(modPath + "\\Kits\\quick_missions.qmk");
         KitRestrictionList kitList(currentFile);
         currentFile.close();
-        updateKitVectorPerRestrictionList(tempKits, kitList, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
+        updateKitVectorsPerRestrictionList(tempKits, kitList, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
     }
 
     // update the music track if there are newer versions of them
@@ -288,8 +268,41 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
         musicLoad1 = modPath + "\\Sound\\Music\\load1.wav";
     if (fs::is_regular_file(modPath + "\\Sound\\Music\\load3.wav", errorCode))
         musicLoad3 = modPath + "\\Sound\\Music\\load3.wav";
+
+    // update the sound effects if there are newer versions of them
+    if (fs::is_regular_file(modPath + "\\Sound\\I_main1.wav", errorCode))
+        soundButton = modPath + "\\Sound\\I_main1.wav";
+    if (fs::is_regular_file(modPath + "\\Sound\\I_launch5.wav", errorCode))
+        soundApply = modPath + "\\Sound\\I_launch5.wav";
 }
 
+// randomly chooses actors from one vector and places them into another vector if that actor isn't already in there
+// loops until it can find an actor from the source that isn't in the destination
+void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Actor> &destination)
+{
+    bool actorAlreadyPresent{false};
+    bool done{false};
+    const Actor *actorPtr{nullptr};
+    while (!done)
+    {
+        actorAlreadyPresent = false;
+        actorPtr = &source[getRandomNumber(0, source.size() - 1)];
+        for (auto &element : destination)
+        {
+            if (element == *actorPtr)
+            {
+                actorAlreadyPresent = true;
+            }
+        }
+        if (!actorAlreadyPresent)
+        {
+            destination.push_back(*actorPtr);
+            done = true;
+        }
+    }
+}
+
+// creates an avatar file the game can read from.  by default creates a singleplayer version but can create a cooperative multiplayer version if the forCooperative flag is true
 void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &avatarFile, bool forCooperative)
 {
     // exit if there are no soldiers in any of the passed in fireteams

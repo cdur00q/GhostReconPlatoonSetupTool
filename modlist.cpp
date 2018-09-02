@@ -1,6 +1,10 @@
 #include "modlist.h"
 
+#include <vector>
+#include <fstream>
+#include <string>
 #include <QMessageBox>
+#include <QTextStream> // for printing to console
 
 ModList::ModList()
 {
@@ -12,6 +16,7 @@ ModList::ModList(std::ifstream &modsSetFile)
     readFromFile(modsSetFile);
 }
 
+// reads every mod path from modsset.txt and stores them in a vector
 void ModList::readFromFile(std::ifstream &modsSetFile)
 {
     bool done{false};
@@ -20,7 +25,6 @@ void ModList::readFromFile(std::ifstream &modsSetFile)
     {
         std::string value{""};
         char curChar;
-        //modsSetFile.seekg(0);
         while (modsSetFile)
         {
             modsSetFile.get(curChar);
@@ -53,7 +57,7 @@ void ModList::readFromFile(std::ifstream &modsSetFile)
     // something went wrong with the file stream
     if (!modsSetFile.good())
     {
-        QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in ModList::readFromFile.");
+        QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in ModList::readFromFile().");
         msgBox.exec();
         exit(EXIT_FAILURE);
     }

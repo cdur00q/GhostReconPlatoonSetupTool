@@ -25,6 +25,7 @@ Gun::Gun(QString fileName, std::ifstream &gunFile, const Strings &strings)
     getMaxZoom(m_maxZoom, gunFile, 0);
 }
 
+// reads and stores one item of game data from a gun file
 fileReadResult Gun::getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &gunFile)
 {
     // only operate if the file stream is working
@@ -48,7 +49,6 @@ fileReadResult Gun::getGameData(const QString &targetTag, QString &valueToFill, 
                     if (curString[curString.size() - 1] == '>')
                         break; // stop reading if a tag closing symbol is encountered
                 }
-                //QTextStream(stdout) << "extracted " << curString << endl;
                 // then compare if this is the right tag
                 if (curString == targetTag)
                 {
@@ -59,13 +59,11 @@ fileReadResult Gun::getGameData(const QString &targetTag, QString &valueToFill, 
                         value += curChar;
                         curChar = gunFile.get();
                     }
-                    //QTextStream(stdout) << "matched " << curString << " value is " << value << '\n';
                     valueToFill = value;
                     return fileReadResult::FOUND;
                 }
                 else
                 {
-                    //QTextStream(stdout) << "no match" << endl;
                     curString = "";
                 }
             }
@@ -81,10 +79,11 @@ fileReadResult Gun::getGameData(const QString &targetTag, QString &valueToFill, 
     // something went wrong with the file stream
     QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Gun::getGameData().");
     msgBox.exec();
-    return fileReadResult::FILESTREAMERROR;
+    exit(EXIT_FAILURE);
 
 }
 
+// uses recursion to extract all listed fire selection options from a gun file
 fileReadResult Gun::getFireModes(std::vector<FireMode> &fireModes, std::ifstream &gunFile, int startReadingPos)
 {
     // only operate if the file stream is working
@@ -110,7 +109,6 @@ fileReadResult Gun::getFireModes(std::vector<FireMode> &fireModes, std::ifstream
                     if (curString[curString.size() - 1] == '>')
                         break; // stop reading if a tag closing symbol is encountered
                 }
-                //QTextStream(stdout) << "extracted " << curString << endl;
                 // then compare if this is the right tag
                 if (curString == rofEntryTag)
                 {
@@ -183,7 +181,6 @@ fileReadResult Gun::getFireModes(std::vector<FireMode> &fireModes, std::ifstream
                 }
                 else
                 {
-                    //QTextStream(stdout) << "no match" << endl;
                     curString = "";
                 }
             }
@@ -199,10 +196,11 @@ fileReadResult Gun::getFireModes(std::vector<FireMode> &fireModes, std::ifstream
     // something went wrong with the file stream
     QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Gun::getFireModes().");
     msgBox.exec();
-    return fileReadResult::FILESTREAMERROR;
+    exit(EXIT_FAILURE);
 
 }
 
+// uses recursion to find and extract the maximum zoom value from a gun file
 fileReadResult Gun::getMaxZoom(QString &valueToFill, std::ifstream &gunFile, int startReadingPos)
 {
     // only operate if the file stream is working
@@ -262,7 +260,7 @@ fileReadResult Gun::getMaxZoom(QString &valueToFill, std::ifstream &gunFile, int
     // something went wrong with the file stream
     QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Gun::getMaxZoom().");
     msgBox.exec();
-    return fileReadResult::FILESTREAMERROR;
+    exit(EXIT_FAILURE);
 }
 
 Gun& Gun::operator= (const Gun &gun)
@@ -305,8 +303,7 @@ void Gun::print() const
     else if (m_weaponType == "6")
         weaponType = "shotgun";
 
-    QTextStream(stdout) << m_fileName <<
-    " " << m_nameToken << " " << m_name << '\n'
+    QTextStream(stdout) << m_fileName << " " << m_nameToken << " " << m_name << '\n'
     << "mag cap: " << m_magCap << '\n'
     << "max range: " << m_maxRange << '\n'
     << "muzzle velocity: " << m_muzzleVelocity << '\n'

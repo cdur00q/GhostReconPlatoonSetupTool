@@ -3,7 +3,6 @@
 
 #include "variables.h"
 #include <QString>
-#include <QTextStream> // for printing to console
 
 class Actor
 {
@@ -24,6 +23,7 @@ private:
     const QString m_leadershipStatTag{"<Leadership>"};
     QString m_leadershipStat{"1"};
 
+    // reads and stores one item of game data from an actor file
     fileReadResult getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &actorFile);
 
 public:

@@ -16,14 +16,14 @@ const QString classHeavyWeapons{"heavy-weapons"}; // heavy-weapons and support a
 const QString classSupport{"support"}; // heavy-weapons and support are used somewhat interchangebly in the game files
 const QString classSniper{"sniper"};
 const QString classDemolitions{"demolitions"};
-const std::string mainGameDirectory{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon"};
+//const std::string mainGameDirectory{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon"};
+const std::string mainGameDirectory{"..\\"};
 // ***switch main game directory to realitive path for release build***
 
 enum class fileReadResult
 {
     FOUND,
-    NOTFOUND,
-    FILESTREAMERROR
+    NOTFOUND
 };
 
 #endif // VARIABLES_H

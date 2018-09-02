@@ -3,7 +3,6 @@
 #include "strings.h"
 
 #include <fstream>
-#include <vector>
 #include <QString>
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
@@ -15,6 +14,7 @@ Projectile::Projectile(QString fileName, std::ifstream &projectileFile, const St
     m_name = strings.getString(m_nameToken);
 }
 
+// reads and stores one item of game data from aa projectile file
 fileReadResult Projectile::getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &projectileFile)
 {
     // only operate if the file stream is working
@@ -38,7 +38,6 @@ fileReadResult Projectile::getGameData(const QString &targetTag, QString &valueT
                     if (curString[curString.size() - 1] == '>')
                         break; // stop reading if a tag closing symbol is encountered
                 }
-                //QTextStream(stdout) << "extracted " << curString << endl;
                 // then compare if this is the right tag
                 if (curString == targetTag)
                 {
@@ -49,13 +48,11 @@ fileReadResult Projectile::getGameData(const QString &targetTag, QString &valueT
                         value += curChar;
                         curChar = projectileFile.get();
                     }
-                    //QTextStream(stdout) << "matched " << curString << " value is " << value << '\n';
                     valueToFill = value;
                     return fileReadResult::FOUND;
                 }
                 else
                 {
-                    //QTextStream(stdout) << "no match" << endl;
                     curString = "";
                 }
             }
@@ -71,7 +68,7 @@ fileReadResult Projectile::getGameData(const QString &targetTag, QString &valueT
     // something went wrong with the file stream
     QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Projectile::getGameData().");
     msgBox.exec();
-    return fileReadResult::FILESTREAMERROR;
+    exit(EXIT_FAILURE);
 
 }
 

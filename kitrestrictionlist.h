@@ -1,8 +1,9 @@
 #ifndef KITRESTRICTIONLIST_H
 #define KITRESTRICTIONLIST_H
 
-#include <QString>
+#include <fstream>
 #include <set>
+#include <QString>
 
 
 class KitRestrictionList

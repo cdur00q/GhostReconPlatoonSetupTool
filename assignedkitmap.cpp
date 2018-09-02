@@ -2,13 +2,14 @@
 
 #include <map>
 #include <QString>
-#include<QMessageBox>
+#include <QMessageBox>
 
 AssignedKitMap::AssignedKitMap()
 {
 
 }
 
+// adds a new actor/kit pair to the kit map or updates the kit info if the actor already exists in the kit map
 void AssignedKitMap::assignKitToActor(const QString &kitFileName, int kitIndex, const QString& actorFileName)
 {
     auto tempIterator{m_kitMap.find(actorFileName)}; // first check if this actor already exists in the kit map
@@ -22,6 +23,7 @@ void AssignedKitMap::assignKitToActor(const QString &kitFileName, int kitIndex, 
     }
 }
 
+// returns the file name of the kit paired with the passed in actor
 QString AssignedKitMap::getKitFileName(const QString& actorFileName) const
 {
     auto tempIterator{m_kitMap.find(actorFileName)};
@@ -37,6 +39,7 @@ QString AssignedKitMap::getKitFileName(const QString& actorFileName) const
     }
 }
 
+// returns the index of the kit paired with the passed in actor
 int AssignedKitMap::getKitIndex(const QString& actorFileName) const
 {
     auto tempIterator{m_kitMap.find(actorFileName)};

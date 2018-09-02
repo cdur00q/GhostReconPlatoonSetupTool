@@ -3,8 +3,8 @@
 
 #include "variables.h"
 #include "strings.h"
+#include <fstream>
 #include <QString>
-#include <QTextStream> // for printing to console
 
 class Projectile
 {
@@ -14,7 +14,7 @@ private:
     QString m_nameToken{"Default name Token"};
     QString m_name{"Default name"};
 
-    // extracts 1 piece of data from a .prj file. targetTag is the data tag to look for
+    // reads and stores one item of game data from aa projectile file
     fileReadResult getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &projectileFile);
 
 public:

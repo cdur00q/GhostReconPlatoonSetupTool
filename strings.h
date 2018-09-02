@@ -2,8 +2,9 @@
 #define STRINGS_H
 
 #include "variables.h"
-#include <QString>
+#include <fstream>
 #include <map>
+#include <QString>
 
 
 class Strings
@@ -20,6 +21,7 @@ public:
     {
     }
 
+    // reads all strings in from a strings.txt file and stores them in the strings map
     void readFromFile(std::ifstream &stringsFile);
 
     QString getString(const QString &key) const;

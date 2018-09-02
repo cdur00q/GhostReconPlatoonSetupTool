@@ -1,7 +1,11 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-#include "variables.h"
+#include <fstream>
+#include <vector>
+#include <QString>
+#include <QUrl>
+
 #include "actor.h"
 #include "strings.h"
 #include "gun.h"
@@ -10,29 +14,27 @@
 #include "kit.h"
 #include "assignedkitmap.h"
 #include "kitrestrictionlist.h"
-#include <vector>
-#include <fstream>
-#include <QString>
-#include <QMessageBox>
-#include <QUrl>
 
 namespace fs = std::experimental::filesystem;
 
+// Generate a random number between min and max (inclusive)
 long getRandomNumber(long min, long max);
 
+// takes a QString and returns the file extension
 QString getFileExtension(const QString &fileName);
 
+// takes a file path as a std::string and returns it as a QUrl
 QUrl stringToQUrl(const std::string &string);
 
-// read in all kits from the passed in directory and it's subdirectories and store them in a kit vector
+// reads in all kits from the passed in directory and it's subdirectories and stores them in a kit vector
 void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector);
 
-// adds/updates kits from passed in kit list to passed in soldier class specific kit lists according to the passed in kit restriction list
+// adds/updates kits from passed in kit list to passed in soldier class specific kit vectors according to the passed in kit restriction list
 // kits are checked one at a time and added to each soldier class that is a user of that kit
 // a kit could be used by more than one soldier class
-void updateKitVectorPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits);
+void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits);
 
-// read in actor or kit files
+// reads in actor or kit files
 // pass in a directory where actor or kit files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
 template <typename T>
 void readInGameFiles(const std::string &directoryPath, const QString &targetFileExtension, T &gameDataVector)
@@ -74,7 +76,7 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
     }
 }
 
-// read gun, projectile, or item files
+// reads in gun, projectile, or item files
 // pass in a directory where gun, projectile, or item files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
 template <typename T>
 void readInGameFiles(const std::string &directoryPath, const QString &targetFileExtension, T &gameDataVector, const Strings &strings)
@@ -119,10 +121,14 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
 // pass in a directory where actor files are held and a vector of actors.  will update the passed in vector with newer versions of the files it finds
 void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> &actors);
 
-void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3);
+// updates/adds game data that is relevant to this program(actor data, kit data, etc) from a passed in ghost recon mod directory
+void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3, std::string &soundButton, std::string &soundApply);
 
+// randomly chooses actors from one vector and places them into another vector if that actor isn't already in there
+// loops until it can find an actor from the source that isn't in the destination
 void assignRandomActorToVector(const std::vector<Actor> &source, std::vector<Actor> &destination);
 
+// creates an avatar file the game can read from.  by default creates a singleplayer version but can create a cooperative multiplayer version if the forCooperative flag is true
 void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*> &bravo, const std::vector<Actor*> &charlie, const AssignedKitMap &assignedKitMap, std::ofstream &file, bool forCooperative);
 
 #endif // FUNCTIONS_H

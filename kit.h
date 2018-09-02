@@ -2,8 +2,8 @@
 #define KIT_H
 
 #include "variables.h"
+#include <fstream>
 #include <QString>
-#include <QTextStream> // for printing to console
 
 class Kit
 {
@@ -32,10 +32,11 @@ private:
     QString m_slot2ItemCount{"0"};
     const QString m_extraAmmoTag{"<ExtraAmmo>"};
     QString m_extraAmmo{"0"};
-    //int m_itemCount{0};
     kitType m_type;
 
+    // returns fileReadResult::FOUND if the passed in slot tag exists in the passed in kit file
     fileReadResult findGameData(const QString &targetSlotTag, std::ifstream &kitFile);
+    // reads and stores one item of game data from a kit file
     fileReadResult getGameData(const QString &targetSlotTag, const QString &targetTag, QString &valueToFill, std::ifstream &kitFile);
 
 public:

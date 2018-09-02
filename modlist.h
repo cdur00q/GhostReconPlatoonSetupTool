@@ -4,8 +4,6 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include <QString>
-#include <QTextStream> // for printing to console
 
 class ModList
 {
@@ -22,6 +20,7 @@ public:
 
     }
 
+    // reads every mod path from modsset.txt and stores them in a vector
     void readFromFile(std::ifstream &modsSetFile);
 
     const std::vector<std::string>& getModList() const {return m_modList;}

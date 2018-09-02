@@ -2,7 +2,6 @@
 #include "variables.h"
 
 #include <fstream>
-#include <vector>
 #include <QString>
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
@@ -19,7 +18,6 @@ Kit::Kit(QString fileName, std::ifstream &kitFile)
     // first item is always a gun so just read that in
     getGameData(m_slot1Tag, m_itemFileNameTag, m_slot1ItemFileName, kitFile);
     getGameData(m_slot1Tag, m_MagCountTag, m_slot1MagCount, kitFile);
-
 
     // second item can be a gun, throwable, or handheld
     // found 2nd gun
@@ -52,7 +50,7 @@ Kit::Kit(QString fileName, std::ifstream &kitFile)
     }
 }
 
-// returns fileReadResult::FOUND if the specified slot tag exists in the specfied kit file
+// returns fileReadResult::FOUND if the passed in slot tag exists in the passed in kit file
 fileReadResult Kit::findGameData(const QString &targetSlotTag, std::ifstream &kitFile)
 {
     // only operate if the file stream is working
@@ -97,11 +95,10 @@ fileReadResult Kit::findGameData(const QString &targetSlotTag, std::ifstream &ki
     // something went wrong with the file stream
     QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Kit::findGameData().");
     msgBox.exec();
-    return fileReadResult::FILESTREAMERROR;
-
+    exit(EXIT_FAILURE);
 }
 
-// finds and fills one value based on specfied slot and specifed data tag
+// reads and stores one item of game data from a kit file
 fileReadResult Kit::getGameData(const QString &targetSlotTag, const QString &targetTag, QString &valueToFill, std::ifstream &kitFile)
 {
     // only operate if the file stream is working
@@ -115,8 +112,7 @@ fileReadResult Kit::getGameData(const QString &targetSlotTag, const QString &tar
         {
             kitFile.get(curChar);
             // first find the target slot tag
-            // found the first char of an item tag
-            if (curChar == '<')
+            if (curChar == '<') // found the first char of an item tag
             {
                 curString += curChar;
                 // read the next chars
@@ -126,7 +122,6 @@ fileReadResult Kit::getGameData(const QString &targetSlotTag, const QString &tar
                     if (curString[curString.size() - 1] == '>')
                         break; // stop reading if a tag closing symbol is encountered
                 }
-                //QTextStream(stdout) << "extracted " << curString << endl;
                 // then compare if this is the target slot tag
                 if (curString == targetSlotTag)
                 {
@@ -135,8 +130,7 @@ fileReadResult Kit::getGameData(const QString &targetSlotTag, const QString &tar
                     while (kitFile)
                     {
                         kitFile.get(curChar);
-                        // found the first char of an item tag
-                        if (curChar == '<')
+                        if (curChar == '<') // found the first char of an item tag
                         {
                             curString += curChar;
                             // read the next chars
@@ -146,7 +140,6 @@ fileReadResult Kit::getGameData(const QString &targetSlotTag, const QString &tar
                                 if (curString[curString.size() - 1] == '>')
                                     break; // stop reading if a tag closing symbol is encountered
                             }
-                            //QTextStream(stdout) << "extracted " << curString << endl;
                             // then compare if this is the right tag
                             if (curString == targetTag)
                             {
@@ -157,13 +150,11 @@ fileReadResult Kit::getGameData(const QString &targetSlotTag, const QString &tar
                                     value += curChar;
                                     curChar = kitFile.get();
                                 }
-                                //QTextStream(stdout) << "matched " << curString << " value is " << value << '\n';
                                 valueToFill = value;
                                 return fileReadResult::FOUND;
                             }
                             else
                             {
-                                //QTextStream(stdout) << "no match" << endl;
                                 curString = "";
                             }
                         }
@@ -171,7 +162,6 @@ fileReadResult Kit::getGameData(const QString &targetSlotTag, const QString &tar
                 }
                 else
                 {
-                    //QTextStream(stdout) << "no match" << endl;
                     curString = "";
                 }
             }
@@ -187,8 +177,7 @@ fileReadResult Kit::getGameData(const QString &targetSlotTag, const QString &tar
     // something went wrong with the file stream
     QMessageBox msgBox(QMessageBox::Critical, "Error", "File stream failure in Kit::getGameData().");
     msgBox.exec();
-    return fileReadResult::FILESTREAMERROR;
-
+    exit(EXIT_FAILURE);
 }
 
 QString Kit::getSlot2FileName() const
@@ -203,7 +192,7 @@ QString Kit::getSlot2FileName() const
     }
     else
     {
-        return "error in getSlot2FileName(): no matching kitType";
+        return "error in Kit::getSlot2FileName(): no matching kitType";
     }
 }
 
@@ -244,5 +233,4 @@ void Kit::print() const
         QTextStream(stdout) << " + " << "extra ammo" <<
         " (" << m_extraAmmo << ") " << '\n';
     }
-
 }
