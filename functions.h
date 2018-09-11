@@ -29,13 +29,16 @@ QUrl stringToQUrl(const std::string &string);
 // reads in all kits from the passed in directory and it's subdirectories and stores them in a kit vector
 void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector);
 
+// adds kits from the passed in source kit vector to the destination kit vector based on whether or not a kit's path matches the passed in kit path
+void updateKitVectorPerKitPath(const QString &targetKitPath, const std::vector<Kit> &source, std::vector<Kit> &destination);
+
 // adds/updates kits from passed in kit list to passed in soldier class specific kit vectors according to the passed in kit restriction list
 // kits are checked one at a time and added to each soldier class that is a user of that kit
 // a kit could be used by more than one soldier class
 void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits);
 
-// reads in actor or kit files
-// pass in a directory where actor or kit files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
+// reads in actor files
+// pass in a directory where actor files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
 template <typename T>
 void readInGameFiles(const std::string &directoryPath, const QString &targetFileExtension, T &gameDataVector)
 {
@@ -122,7 +125,7 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
 void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> &actors);
 
 // updates/adds game data that is relevant to this program(actor data, kit data, etc) from a passed in ghost recon mod directory
-void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3, std::string &soundButton, std::string &soundApply);
+void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &tempKits, KitRestrictionList &kitList, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3, std::string &soundButton, std::string &soundApply);
 
 // randomly chooses actors from one vector and places them into another vector if that actor isn't already in there
 // loops until it can find an actor from the source that isn't in the destination

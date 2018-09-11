@@ -35,11 +35,15 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     ui->pteFireModes1->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     ui->pteFireModes2->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
 
-    // reserve space in the actor vectors
-    m_rifleman.reserve(76);
-    m_heavyWeapons.reserve(60);
-    m_sniper.reserve(40);
-    m_demolitions.reserve(59);
+    // create the actor vectors and reserve space
+    std::vector<Actor> rifleman;
+    std::vector<Actor> heavyWeapons;
+    std::vector<Actor> sniper;
+    std::vector<Actor> demolitions;
+    rifleman.reserve(76);
+    heavyWeapons.reserve(60);
+    sniper.reserve(40);
+    demolitions.reserve(59);
     m_actors.reserve(36);
 
     std::ifstream currentFile;
@@ -49,7 +53,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 
     // read in all actors
     if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\rifleman", errorCode) && !errorLoadingBaseGameData)
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\rifleman", actorExtension, m_rifleman);
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\rifleman", actorExtension, rifleman);
     else if (!errorLoadingBaseGameData)
     {
         errorLoadingBaseGameData = true;
@@ -58,7 +62,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\heavy-weapons", errorCode) && !errorLoadingBaseGameData)
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\heavy-weapons", actorExtension, m_heavyWeapons);
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\heavy-weapons", actorExtension, heavyWeapons);
     else if (!errorLoadingBaseGameData)
     {
         errorLoadingBaseGameData = true;
@@ -67,7 +71,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\sniper", errorCode) && !errorLoadingBaseGameData)
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\sniper", actorExtension, m_sniper);
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\sniper", actorExtension, sniper);
     else if (!errorLoadingBaseGameData)
     {
         errorLoadingBaseGameData = true;
@@ -76,7 +80,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\demolitions", errorCode) && !errorLoadingBaseGameData)
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\demolitions", actorExtension, m_demolitions);
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Actor\\demolitions", actorExtension, demolitions);
     else if (!errorLoadingBaseGameData)
     {
         errorLoadingBaseGameData = true;
@@ -85,10 +89,10 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // randomly choose nine actors of each class and put them into the actors pool
-    if (m_rifleman.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_rifleman, m_actors); }
-    if (m_heavyWeapons.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_heavyWeapons, m_actors); }
-    if (m_sniper.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_sniper, m_actors); }
-    if (m_demolitions.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(m_demolitions, m_actors); }
+    if (rifleman.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(rifleman, m_actors); }
+    if (heavyWeapons.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(heavyWeapons, m_actors); }
+    if (sniper.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(sniper, m_actors); }
+    if (demolitions.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(demolitions, m_actors); }
 
     // read in strings
     if (fs::is_regular_file(mainGameDirectory + "\\Data\\Shell\\strings.txt", errorCode) && !errorLoadingBaseGameData)
@@ -118,62 +122,18 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Equip";
     }
 
-    // read in base kits for the four character classes and store them into their respective kit vectors
-    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\rifleman", errorCode) && !errorLoadingBaseGameData)
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\rifleman", kitExtension, m_riflemanKits);
-    else if (!errorLoadingBaseGameData)
-    {
-        errorLoadingBaseGameData = true;
-        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
-        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\rifleman";
-    }
-
-    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\heavy-weapons", errorCode) && !errorLoadingBaseGameData)
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\heavy-weapons", kitExtension, m_heavyWeaponsKits);
-    else if (!errorLoadingBaseGameData)
-    {
-        errorLoadingBaseGameData = true;
-        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
-        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\heavy-weapons";
-    }
-
-    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\sniper", errorCode) && !errorLoadingBaseGameData)
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\sniper", kitExtension, m_sniperKits);
-    else if (!errorLoadingBaseGameData)
-    {
-        errorLoadingBaseGameData = true;
-        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
-        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\sniper";
-    }
-
-    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\demolitions", errorCode) && !errorLoadingBaseGameData)
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\demolitions", kitExtension, m_demolitionsKits);
-    else if (!errorLoadingBaseGameData)
-    {
-        errorLoadingBaseGameData = true;
-        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
-        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits\\demolitions";
-    }
-
-    // read in all the kits and store them into a temporary kit vector
+    // read in all discovered kits and store them into a temporary kit vector
     std::vector<Kit> tempKits;
     tempKits.reserve(71); // 71 kits in Mods\Origmiss\Kits
-    if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Kits", errorCode) && !errorLoadingBaseGameData) // this check is redundant as the checks above would have failed if the Kits directory didn't exist
-        readInAllKits(mainGameDirectory + "\\Mods\\Origmiss\\Kits", tempKits);
-    else if (!errorLoadingBaseGameData)
-    {
-        errorLoadingBaseGameData = true;
-        errorMessage = "Error in PlatoonSetup::PlatoonSetup().  Failed to find directory: ";
-        errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Kits";
-    }
+    readInAllKits(mainGameDirectory + "\\Mods\\Origmiss", tempKits);
 
-    // create the kit restriction list and add the kits it specfies to the apppropriate soldier class kit vectors
+    // create the kit restriction list
+    KitRestrictionList kitList;
     if (fs::is_regular_file(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\quick_missions.qmk", errorCode) && !errorLoadingBaseGameData)
     {
         currentFile.open(mainGameDirectory + "\\Mods\\Origmiss\\Kits\\quick_missions.qmk");
-        KitRestrictionList kitList(currentFile);
+        kitList.readFromFile(currentFile);
         currentFile.close();
-        updateKitVectorsPerRestrictionList(tempKits, kitList, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits);
     }
     else if (!errorLoadingBaseGameData)
     {
@@ -270,10 +230,51 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // load mods
     for (const auto &currentMod : modList.getModList())
     {
-        loadMod(mainGameDirectory + currentMod, m_actors, m_strings, m_guns, m_projectiles, m_items, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits, musicAction3, musicLoad1, musicLoad3, soundButton, soundApply);
+        loadMod(mainGameDirectory + currentMod, m_actors, m_strings, m_guns, m_projectiles, m_items, tempKits, kitList, musicAction3, musicLoad1, musicLoad3, soundButton, soundApply);
     }
 
-    // check that each soldier class has at least one kit in their kit vector and close program if not (must do after loading mods and mods may add kits)
+    // identify the kit paths of each soldier class (must do after loading mods as mods may change actor kit paths)
+    QString riflemanKitPath{"no kit path"};
+    QString supportKitPath{"no kit path"};
+    QString sniperKitPath{"no kit path"};
+    QString demolitionsKitPath{"no kit path"};
+    for (const auto &element : m_actors) // iterate through all actors and assign/reassign as the different soldier classes are encoutnered
+    {
+        if (element.getClassName() == classRifleman)
+            riflemanKitPath = element.getKitPath();
+        else if (element.getClassName() == classSupport)
+            supportKitPath = element.getKitPath();
+        else if (element.getClassName() == classSniper)
+            sniperKitPath = element.getKitPath();
+        else if (element.getClassName() == classDemolitions)
+            demolitionsKitPath = element.getKitPath();
+        else
+        {
+            QString errorMsg{"Error while assigning kit paths.  Unrecognized soldier class: '"};
+            errorMsg += element.getClassName();
+            errorMsg += "' for actor: '";
+            errorMsg += element.getFirstInitialLastName();
+            errorMsg += "' filename: ";
+            errorMsg += element.getFileName();
+            QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+            msgBox.exec();
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // add kits to actor kit vectors
+    updateKitVectorPerKitPath(riflemanKitPath, tempKits, m_riflemanKits);
+    updateKitVectorPerKitPath(supportKitPath, tempKits, m_heavyWeaponsKits);
+    updateKitVectorPerKitPath(sniperKitPath, tempKits, m_sniperKits);
+    updateKitVectorPerKitPath(demolitionsKitPath, tempKits, m_demolitionsKits);
+
+    // add kits from the quick_missions.qmk file only if all four soldier classes are using the default kit paths
+    if (riflemanKitPath == defaultRiflemanKitPath && supportKitPath == defaultSupportKitPath && sniperKitPath == defaultSniperKitPath && demolitionsKitPath == defaultDemolitionsKitPath)
+    {
+        updateKitVectorsPerRestrictionList(tempKits, kitList, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits);
+    }
+
+    // check that each soldier class has at least one kit in their kit vector and close program if not (must do after loading mods as mods may add kits)
     if (m_riflemanKits.size() <= 0 || m_heavyWeaponsKits.size() <= 0 || m_sniperKits.size() <= 0 || m_demolitionsKits.size() <= 0)
     {
         QMessageBox msgBox(QMessageBox::Critical, "Error", "Error in PlatoonSetup::PlatoonSetup().  Failed to find at least one kit for each soldier class.");
@@ -302,28 +303,32 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 
     // assign default kits to actors.  the default kits are the first kits of all the availble kits
     int defaultKitIndex{0};
-    for (auto &element : m_actors)
+    for (const auto &element : m_actors)
     {
-        if (element.getKitPath() == classRifleman)
+        //if (element.getKitPath() == classRifleman)
+        if (element.getClassName() == classRifleman)
         {
             m_assignedKitMap.assignKitToActor(m_riflemanKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
         }
-        else if (element.getKitPath() == classHeavyWeapons)
+        //else if (element.getKitPath() == classHeavyWeapons)
+        else if (element.getClassName() == classSupport)
         {
             m_assignedKitMap.assignKitToActor(m_heavyWeaponsKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
         }
-        else if (element.getKitPath() == classSniper)
+        //else if (element.getKitPath() == classSniper)
+        else if (element.getClassName() == classSniper)
         {
             m_assignedKitMap.assignKitToActor(m_sniperKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
         }
-        else if (element.getKitPath() == classDemolitions)
+        //else if (element.getKitPath() == classDemolitions)
+        else if (element.getClassName() == classDemolitions)
         {
             m_assignedKitMap.assignKitToActor(m_demolitionsKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
         }
         else
         {
-            QString errorMsg{"Error while assigning default kits.  Unrecognized kit path: '"};
-            errorMsg += element.getKitPath();
+            QString errorMsg{"Error while assigning default kits.  Unrecognized soldier class: '"};
+            errorMsg += element.getClassName();
             errorMsg += "' for actor: '";
             errorMsg += element.getFirstInitialLastName();
             errorMsg += "' filename: ";
@@ -936,26 +941,26 @@ void PlatoonSetup::updateUnassignButton()
 void PlatoonSetup::setActorsKit(const Actor &actor)
 {
     int kitIndex{ui->lwKits->currentRow()};
-    if (actor.getKitPath() == classRifleman)
+    if (actor.getClassName() == classRifleman)
     {
         m_assignedKitMap.assignKitToActor(m_riflemanKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
-    else if (actor.getKitPath() == classHeavyWeapons)
+    else if (actor.getClassName() == classSupport)
     {
         m_assignedKitMap.assignKitToActor(m_heavyWeaponsKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
-    else if (actor.getKitPath() == classSniper)
+    else if (actor.getClassName() == classSniper)
     {
         m_assignedKitMap.assignKitToActor(m_sniperKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
-    else if (actor.getKitPath() == classDemolitions)
+    else if (actor.getClassName() == classDemolitions)
     {
         m_assignedKitMap.assignKitToActor(m_demolitionsKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
     else
     {
-        QString errorMsg{"Error in PlatoonSetup::setActorsKit().  Unrecognized kit path: '"};
-        errorMsg += actor.getKitPath();
+        QString errorMsg{"Error in PlatoonSetup::setActorsKit().  Unrecognized soldier class: '"};
+        errorMsg += actor.getClassName();
         errorMsg += "' for actor: ";
         errorMsg += actor.getFirstInitialLastName();
         errorMsg += " filename: ";
@@ -978,26 +983,26 @@ void PlatoonSetup::selectActorsKit()
 std::vector<Kit>& PlatoonSetup::getSelectedActorsKits()
 {
     const Actor &selectedActor{m_actors[ui->lwSoldierPool->currentRow()]};
-    if (selectedActor.getKitPath() == classRifleman)
+    if (selectedActor.getClassName() == classRifleman)
     {
         return m_riflemanKits;
     }
-    else if (selectedActor.getKitPath() == classHeavyWeapons)
+    else if (selectedActor.getClassName() == classSupport)
     {
         return m_heavyWeaponsKits;
     }
-    else if (selectedActor.getKitPath() == classSniper)
+    else if (selectedActor.getClassName() == classSniper)
     {
         return m_sniperKits;
     }
-    else if (selectedActor.getKitPath() == classDemolitions)
+    else if (selectedActor.getClassName() == classDemolitions)
     {
         return m_demolitionsKits;
     }
     else
     {
-        QString errorMsg{"Error in getSelectedActorsKitPath().  Unrecognized kit path: '"};
-        errorMsg += selectedActor.getKitPath();
+        QString errorMsg{"Error in PlatoonSetup::getSelectedActorsKits().  Unrecognized soldier class: '"};
+        errorMsg += selectedActor.getClassName();
         errorMsg += "' for actor: ";
         errorMsg += selectedActor.getFirstInitialLastName();
         errorMsg += " filename: ";

@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QUrl>
 
+#include <set> // for readinallkits
+
 #include "variables.h"
 #include "actor.h"
 #include "strings.h"
@@ -49,11 +51,13 @@ QString getFileExtension(const QString &fileName)
             return extension;
         }
     }
-    // no extension found
+    // no extension found (turn of popup message box for release)
+    /*
     QString errorMessage{"Error in getFileExtension().  No extension could be found for filename: "};
     errorMessage += fileName;
     QMessageBox msgBox(QMessageBox::Critical, "Error", errorMessage);
     msgBox.exec();
+    */
     return "error";
 }
 
@@ -77,8 +81,10 @@ QUrl stringToQUrl(const std::string &string)
 }
 
 // reads in all kits from the passed in directory and it's subdirectories and stores them in a kit vector
+// maintains a list of discovered kit file names so that only the first discoverd kit will be processed just like the game does
 void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector)
 {
+    std::set<QString> discoveredKits;
     for (const auto &element : fs::recursive_directory_iterator(kitsDirectoryPath))
     {
         std::ifstream currentFile;
@@ -88,6 +94,9 @@ void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVe
         std::error_code errorCode;
         if (fs::is_regular_file(element.path(), errorCode))
         {
+            fs::path pathNoFilename{element.path()};
+            pathNoFilename.remove_filename();
+            QString curFilePath{QString::fromStdWString(pathNoFilename)};
             QString curFileName{QString::fromStdWString(element.path().filename())};
             if (QString::compare(getFileExtension(curFileName), kitExtension, Qt::CaseInsensitive) == 0)  // check this is a kit file
             {
@@ -100,22 +109,63 @@ void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVe
                     msgBox.exec();
                     exit(EXIT_FAILURE);
                 }
-                bool replacedItem{false};
-                for (auto &element2 : kitVector)
+                // now check if this kit file name has already been seen
+                std::set<QString>::const_iterator it{discoveredKits.cbegin()};
+                it = discoveredKits.find(curFileName);
+                if (it == discoveredKits.cend()) // kit file name hasn't been seen yet, proceed to check it against the passed in kit vector
                 {
-                    if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found a kit in the vector with same filename as this one, replace it with this new one
+                    discoveredKits.insert(curFileName); // add this kit file name to the list of discovered kits
+                    bool replacedItem{false};
+                    for (auto &element2 : kitVector)
                     {
-                        element2 = Kit(curFileName, currentFile);
-                        replacedItem = true;
+                        if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found a kit in the vector with same filename as this one, replace it with this new one
+                        {
+                            element2 = Kit(curFilePath, curFileName, currentFile);
+                            replacedItem = true;
+                        }
+                    }
+                    if (!replacedItem) // didn't find a kit in the vector with this name already so add in this new kit
+                    {
+                        kitVector.push_back(Kit(curFilePath, curFileName, currentFile));
                     }
                 }
-                if (!replacedItem) // didn't find a kit in the vector with this name already so add in this new kit
+                else // kit file name has been seen before so only add this new kit path to the kit
                 {
-                    kitVector.push_back(Kit(curFileName, currentFile));
+                    for (auto &element2 : kitVector)
+                    {
+                        if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0)
+                        {
+                            element2.addFilePath(curFilePath);
+                        }
+                    }
                 }
             }
         }
         currentFile.close();
+    }
+}
+
+// adds kits from the passed in source kit vector to the destination kit vector based on whether or not a kit's path matches the passed in kit path
+void updateKitVectorPerKitPath(const QString &targetKitPath, const std::vector<Kit> &source, std::vector<Kit> &destination)
+{
+    for (const auto &element : source)
+    {
+        if (element.containsFilePath(targetKitPath))
+        {
+            bool replacedItem{false};
+            for (auto &element2 : destination)
+            {
+                if (QString::compare(element.getFileName(), element2.getFileName(), Qt::CaseInsensitive) == 0) // found a kit in the vector with same filename as this one, replace it with this new one
+                {
+                    element2 = element;
+                    replacedItem = true;
+                }
+            }
+            if (!replacedItem) // didn't find a kit in the vector with this name already so add in this new kit
+            {
+                destination.push_back(element);
+            }
+        }
     }
 }
 
@@ -185,7 +235,7 @@ void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> 
 }
 
 // updates/adds game data that is relevant to this program(actor data, kit data, etc) from a passed in ghost recon mod directory
-void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3, std::string &soundButton, std::string &soundApply)
+void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &strings, std::vector<Gun> &guns, std::vector<Projectile> &projectiles, std::vector<Item> &items, std::vector<Kit> &tempKits, KitRestrictionList &kitList, std::string &musicAction3, std::string &musicLoad1, std::string &musicLoad3, std::string &soundButton, std::string &soundApply)
 {
     std::ifstream currentFile;
     std::error_code errorCode; // no actual error handling will take place with this error code
@@ -216,49 +266,15 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
         readInGameFiles(modPath + "\\Equip", itemExtension, items, strings);
     }
 
-    // if there is a directory for it, read in base kits for the four character classes and update / add them into their respective kit vectors
-    if (fs::is_directory(modPath + "\\Kits\\rifleman", errorCode))
-        readInGameFiles(modPath + "\\Kits\\rifleman", kitExtension, riflemanKits);
-    if (fs::is_directory(modPath + "\\Kits\\heavy-weapons", errorCode))
-        readInGameFiles(modPath + "\\Kits\\heavy-weapons", kitExtension, heavyWeaponsKits);
-    if (fs::is_directory(modPath + "\\Kits\\sniper", errorCode))
-        readInGameFiles(modPath + "\\Kits\\sniper", kitExtension, sniperKits);
-    if (fs::is_directory(modPath + "\\Kits\\demolitions", errorCode))
-        readInGameFiles(modPath + "\\Kits\\demolitions", kitExtension, demolitionsKits);
+    // add/update any new kits discovered in this mod
+    readInAllKits(modPath, tempKits);
 
-    std::vector<Kit> tempKits;
-    // read in all the kits and store them into a temporary kit vector if there is a "kits" folder
-    if (fs::is_directory(modPath + "\\Kits", errorCode))
-    {
-        readInAllKits(modPath + "\\Kits", tempKits);
-    }
-
-    std::vector<std::vector<Kit>*> allClassesKits{&riflemanKits, &heavyWeaponsKits, &sniperKits, &demolitionsKits};
-    // compare any new kits to existing soldier class kit vectors and update if necessary (no adding - updating only)
-    // this is here to catch a situation like:
-    // base game kit restriction list adds multiplayer\somekitname.kit
-    // mod has a multiplayer\somekitname.kit file in it, but which doesn't appear in it's kit restriction list
-    // which means that update to somekitname.kit wouldn't be applied because outside this code only the
-    // rifleman/heavy-weapons/sniper/demolitions directories are checked, and whatever the kit restriction list includes
-    for (const auto &potentialKit : tempKits) // for every kit in the temporary kit vector
-    {
-        for (auto &currentClassKitVector : allClassesKits) // working on one of the four class kit vectors at a time (riflemanKits, etc)
-        {
-            for (auto &currentClassKit : *currentClassKitVector) // check if current kit happens to already be in the permanent kit list for current solider class
-            {
-                if (QString::compare(potentialKit.getFileName(), currentClassKit.getFileName(), Qt::CaseInsensitive) == 0) // it is, so update it with this new one
-                    currentClassKit = potentialKit;
-            }
-        }
-    }
-
-    // if this mod has a kit restriction list file read it and add it's kits to the appropriate soldier class kit vectors
+    // if this mod has a kit restriction list file read it
     if (fs::is_regular_file(modPath + "\\Kits\\quick_missions.qmk", errorCode))
     {
         currentFile.open(modPath + "\\Kits\\quick_missions.qmk");
-        KitRestrictionList kitList(currentFile);
+        kitList.readFromFile(currentFile);
         currentFile.close();
-        updateKitVectorsPerRestrictionList(tempKits, kitList, riflemanKits, heavyWeaponsKits, sniperKits, demolitionsKits);
     }
 
     // update the music track if there are newer versions of them

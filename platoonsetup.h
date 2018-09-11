@@ -66,10 +66,6 @@ private slots:
 private:
     Ui::PlatoonSetup *ui;
 
-    std::vector<Actor> m_rifleman;
-    std::vector<Actor> m_heavyWeapons;
-    std::vector<Actor> m_sniper;
-    std::vector<Actor> m_demolitions;
     std::vector<Actor> m_actors;
     std::vector<Actor*> m_alpha; // these point to elements in actors, which lasts until the end of the program so no need to worry about dangling pointers
     std::vector<Actor*> m_bravo;

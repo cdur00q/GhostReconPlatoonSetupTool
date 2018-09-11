@@ -2,13 +2,16 @@
 #include "variables.h"
 
 #include <fstream>
+#include <cmath> // for std::abs()
 #include <QString>
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
-Kit::Kit(QString fileName, std::ifstream &kitFile)
+Kit::Kit(QString filePath, QString fileName, std::ifstream &kitFile)
     : m_fileName(fileName)
 {
+    m_filePaths.insert(filePath);
+
     /* 4 possibilites
      * 2 guns
      * 1 gun with extra ammo
@@ -196,12 +199,40 @@ QString Kit::getSlot2FileName() const
     }
 }
 
+// checks if the kit contains the passed in file path within it's internal file path list
+bool Kit::containsFilePath(const QString &filePath) const
+{
+    std::set<QString>::const_iterator it{m_filePaths.cbegin()};
+    while (it != m_filePaths.cend())
+    {
+        QString pathForComparision{""};
+        int sizeDifference{std::abs(filePath.size() - it->size())};
+        for (int i{sizeDifference} ; i < it->size() ; ++i)
+        {
+            pathForComparision += (*it)[i];
+        }
+        if (QString::compare(pathForComparision, filePath, Qt::CaseInsensitive) == 0)
+            return true;
+        ++it;
+    }
+    return false;
+}
+
 Kit& Kit::operator= (const Kit &kit)
 {
     if (this == &kit)
     {
         return *this;
     }
+
+    // when assigning one kit to another, combine their file path lists
+    std::set<QString>::iterator it{kit.m_filePaths.begin()};
+    while (it != kit.m_filePaths.end())
+    {
+        m_filePaths.insert(*it);
+        ++it;
+    }
+
     m_fileName = kit.m_fileName;
     m_slot1ItemFileName = kit.m_slot1ItemFileName;
     m_slot2ItemFileName = kit.m_slot2ItemFileName;
