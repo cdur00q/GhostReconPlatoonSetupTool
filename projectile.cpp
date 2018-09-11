@@ -14,7 +14,7 @@ Projectile::Projectile(QString fileName, std::ifstream &projectileFile, const St
     m_name = strings.getString(m_nameToken);
 }
 
-// reads and stores one item of game data from aa projectile file
+// reads and stores one item of game data from a projectile file
 fileReadResult Projectile::getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &projectileFile)
 {
     // only operate if the file stream is working

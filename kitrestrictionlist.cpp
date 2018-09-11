@@ -7,6 +7,11 @@
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
+KitRestrictionList::KitRestrictionList()
+{
+
+}
+
 KitRestrictionList::KitRestrictionList(std::ifstream &kitRestrictionFile)
 {
     getGameData(m_riflemanTag, m_riflemanList, kitRestrictionFile);
@@ -85,6 +90,15 @@ KitRestrictionList::getGameDataResult KitRestrictionList::getGameData(const QStr
     exit(EXIT_FAILURE);
 }
 
+// reads from the passed in kit restriction list and stores the kits and which class they belong to
+void KitRestrictionList::readFromFile(std::ifstream &kitRestrictionFile)
+{
+    getGameData(m_riflemanTag, m_riflemanList, kitRestrictionFile);
+    getGameData(m_demolitionsTag, m_demolitionsList, kitRestrictionFile);
+    getGameData(m_heavyWeaponsTag, m_heavyWeaponsList, kitRestrictionFile);
+    getGameData(m_sniperTag, m_sniperList, kitRestrictionFile);
+}
+
 // checks if the passed in kit filename is on the list of the passed in soldier class
 // possible soldier classes are: "rifleman", "heavy-weapons", "sniper", and "demolitions"
 bool KitRestrictionList::checkKitAgainstRestrictionList(const QString &soldierClass, const QString &kitName) const
@@ -115,9 +129,9 @@ bool KitRestrictionList::checkKitAgainstRestrictionList(const QString &soldierCl
         msgBox.exec();
         return false;
     }
-    std::set<QString>::iterator it{listToCheck->begin()};
+    std::set<QString>::const_iterator it{listToCheck->cbegin()};
     it = listToCheck->find(kitName);
-    if (it != listToCheck->end())
+    if (it != listToCheck->cend())
     {
         return true;
     }

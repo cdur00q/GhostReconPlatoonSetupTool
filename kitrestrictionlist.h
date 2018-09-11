@@ -27,11 +27,16 @@ private:
     getGameDataResult getGameData(const QString &targetTag, std::set<QString> &kitList, std::ifstream &kitRestrictionFile);
 
 public:
+    KitRestrictionList();
+
     KitRestrictionList(std::ifstream &kitRestrictionFile);
 
     ~KitRestrictionList()
     {
     }
+
+    // reads from the passed in kit restriction list and stores the kits and which class they belong to
+    void readFromFile(std::ifstream &kitRestrictionFile);
 
     // checks if the passed in kit filename is on the list of the passed in soldier class
     // possible soldier classes are: "rifleman", "heavy-weapons", "sniper", and "demolitions"

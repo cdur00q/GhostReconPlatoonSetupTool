@@ -3,6 +3,7 @@
 
 #include "variables.h"
 #include <fstream>
+#include <set>
 #include <QString>
 
 class Kit
@@ -17,6 +18,7 @@ public:
     };
 
 private:
+    std::set<QString> m_filePaths;
     QString m_fileName{"Default file name"};
     const QString m_slot1Tag{R"(<Firearm SlotNumber = "0">)"};
     const QString m_slot2TagGun{R"(<Firearm SlotNumber = "1">)"};
@@ -40,7 +42,7 @@ private:
     fileReadResult getGameData(const QString &targetSlotTag, const QString &targetTag, QString &valueToFill, std::ifstream &kitFile);
 
 public:
-    Kit(QString fileName, std::ifstream &kitFile);
+    Kit(QString filePath, QString fileName, std::ifstream &kitFile);
 
     ~Kit()
     {
@@ -54,6 +56,11 @@ public:
     const QString& getSlot2MagCount() const {return m_slot2MagCount;}
     const QString& getSlot2ItemCount() const {return m_slot2ItemCount;}
     const QString& getExtraAmmo() const {return m_extraAmmo;}
+
+    void addFilePath(const QString &filePath) {m_filePaths.insert(filePath);}
+
+    // checks if the kit contains the passed in file path within it's internal file path list
+    bool containsFilePath(const QString &filePath) const;
 
     Kit& operator= (const Kit &kit);
 

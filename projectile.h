@@ -14,7 +14,7 @@ private:
     QString m_nameToken{"Default name Token"};
     QString m_name{"Default name"};
 
-    // reads and stores one item of game data from aa projectile file
+    // reads and stores one item of game data from a projectile file
     fileReadResult getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &projectileFile);
 
 public:

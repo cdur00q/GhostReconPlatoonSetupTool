@@ -36,14 +36,14 @@ void Strings::readFromFile(std::ifstream &stringsFile)
             {
                 stringsFile.get(curChar);
                 // read until the next quotation mark
-                while (curChar != '"')
+                while (curChar != '"' && !stringsFile.eof())
                 {
                     key += curChar;
                     stringsFile.get(curChar);
                 }
                 stringsFile.get(curChar);
                 // key is done, now find the opening quote of the value
-                while (curChar != '"')
+                while (curChar != '"' && !stringsFile.eof())
                 {
                     stringsFile.get(curChar);
                 }
@@ -52,13 +52,13 @@ void Strings::readFromFile(std::ifstream &stringsFile)
                 {
                     stringsFile.get(curChar);
                     // read until the next quotation mark
-                    while (curChar != '"')
+                    while (curChar != '"' && !stringsFile.eof())
                     {
                         value += curChar;
                         stringsFile.get(curChar);
                     }
                     stringsFile.get(curChar);
-                    m_stringsMap.insert(std::make_pair(key, value)); // insert this round's key and value into the strings map
+                    m_stringsMap.insert_or_assign(key, value); // insert this round's key and value into the strings map or update the value if the key already exists in the map
                     key = ""; // clear key and value for use in the next round
                     value = "";
                 }
