@@ -27,6 +27,7 @@ QString getFileExtension(const QString &fileName);
 QUrl stringToQUrl(const std::string &string);
 
 // reads in all kits from the passed in directory and it's subdirectories and stores them in a kit vector
+// maintains a list of discovered kit file names so that only the first discoverd kit will be processed just like the game does
 void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector);
 
 // adds kits from the passed in source kit vector to the destination kit vector based on whether or not a kit's path matches the passed in kit path
@@ -37,8 +38,8 @@ void updateKitVectorPerKitPath(const QString &targetKitPath, const std::vector<K
 // a kit could be used by more than one soldier class
 void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits);
 
-// reads in actor files
-// pass in a directory where actor files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
+// reads in actor, gun, projectile, or item files
+// pass in a directory where actor, gun, projectile, or item files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
 template <typename T>
 void readInGameFiles(const std::string &directoryPath, const QString &targetFileExtension, T &gameDataVector)
 {
@@ -81,6 +82,7 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
 
 // reads in gun, projectile, or item files
 // pass in a directory where gun, projectile, or item files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
+/*
 template <typename T>
 void readInGameFiles(const std::string &directoryPath, const QString &targetFileExtension, T &gameDataVector, const Strings &strings)
 {
@@ -120,6 +122,7 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
         currentFile.close();
     }
 }
+*/
 
 // pass in a directory where actor files are held and a vector of actors.  will update the passed in vector with newer versions of the files it finds
 void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> &actors);

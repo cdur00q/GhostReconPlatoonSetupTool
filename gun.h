@@ -45,7 +45,7 @@ private:
     fileReadResult getMaxZoom(QString &valueToFill, std::ifstream &gunFile, int startReadingPos);
 
 public:
-    Gun(QString fileName, std::ifstream &gunFile, const Strings &strings);
+    Gun(QString fileName, std::ifstream &gunFile);
 
     ~Gun()
     {
@@ -63,6 +63,8 @@ public:
     const QString& getSilenced() const {return m_silenced;}
     const QString& getMaxZoom() const {return m_maxZoom;}
     const std::vector<FireMode>& getFireModes() const {return m_fireModes;}
+
+    void setNameFromStrings(const Strings &strings) {m_name = strings.getString(m_nameToken);}
 
     Gun& operator= (const Gun &gun);
 

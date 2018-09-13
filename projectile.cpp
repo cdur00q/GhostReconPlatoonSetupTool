@@ -1,17 +1,15 @@
 #include "projectile.h"
 #include "variables.h"
-#include "strings.h"
 
 #include <fstream>
 #include <QString>
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
-Projectile::Projectile(QString fileName, std::ifstream &projectileFile, const Strings &strings)
+Projectile::Projectile(QString fileName, std::ifstream &projectileFile)
     : m_fileName(fileName)
 {
     getGameData(m_nameTokenTag, m_nameToken, projectileFile);
-    m_name = strings.getString(m_nameToken);
 }
 
 // reads and stores one item of game data from a projectile file

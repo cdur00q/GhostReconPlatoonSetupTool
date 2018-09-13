@@ -889,7 +889,7 @@ QPushButton:pressed {
      </font>
     </property>
     <property name="text">
-     <string>Max Accuracy</string>
+     <string>Min Inaccuracy</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="leAccuracy1">

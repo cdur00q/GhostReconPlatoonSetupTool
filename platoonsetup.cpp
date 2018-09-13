@@ -111,9 +111,9 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     // read in guns, projectiles, and items
     if (fs::is_directory(mainGameDirectory + "\\Mods\\Origmiss\\Equip", errorCode) && !errorLoadingBaseGameData)
     {
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", gunExtension, m_guns, m_strings);
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", projectileExtension, m_projectiles, m_strings);
-        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", itemExtension, m_items, m_strings);
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", gunExtension, m_guns);
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", projectileExtension, m_projectiles);
+        readInGameFiles(mainGameDirectory + "\\Mods\\Origmiss\\Equip", itemExtension, m_items);
     }
     else if (!errorLoadingBaseGameData)
     {
@@ -232,6 +232,11 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     {
         loadMod(mainGameDirectory + currentMod, m_actors, m_strings, m_guns, m_projectiles, m_items, tempKits, kitList, musicAction3, musicLoad1, musicLoad3, soundButton, soundApply);
     }
+
+    // have the guns, projectiles, and items get their names from the strings object (must do after loading mods as mods may changes strings)
+    for (auto &element : m_guns) {element.setNameFromStrings(m_strings);}
+    for (auto &element : m_projectiles) {element.setNameFromStrings(m_strings);}
+    for (auto &element : m_items) {element.setNameFromStrings(m_strings);}
 
     // identify the kit paths of each soldier class (must do after loading mods as mods may change actor kit paths)
     QString riflemanKitPath{"no kit path"};

@@ -2,14 +2,13 @@
 
 #include <fstream>
 #include <vector>
+#include <set>
 #include <string>
 #include <filesystem>
 #include <cstdlib> // for rand() and srand()
 #include <QString>
 #include <QMessageBox>
 #include <QUrl>
-
-#include <set> // for readinallkits
 
 #include "variables.h"
 #include "actor.h"
@@ -261,9 +260,9 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
     // read in guns, projectiles, and items if there is an "equip" folder
     if (fs::is_directory(modPath + "\\Equip", errorCode))
     {
-        readInGameFiles(modPath + "\\Equip", gunExtension, guns, strings);
-        readInGameFiles(modPath + "\\Equip", projectileExtension, projectiles, strings);
-        readInGameFiles(modPath + "\\Equip", itemExtension, items, strings);
+        readInGameFiles(modPath + "\\Equip", gunExtension, guns);
+        readInGameFiles(modPath + "\\Equip", projectileExtension, projectiles);
+        readInGameFiles(modPath + "\\Equip", itemExtension, items);
     }
 
     // add/update any new kits discovered in this mod
@@ -277,19 +276,33 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
         currentFile.close();
     }
 
-    // update the music track if there are newer versions of them
-    if (fs::is_regular_file(modPath + "\\Sound\\Music\\action3.wav", errorCode))
-        musicAction3 = modPath + "\\Sound\\Music\\action3.wav";
-    if (fs::is_regular_file(modPath + "\\Sound\\Music\\load1.wav", errorCode))
-        musicLoad1 = modPath + "\\Sound\\Music\\load1.wav";
-    if (fs::is_regular_file(modPath + "\\Sound\\Music\\load3.wav", errorCode))
-        musicLoad3 = modPath + "\\Sound\\Music\\load3.wav";
-
-    // update the sound effects if there are newer versions of them
-    if (fs::is_regular_file(modPath + "\\Sound\\I_main1.wav", errorCode))
-        soundButton = modPath + "\\Sound\\I_main1.wav";
-    if (fs::is_regular_file(modPath + "\\Sound\\I_launch5.wav", errorCode))
-        soundApply = modPath + "\\Sound\\I_launch5.wav";
+    // update the music tracks and sound effects if there are newer versions of them
+    for (const auto &element : fs::recursive_directory_iterator(modPath))
+    {
+        QString curFilePath{QString::fromStdWString(element.path())};
+        QString curFileName{QString::fromStdWString(element.path().filename())};
+        std::error_code errorCode;
+        if ((QString::compare(curFileName, "action3.wav", Qt::CaseInsensitive) == 0) && fs::is_regular_file(element.path(), errorCode))
+        {
+            musicAction3 = curFilePath.toStdString();
+        }
+        else if ((QString::compare(curFileName, "load1.wav", Qt::CaseInsensitive) == 0) && fs::is_regular_file(element.path(), errorCode))
+        {
+            musicLoad1 = curFilePath.toStdString();
+        }
+        else if ((QString::compare(curFileName, "load3.wav", Qt::CaseInsensitive) == 0) && fs::is_regular_file(element.path(), errorCode))
+        {
+            musicLoad3 = curFilePath.toStdString();
+        }
+        else if ((QString::compare(curFileName, "I_main1.wav", Qt::CaseInsensitive) == 0) && fs::is_regular_file(element.path(), errorCode))
+        {
+            soundButton = curFilePath.toStdString();
+        }
+        else if ((QString::compare(curFileName, "I_launch5.wav", Qt::CaseInsensitive) == 0) && fs::is_regular_file(element.path(), errorCode))
+        {
+            soundApply = curFilePath.toStdString();
+        }
+    }
 }
 
 // randomly chooses actors from one vector and places them into another vector if that actor isn't already in there

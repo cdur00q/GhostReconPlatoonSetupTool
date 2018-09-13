@@ -1,6 +1,5 @@
 #include "gun.h"
 #include "variables.h"
-#include "strings.h"
 
 #include <fstream>
 #include <vector>
@@ -8,11 +7,10 @@
 #include <QMessageBox>
 #include <QTextStream> // for printing to console
 
-Gun::Gun(QString fileName, std::ifstream &gunFile, const Strings &strings)
+Gun::Gun(QString fileName, std::ifstream &gunFile)
     : m_fileName(fileName)
 {
     getGameData(m_nameTokenTag, m_nameToken, gunFile);
-    m_name = strings.getString(m_nameToken);
     getGameData(m_magCapTag, m_magCap, gunFile);
     getGameData(m_maxRangeTag, m_maxRange, gunFile);
     getGameData(m_muzzleVelocityTag, m_muzzleVelocity, gunFile);
