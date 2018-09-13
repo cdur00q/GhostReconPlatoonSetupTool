@@ -3,7 +3,6 @@
 
 #include <fstream>
 #include <map>
-#include <utility> // for std::make_pair
 #include <QString>
 #include <QMessageBox>
 

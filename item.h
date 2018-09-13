@@ -7,7 +7,7 @@
 class Item : public Projectile
 {
 public:
-    Item(QString fileName, std::ifstream &itemFile, const Strings &strings);
+    Item(QString fileName, std::ifstream &itemFile);
 
     ~Item()
     {

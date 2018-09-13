@@ -27,6 +27,7 @@ QString getFileExtension(const QString &fileName);
 QUrl stringToQUrl(const std::string &string);
 
 // reads in all kits from the passed in directory and it's subdirectories and stores them in a kit vector
+// maintains a list of discovered kit file names so that only the first discoverd kit will be processed just like the game does
 void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector);
 
 // adds kits from the passed in source kit vector to the destination kit vector based on whether or not a kit's path matches the passed in kit path
@@ -37,8 +38,8 @@ void updateKitVectorPerKitPath(const QString &targetKitPath, const std::vector<K
 // a kit could be used by more than one soldier class
 void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits);
 
-// reads in actor files
-// pass in a directory where actor files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
+// reads in actor, gun, projectile, or item files
+// pass in a directory where actor, gun, projectile, or item files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
 template <typename T>
 void readInGameFiles(const std::string &directoryPath, const QString &targetFileExtension, T &gameDataVector)
 {
@@ -72,48 +73,6 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
                 if (!replacedItem) // didn't find an item in the vector with this name already so add in this new item
                 {
                     gameDataVector.push_back(typename T::value_type(curFileName, currentFile));
-                }
-            }
-        }
-        currentFile.close();
-    }
-}
-
-// reads in gun, projectile, or item files
-// pass in a directory where gun, projectile, or item files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
-template <typename T>
-void readInGameFiles(const std::string &directoryPath, const QString &targetFileExtension, T &gameDataVector, const Strings &strings)
-{
-    for (const auto &element : fs::directory_iterator(directoryPath))
-    {
-        std::ifstream currentFile;
-        std::error_code errorCode; // no actual error handling will take place with this error code
-        if (fs::is_regular_file(element.path(), errorCode))
-        {
-            QString curFileName{QString::fromStdWString(element.path().filename())};
-            if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check the extension of the current iteration file matches what was passed in
-            {
-                currentFile.open(element.path());
-                if (!currentFile.good())
-                {
-                    QString errorMsg{"Error in readInGameFiles().  Failed to open file: "};
-                    errorMsg += QString::fromStdWString(element.path());
-                    QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
-                    msgBox.exec();
-                    exit(EXIT_FAILURE);
-                }
-                bool replacedItem{false};
-                for (auto &element2 : gameDataVector)
-                {
-                    if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found an item in the vector with same filename as this one, replace it with this new one
-                    {
-                        element2 = typename T::value_type(curFileName, currentFile, strings);
-                        replacedItem = true;
-                    }
-                }
-                if (!replacedItem) // didn't find an item in the vector with this name already so add in this new item
-                {
-                    gameDataVector.push_back(typename T::value_type(curFileName, currentFile, strings));
                 }
             }
         }

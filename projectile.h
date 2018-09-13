@@ -18,7 +18,7 @@ private:
     fileReadResult getGameData(const QString &targetTag, QString &valueToFill, std::ifstream &projectileFile);
 
 public:
-    Projectile(QString fileName, std::ifstream &projectileFile, const Strings &strings);
+    Projectile(QString fileName, std::ifstream &projectileFile);
 
     ~Projectile()
     {
@@ -26,6 +26,8 @@ public:
 
     const QString& getFileName() const {return m_fileName;}
     const QString& getName() const {return m_name;}
+
+    void setNameFromStrings(const Strings &strings) {m_name = strings.getString(m_nameToken);}
 
     Projectile& operator= (const Projectile &projectile);
 
