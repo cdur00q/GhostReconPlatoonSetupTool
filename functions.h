@@ -80,50 +80,6 @@ void readInGameFiles(const std::string &directoryPath, const QString &targetFile
     }
 }
 
-// reads in gun, projectile, or item files
-// pass in a directory where gun, projectile, or item files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
-/*
-template <typename T>
-void readInGameFiles(const std::string &directoryPath, const QString &targetFileExtension, T &gameDataVector, const Strings &strings)
-{
-    for (const auto &element : fs::directory_iterator(directoryPath))
-    {
-        std::ifstream currentFile;
-        std::error_code errorCode; // no actual error handling will take place with this error code
-        if (fs::is_regular_file(element.path(), errorCode))
-        {
-            QString curFileName{QString::fromStdWString(element.path().filename())};
-            if (QString::compare(getFileExtension(curFileName), targetFileExtension, Qt::CaseInsensitive) == 0)  // check the extension of the current iteration file matches what was passed in
-            {
-                currentFile.open(element.path());
-                if (!currentFile.good())
-                {
-                    QString errorMsg{"Error in readInGameFiles().  Failed to open file: "};
-                    errorMsg += QString::fromStdWString(element.path());
-                    QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
-                    msgBox.exec();
-                    exit(EXIT_FAILURE);
-                }
-                bool replacedItem{false};
-                for (auto &element2 : gameDataVector)
-                {
-                    if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found an item in the vector with same filename as this one, replace it with this new one
-                    {
-                        element2 = typename T::value_type(curFileName, currentFile, strings);
-                        replacedItem = true;
-                    }
-                }
-                if (!replacedItem) // didn't find an item in the vector with this name already so add in this new item
-                {
-                    gameDataVector.push_back(typename T::value_type(curFileName, currentFile, strings));
-                }
-            }
-        }
-        currentFile.close();
-    }
-}
-*/
-
 // pass in a directory where actor files are held and a vector of actors.  will update the passed in vector with newer versions of the files it finds
 void updateActorFiles(const std::string &actorDirectoryPath, std::vector<Actor> &actors);
 
