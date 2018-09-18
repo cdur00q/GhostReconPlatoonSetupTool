@@ -34,14 +34,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     PlatoonSetup::grabKeyboard(); // send all keboard input to the main window to prevent messing up the selection logic of the fireteam/soldier pool boxes
     ui->pteFireModes1->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     ui->pteFireModes2->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
-/*
-    // filesystem compare test
-    std::error_code ec;
-    fs::path path1{mainGameDirectory + "\\Mods\\Origmiss\\Actor\\rifleman"};
-    fs::path path2{"\\Mods\\Origmiss\\Actor\\rifleman"};
-    if (fs::equivalent(path1, path2, ec))
-        int a{1};
-*/
+
     // create the actor vectors and reserve space
     std::vector<Actor> rifleman;
     std::vector<Actor> heavyWeapons;
