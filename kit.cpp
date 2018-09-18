@@ -212,7 +212,9 @@ bool Kit::containsFilePath(const QString &filePath) const
             pathForComparision += (*it)[i];
         }
         if (QString::compare(pathForComparision, filePath, Qt::CaseInsensitive) == 0)
+        {
             return true;
+        }
         ++it;
     }
     return false;

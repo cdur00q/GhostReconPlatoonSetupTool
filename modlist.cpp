@@ -30,7 +30,7 @@ void ModList::readFromFile(std::ifstream &modsSetFile)
             modsSetFile.get(curChar);
             // found the open quotation mark of a mod path
             // now read in all data until the closing quotation is found
-            if (curChar == '"')
+            if (curChar == '"' && !modsSetFile.eof())
             {
                 modsSetFile.get(curChar);
                 while (curChar != '"')

@@ -368,7 +368,7 @@ void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*>
             if (forCooperative) // switch the single player actors the multiplayer actors
             {
                 if (alpha[i]->getClassName() == classRifleman) {alphaStrings[i] += "mp_plt1_asl.atr";}
-                else if (alpha[i]->getClassName() == classSupport) {alphaStrings[i] += "mp_plt1_hvywep.atr";}
+                else if (alpha[i]->getClassName() == classSupport || alpha[i]->getClassName() == classHeavyWeapons) {alphaStrings[i] += "mp_plt1_hvywep.atr";}
                 else if (alpha[i]->getClassName() == classSniper) {alphaStrings[i] += "mp_plt1_snip.atr";}
                 else if (alpha[i]->getClassName() == classDemolitions) {alphaStrings[i] += "mp_plt1_dem.atr";}
                 else
@@ -400,7 +400,7 @@ void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*>
             if (forCooperative)
             {
                 if (bravo[i]->getClassName() == classRifleman) {bravoStrings[i] += "mp_plt1_asl.atr";}
-                else if (bravo[i]->getClassName() == classSupport) {bravoStrings[i] += "mp_plt1_hvywep.atr";}
+                else if (bravo[i]->getClassName() == classSupport || bravo[i]->getClassName() == classHeavyWeapons) {bravoStrings[i] += "mp_plt1_hvywep.atr";}
                 else if (bravo[i]->getClassName() == classSniper) {bravoStrings[i] += "mp_plt1_snip.atr";}
                 else if (bravo[i]->getClassName() == classDemolitions) {bravoStrings[i] += "mp_plt1_dem.atr";}
                 else
@@ -432,7 +432,7 @@ void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*>
             if (forCooperative)
             {
                 if (charlie[i]->getClassName() == classRifleman) {charlieStrings[i] += "mp_plt1_asl.atr";}
-                else if (charlie[i]->getClassName() == classSupport) {charlieStrings[i] += "mp_plt1_hvywep.atr";}
+                else if (charlie[i]->getClassName() == classSupport || charlie[i]->getClassName() == classHeavyWeapons) {charlieStrings[i] += "mp_plt1_hvywep.atr";}
                 else if (charlie[i]->getClassName() == classSniper) {charlieStrings[i] += "mp_plt1_snip.atr";}
                 else if (charlie[i]->getClassName() == classDemolitions) {charlieStrings[i] += "mp_plt1_dem.atr";}
                 else

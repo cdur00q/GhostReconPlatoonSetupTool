@@ -34,7 +34,14 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     PlatoonSetup::grabKeyboard(); // send all keboard input to the main window to prevent messing up the selection logic of the fireteam/soldier pool boxes
     ui->pteFireModes1->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     ui->pteFireModes2->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
-
+/*
+    // filesystem compare test
+    std::error_code ec;
+    fs::path path1{mainGameDirectory + "\\Mods\\Origmiss\\Actor\\rifleman"};
+    fs::path path2{"\\Mods\\Origmiss\\Actor\\rifleman"};
+    if (fs::equivalent(path1, path2, ec))
+        int a{1};
+*/
     // create the actor vectors and reserve space
     std::vector<Actor> rifleman;
     std::vector<Actor> heavyWeapons;
@@ -89,10 +96,10 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     }
 
     // randomly choose nine actors of each class and put them into the actors pool
-    if (rifleman.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(rifleman, m_actors); }
-    if (heavyWeapons.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(heavyWeapons, m_actors); }
-    if (sniper.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(sniper, m_actors); }
-    if (demolitions.size() > 0) for (int i{0}; i < 9; ++i) { assignRandomActorToVector(demolitions, m_actors); }
+    if (rifleman.size() > 0) for (int i{0}; i < 76; ++i) { assignRandomActorToVector(rifleman, m_actors); }
+    if (heavyWeapons.size() > 0) for (int i{0}; i < 60; ++i) { assignRandomActorToVector(heavyWeapons, m_actors); }
+    if (sniper.size() > 0) for (int i{0}; i < 40; ++i) { assignRandomActorToVector(sniper, m_actors); }
+    if (demolitions.size() > 0) for (int i{0}; i < 59; ++i) { assignRandomActorToVector(demolitions, m_actors); }
 
     // read in strings
     if (fs::is_regular_file(mainGameDirectory + "\\Data\\Shell\\strings.txt", errorCode) && !errorLoadingBaseGameData)
@@ -247,7 +254,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     {
         if (element.getClassName() == classRifleman)
             riflemanKitPath = element.getKitPath();
-        else if (element.getClassName() == classSupport)
+        else if (element.getClassName() == classSupport || element.getClassName() == classHeavyWeapons)
             supportKitPath = element.getKitPath();
         else if (element.getClassName() == classSniper)
             sniperKitPath = element.getKitPath();
@@ -297,6 +304,13 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
             else
                 new QListWidgetItem(element.getFirstInitialLastName() + "\t\t" + "DEMO", ui->lwSoldierPool); // otherwise just add two tabs
         }
+        else if (element.getClassName() == classHeavyWeapons)
+        {
+            if (element.getFirstInitialLastName().size() >= 13)
+                new QListWidgetItem(element.getFirstInitialLastName().leftJustified(30) + '\t' + "SUPPORT", ui->lwSoldierPool);
+            else
+                new QListWidgetItem(element.getFirstInitialLastName() + "\t\t" + "SUPPORT", ui->lwSoldierPool);
+        }
         else
         {
             if (element.getFirstInitialLastName().size() >= 13)
@@ -310,22 +324,18 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     int defaultKitIndex{0};
     for (const auto &element : m_actors)
     {
-        //if (element.getKitPath() == classRifleman)
         if (element.getClassName() == classRifleman)
         {
             m_assignedKitMap.assignKitToActor(m_riflemanKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
         }
-        //else if (element.getKitPath() == classHeavyWeapons)
-        else if (element.getClassName() == classSupport)
+        else if (element.getClassName() == classSupport || element.getClassName() == classHeavyWeapons)
         {
             m_assignedKitMap.assignKitToActor(m_heavyWeaponsKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
         }
-        //else if (element.getKitPath() == classSniper)
         else if (element.getClassName() == classSniper)
         {
             m_assignedKitMap.assignKitToActor(m_sniperKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
         }
-        //else if (element.getKitPath() == classDemolitions)
         else if (element.getClassName() == classDemolitions)
         {
             m_assignedKitMap.assignKitToActor(m_demolitionsKits[defaultKitIndex].getFileName(), defaultKitIndex, element.getFileName());
@@ -615,14 +625,15 @@ void PlatoonSetup::on_pbKitFireteam_clicked()
 
     if (fireteamPtr) // if fireteam pointer is not null (as in the selected actor is on one of the fireteams)
     {
-        // iterate through whatever fireteam the selected actor is on and assign their kit to any other actors that share the same kit path
+        // iterate through whatever fireteam the selected actor is on and assign their kit to any other actors of the same soldier class
         for (const auto &element : *fireteamPtr)
         {
-            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+            if ((element->getClassName() == selectedActor.getClassName() && *element != selectedActor)
+                    || (element->getClassName() == classSupport && selectedActor.getClassName() == classHeavyWeapons)
+                    || (element->getClassName() == classHeavyWeapons && selectedActor.getClassName() == classSupport))
                 setActorsKit(*element);
         }
     }
-
     m_mediaPlayerButtonClick->play();
 }
 
@@ -630,25 +641,30 @@ void PlatoonSetup::on_pbKitSquad_clicked()
 {
     const Actor &selectedActor{m_actors[ui->lwSoldierPool->currentRow()]};
 
-    // iterate through all three fireteams and assign the selected actor's kit to any other actors that share the same kit path
+    // iterate through all three fireteams and assign the selected actor's kit to any other actors of the same soldier class
     for (const auto &element : m_alpha)
     {
-        if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+        if ((element->getClassName() == selectedActor.getClassName() && *element != selectedActor)
+                || (element->getClassName() == classSupport && selectedActor.getClassName() == classHeavyWeapons)
+                || (element->getClassName() == classHeavyWeapons && selectedActor.getClassName() == classSupport))
             setActorsKit(*element);
     }
 
     for (const auto &element : m_bravo)
     {
-        if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+        if ((element->getClassName() == selectedActor.getClassName() && *element != selectedActor)
+                || (element->getClassName() == classSupport && selectedActor.getClassName() == classHeavyWeapons)
+                || (element->getClassName() == classHeavyWeapons && selectedActor.getClassName() == classSupport))
             setActorsKit(*element);
     }
 
     for (const auto &element : m_charlie)
     {
-        if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
+        if ((element->getClassName() == selectedActor.getClassName() && *element != selectedActor)
+                || (element->getClassName() == classSupport && selectedActor.getClassName() == classHeavyWeapons)
+                || (element->getClassName() == classHeavyWeapons && selectedActor.getClassName() == classSupport))
             setActorsKit(*element);
     }
-
     m_mediaPlayerButtonClick->play();
 }
 
@@ -950,7 +966,7 @@ void PlatoonSetup::setActorsKit(const Actor &actor)
     {
         m_assignedKitMap.assignKitToActor(m_riflemanKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
-    else if (actor.getClassName() == classSupport)
+    else if (actor.getClassName() == classSupport || actor.getClassName() == classHeavyWeapons)
     {
         m_assignedKitMap.assignKitToActor(m_heavyWeaponsKits[kitIndex].getFileName(), kitIndex, actor.getFileName());
     }
@@ -992,7 +1008,7 @@ std::vector<Kit>& PlatoonSetup::getSelectedActorsKits()
     {
         return m_riflemanKits;
     }
-    else if (selectedActor.getClassName() == classSupport)
+    else if (selectedActor.getClassName() == classSupport || selectedActor.getClassName() == classHeavyWeapons)
     {
         return m_heavyWeaponsKits;
     }
@@ -1104,6 +1120,10 @@ void PlatoonSetup::updateKitNameBox()
     if (selectedActor.getClassName() == classDemolitions)
     {
         kitName = "DEMO KIT: ";
+    }
+    else if (selectedActor.getClassName() == classHeavyWeapons)
+    {
+        kitName = "SUPPORT KIT: ";
     }
     else
     {
@@ -1390,7 +1410,11 @@ void PlatoonSetup::updateSelectedKitInfo(const std::vector<Kit> &kits)
 void PlatoonSetup::updateSoldierDetails()
 {
     const Actor &selectedActor{m_actors[ui->lwSoldierPool->currentRow()]};
-    QString soldierName{selectedActor.getClassName().toUpper() + " " + selectedActor.getName()};
+    QString soldierName{""};
+    if (selectedActor.getClassName() == classHeavyWeapons)
+        soldierName = "SUPPORT " + selectedActor.getName();
+    else
+        soldierName = selectedActor.getClassName().toUpper() + " " + selectedActor.getName();
     ui->leSoldierName->setText(soldierName);
     ui->leWeapon->setText("Weapon: " + selectedActor.getWeaponStat());
     ui->leStamina->setText("Endurance: " + selectedActor.getStaminaStat());
@@ -1415,14 +1439,16 @@ void PlatoonSetup::updateApplyKitToFireteamButton()
 
     if (fireteamPtr) // if fireteam pointer is not null (as in the selected actor is on one of the fireteams)
     {
-        // iterate through whatever fireteam the selected actor is on and count the number of team members with the same kit path as the selected actor
-        int soldiersWithSameKitPath{0};
+        // iterate through whatever fireteam the selected actor is on and count the number of team members of the same soldier class as the selected actor
+        int soldiersOfSameClass{0};
         for (const auto &element : *fireteamPtr)
         {
-            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
-                ++soldiersWithSameKitPath;
+            if ((element->getClassName() == selectedActor.getClassName() && *element != selectedActor)
+                    || (element->getClassName() == classSupport && selectedActor.getClassName() == classHeavyWeapons)
+                    || (element->getClassName() == classHeavyWeapons && selectedActor.getClassName() == classSupport))
+                ++soldiersOfSameClass;
         }
-        if (soldiersWithSameKitPath >= 1) // counted 1 or more actors on the same fireteam with the same kit path
+        if (soldiersOfSameClass >= 1) // counted 1 or more actors on the same fireteam of the same soldier class
             ui->pbKitFireteam->setEnabled(true);
         else
             ui->pbKitFireteam->setDisabled(true);
@@ -1446,28 +1472,34 @@ void PlatoonSetup::updateApplyKitToSquadButton()
 
     if (selectedActorOnSquad)
     {
-        // iterate through all three fireteams and compare the kit path of the selected actor against all the other actors
+        // iterate through all three fireteams and compare the soldier class of the selected actor against all the other actors
         // and tally up how many matches there are
-        int soldiersWithSameKitPath{0};
+        int soldiersOfSameClass{0};
         for (const auto &element : m_alpha)
         {
-            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
-                ++soldiersWithSameKitPath;
+            if ((element->getClassName() == selectedActor.getClassName() && *element != selectedActor)
+                    || (element->getClassName() == classSupport && selectedActor.getClassName() == classHeavyWeapons)
+                    || (element->getClassName() == classHeavyWeapons && selectedActor.getClassName() == classSupport))
+                ++soldiersOfSameClass;
         }
 
         for (const auto &element : m_bravo)
         {
-            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
-                ++soldiersWithSameKitPath;
+            if ((element->getClassName() == selectedActor.getClassName() && *element != selectedActor)
+                    || (element->getClassName() == classSupport && selectedActor.getClassName() == classHeavyWeapons)
+                    || (element->getClassName() == classHeavyWeapons && selectedActor.getClassName() == classSupport))
+                ++soldiersOfSameClass;
         }
 
         for (const auto &element : m_charlie)
         {
-            if (element->getKitPath() == selectedActor.getKitPath() && *element != selectedActor)
-                ++soldiersWithSameKitPath;
+            if ((element->getClassName() == selectedActor.getClassName() && *element != selectedActor)
+                    || (element->getClassName() == classSupport && selectedActor.getClassName() == classHeavyWeapons)
+                    || (element->getClassName() == classHeavyWeapons && selectedActor.getClassName() == classSupport))
+                ++soldiersOfSameClass;
         }
 
-        if (soldiersWithSameKitPath >= 1) // counted 1 or more actors accross all three fireteams with the same kit path
+        if (soldiersOfSameClass >= 1) // counted 1 or more actors accross all three fireteams of the same class
             ui->pbKitSquad->setEnabled(true);
         else
             ui->pbKitSquad->setDisabled(true);
