@@ -462,7 +462,11 @@ void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*>
             idNumber = alpha.size() + bravo.size() + charlie.size() + 1;
             (alphaTeam += '"') += QString::number(idNumber);
             alphaTeam += R"(" ScriptId = "0" Name = "_Alpha">)";
-            alphaTeam += alphaStrings[0] += alphaStrings[1] += alphaStrings[2] += "\n\t\t\t</Team>";
+            for (int i{0}; i < alpha.size(); ++i)
+            {
+                alphaTeam += alphaStrings[i];
+            }
+            alphaTeam += "\n\t\t\t</Team>";
         }
 
         // create bravo team
@@ -474,7 +478,11 @@ void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*>
             if (alpha.size() > 0) { ++idNumber;}
             (bravoTeam += '"') += QString::number(idNumber);
             bravoTeam += R"(" ScriptId = "0" Name = "_Bravo">)";
-            bravoTeam += bravoStrings[0] += bravoStrings[1] += bravoStrings[2] += "\n\t\t\t</Team>";
+            for (int i{0}; i < bravo.size(); ++i)
+            {
+                bravoTeam += bravoStrings[i];
+            }
+            bravoTeam += "\n\t\t\t</Team>";
         }
 
         // create charlie team
@@ -487,7 +495,11 @@ void writeAvatarFile(const std::vector<Actor*> &alpha, const std::vector<Actor*>
             if (bravo.size() > 0) { ++idNumber;}
             (charlieTeam += '"') += QString::number(idNumber);
             charlieTeam += R"(" ScriptId = "0" Name = "_Charlie">)";
-            charlieTeam += charlieStrings[0] += charlieStrings[1] += charlieStrings[2] += "\n\t\t\t</Team>";
+            for (int i{0}; i < charlie.size(); ++i)
+            {
+                charlieTeam += charlieStrings[i];
+            }
+            charlieTeam += "\n\t\t\t</Team>";
         }
 
         // create platoon

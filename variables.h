@@ -5,7 +5,7 @@
 #include <QString>
 
 
-constexpr int fireteamMaxMembers{3};
+constexpr int fireteamMaxMembers{6}; // the AI stops functioning when there is more than six members on a fireteam
 const QString actorExtension{".atr"};
 const QString gunExtension{".gun"};
 const QString projectileExtension{".prj"};

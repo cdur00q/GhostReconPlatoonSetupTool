@@ -37,17 +37,24 @@ private slots:
 
     void on_pbCharlie_clicked();
 
-    void on_lwSoldierPool_itemPressed();
+    // the list widget slots for alpha, bravo, charlie, the soldier pool, and the kit list are only allowed to fire on user interaction - not as a result of another function making selection changes to the lists
+    void on_lwSoldierPool_currentItemChanged();
 
-    void on_lwAlpha_itemPressed();
+    void on_lwAlpha_itemEntered(); // this is fired when user clicks into the selection box and the drags the mouse over on of the items(soldier names).  Without this the name would be highlighed but that soldier wouldn't actually be selected
+    void on_lwAlpha_currentItemChanged(); // this is fired when user clicks an item or is holding a click and drag selecting through items
+    void on_lwAlpha_itemPressed(); // this is fired when user clicks an item with left or right mouse button
 
+    void on_lwBravo_itemEntered();
+    void on_lwBravo_currentItemChanged();
     void on_lwBravo_itemPressed();
 
+    void on_lwCharlie_itemEntered();
+    void on_lwCharlie_currentItemChanged();
     void on_lwCharlie_itemPressed();
 
     void on_pbUnassign_clicked();
 
-    void on_lwKits_itemPressed();
+    void on_lwKits_currentItemChanged();
 
     void on_pbKitLeft_clicked();
 
