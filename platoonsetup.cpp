@@ -31,7 +31,7 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowFlags(Qt::MSWindowsFixedSizeDialogHint); // removes resize arrows when hovering over the border
-    PlatoonSetup::grabKeyboard(); // send all keboard input to the main window to prevent messing up the selection logic of the fireteam/soldier pool boxes
+    PlatoonSetup::grabKeyboard(); // send all keboard input to the main window to disable user's use of keyboard
     ui->pteFireModes1->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     ui->pteFireModes2->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
 
@@ -349,7 +349,23 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
 
     // select first soldier (can only do this after actors and kits are loaded and processed)
     ui->lwSoldierPool->setCurrentRow(0);
-    on_lwSoldierPool_itemPressed();
+    // these next lines should be identical to what's executed in on_lwSoldierPool_currentItemChanged(), minus the check for user's mouse position
+    syncSoldierPoolWithFireteam(m_alpha, ui->lwAlpha);
+    syncSoldierPoolWithFireteam(m_bravo, ui->lwBravo);
+    syncSoldierPoolWithFireteam(m_charlie, ui->lwCharlie);
+    updateTeamButton(m_alpha, ui->pbAlpha);
+    updateTeamButton(m_bravo, ui->pbBravo);
+    updateTeamButton(m_charlie, ui->pbCharlie);
+    updateUnassignButton();
+
+    buildKitPool(getSelectedActorsKits());
+    selectActorsKit();
+    updateKitNameBox();
+    updateSelectedKitInfo(getSelectedActorsKits());
+    updateApplyKitToFireteamButton();
+    updateApplyKitToSquadButton();
+
+    updateSoldierDetails();
 
     // connect signals and slots
     QCoreApplication *coreApp{QCoreApplication::instance()};
@@ -440,24 +456,39 @@ void PlatoonSetup::on_pbCharlie_clicked()
     m_mediaPlayerButtonClick->play();
 }
 
-void PlatoonSetup::on_lwSoldierPool_itemPressed()
+void PlatoonSetup::on_lwSoldierPool_currentItemChanged()
 {
-    syncSoldierPoolWithFireteam(m_alpha, ui->lwAlpha);
-    syncSoldierPoolWithFireteam(m_bravo, ui->lwBravo);
-    syncSoldierPoolWithFireteam(m_charlie, ui->lwCharlie);
-    updateTeamButton(m_alpha, ui->pbAlpha);
-    updateTeamButton(m_bravo, ui->pbBravo);
-    updateTeamButton(m_charlie, ui->pbCharlie);
-    updateUnassignButton();
+    if (ui->lwSoldierPool->underMouse())
+    {
+        syncSoldierPoolWithFireteam(m_alpha, ui->lwAlpha);
+        syncSoldierPoolWithFireteam(m_bravo, ui->lwBravo);
+        syncSoldierPoolWithFireteam(m_charlie, ui->lwCharlie);
+        updateTeamButton(m_alpha, ui->pbAlpha);
+        updateTeamButton(m_bravo, ui->pbBravo);
+        updateTeamButton(m_charlie, ui->pbCharlie);
+        updateUnassignButton();
 
-    buildKitPool(getSelectedActorsKits());
-    selectActorsKit();
-    updateKitNameBox();
-    updateSelectedKitInfo(getSelectedActorsKits());
-    updateApplyKitToFireteamButton();
-    updateApplyKitToSquadButton();
+        buildKitPool(getSelectedActorsKits());
+        selectActorsKit();
+        updateKitNameBox();
+        updateSelectedKitInfo(getSelectedActorsKits());
+        updateApplyKitToFireteamButton();
+        updateApplyKitToSquadButton();
 
-    updateSoldierDetails();
+        updateSoldierDetails();
+    }
+}
+
+void PlatoonSetup::on_lwAlpha_itemEntered()
+{
+    ui->lwAlpha->setCurrentRow(m_alpha.size() - 1);
+    on_lwAlpha_itemPressed();
+}
+
+void PlatoonSetup::on_lwAlpha_currentItemChanged()
+{
+    if (ui->lwAlpha->underMouse())
+        on_lwAlpha_itemPressed();
 }
 
 void PlatoonSetup::on_lwAlpha_itemPressed()
@@ -480,6 +511,18 @@ void PlatoonSetup::on_lwAlpha_itemPressed()
     updateSoldierDetails();
 }
 
+void PlatoonSetup::on_lwBravo_itemEntered()
+{
+    ui->lwBravo->setCurrentRow(m_bravo.size() - 1);
+    on_lwBravo_itemPressed();
+}
+
+void PlatoonSetup::on_lwBravo_currentItemChanged()
+{
+    if (ui->lwBravo->underMouse())
+        on_lwBravo_itemPressed();
+}
+
 void PlatoonSetup::on_lwBravo_itemPressed()
 {
     syncFireteamWithSoldierPool(m_bravo, ui->lwBravo);
@@ -498,6 +541,18 @@ void PlatoonSetup::on_lwBravo_itemPressed()
     updateApplyKitToSquadButton();
 
     updateSoldierDetails();
+}
+
+void PlatoonSetup::on_lwCharlie_itemEntered()
+{
+    ui->lwCharlie->setCurrentRow(m_charlie.size() - 1);
+    on_lwCharlie_itemPressed();
+}
+
+void PlatoonSetup::on_lwCharlie_currentItemChanged()
+{
+    if (ui->lwCharlie->underMouse())
+        on_lwCharlie_itemPressed();
 }
 
 void PlatoonSetup::on_lwCharlie_itemPressed()
@@ -535,11 +590,14 @@ void PlatoonSetup::on_pbUnassign_clicked()
     m_mediaPlayerButtonClick->play();
 }
 
-void PlatoonSetup::on_lwKits_itemPressed()
+void PlatoonSetup::on_lwKits_currentItemChanged()
 {
-    updateKitNameBox();
-    updateSelectedKitInfo(getSelectedActorsKits());
-    setActorsKit(m_actors[ui->lwSoldierPool->currentRow()]);
+    if (ui->lwKits->underMouse())
+    {
+        updateKitNameBox();
+        updateSelectedKitInfo(getSelectedActorsKits());
+        setActorsKit(m_actors[ui->lwSoldierPool->currentRow()]);
+    }
 }
 
 void PlatoonSetup::on_pbKitLeft_clicked()
