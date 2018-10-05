@@ -20,8 +20,8 @@ const QString defaultRiflemanKitPath{"rifleman"};
 const QString defaultSupportKitPath{"heavy-weapons"};
 const QString defaultSniperKitPath{"sniper"};
 const QString defaultDemolitionsKitPath{"demolitions"};
-const std::string mainGameDirectory{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon"};
-//const std::string mainGameDirectory{"..\\"};
+//const std::string mainGameDirectory{"C:\\Program Files (x86)\\Red Storm Entertainment\\Ghost Recon"};
+const std::string mainGameDirectory{"..\\"};
 // ***switch main game directory to realitive path for release build***
 
 enum class fileReadResult

@@ -143,7 +143,77 @@ void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVe
         currentFile.close();
     }
 }
-
+/*
+void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVector)
+{
+    std::set<QString> discoveredKits;
+    for (auto it{fs::recursive_directory_iterator(kitsDirectoryPath)} ; it != fs::recursive_directory_iterator() ; ++it)
+    //for (const auto &element : fs::recursive_directory_iterator(kitsDirectoryPath))
+    {
+        fs::path relativePath{it->path().relative_path()};
+        fs::path fullPath{it->path()};
+        fs::path fileName{it->path().filename()};
+        if (QString::compare(QString::fromStdWString(it->path().relative_path()), "equip", Qt::CaseInsensitive) == 0)
+        //if (it->path().filename() == "equip")
+            it.disable_recursion_pending();
+        std::ifstream currentFile;
+        // first check this is a regular file before proceeding
+        // using the error code version to avoid exceptions being thrown
+        // but no actual error handling will take place with this error code
+        std::error_code errorCode;
+        if (fs::is_regular_file(it->path(), errorCode))
+        {
+            fs::path pathNoFilename{it->path()};
+            pathNoFilename.remove_filename();
+            QString curFilePath{QString::fromStdWString(pathNoFilename)};
+            QString curFileName{QString::fromStdWString(it->path().filename())};
+            if (QString::compare(getFileExtension(curFileName), kitExtension, Qt::CaseInsensitive) == 0)  // check this is a kit file
+            {
+                currentFile.open(it->path());
+                if (!currentFile.good())
+                {
+                    QString errorMsg{"Error in readInAllKits().  Failed to open file: "};
+                    errorMsg += QString::fromStdWString(it->path());
+                    QMessageBox msgBox(QMessageBox::Critical, "Error", errorMsg);
+                    msgBox.exec();
+                    exit(EXIT_FAILURE);
+                }
+                // now check if this kit file name has already been seen
+                std::set<QString>::const_iterator it{discoveredKits.cbegin()};
+                it = discoveredKits.find(curFileName);
+                if (it == discoveredKits.cend()) // kit file name hasn't been seen yet, proceed to check it against the passed in kit vector
+                {
+                    discoveredKits.insert(curFileName); // add this kit file name to the list of discovered kits
+                    bool replacedItem{false};
+                    for (auto &element2 : kitVector)
+                    {
+                        if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0) // found a kit in the vector with same filename as this one, replace it with this new one
+                        {
+                            element2 = Kit(curFilePath, curFileName, currentFile);
+                            replacedItem = true;
+                        }
+                    }
+                    if (!replacedItem) // didn't find a kit in the vector with this name already so add in this new kit
+                    {
+                        kitVector.push_back(Kit(curFilePath, curFileName, currentFile));
+                    }
+                }
+                else // kit file name has been seen before so only add this new kit path to the kit
+                {
+                    for (auto &element2 : kitVector)
+                    {
+                        if (QString::compare(curFileName, element2.getFileName(), Qt::CaseInsensitive) == 0)
+                        {
+                            element2.addFilePath(curFilePath);
+                        }
+                    }
+                }
+            }
+        }
+        currentFile.close();
+    }
+}
+*/
 // adds kits from the passed in source kit vector to the destination kit vector based on whether or not a kit's path matches the passed in kit path
 void updateKitVectorPerKitPath(const QString &targetKitPath, const std::vector<Kit> &source, std::vector<Kit> &destination)
 {
@@ -168,7 +238,7 @@ void updateKitVectorPerKitPath(const QString &targetKitPath, const std::vector<K
     }
 }
 
-// adds/updates kits from passed in kit list to passed in soldier class specific kit vectors according to the passed in kit restriction list
+// adds/updates kits from passed in kit vector to passed in soldier class specific kit vectors according to the passed in kit restriction list
 // kits are checked one at a time and added to each soldier class that is a user of that kit
 // a kit could be used by more than one soldier class
 void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits)
@@ -198,6 +268,30 @@ void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const K
                 {
                     allClassesKits[currentClass]->push_back(potentialKit);
                 }
+            }
+        }
+    }
+}
+
+// adds/updates kits from passed in kit vector to passed in soldier class specific kit vector according to the passed in kit restriction list
+void updateKitVectorPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, const QString &soldierClass, std::vector<Kit> &soldierKitVector)
+{
+    for (const auto &potentialKit : allKits) // for every kit
+    {
+        if (kitList.checkKitAgainstRestrictionList(soldierClass, potentialKit.getFileName()) == true) // current kit belongs to passed in soldier class
+        {
+            bool replacedKit{false};
+            for (auto &existingKit : soldierKitVector) // check if current kit happens to already be in the passed in kit vector
+            {
+                if (QString::compare(potentialKit.getFileName(), existingKit.getFileName(), Qt::CaseInsensitive) == 0) // it is, so update it with this new one
+                {
+                    existingKit = potentialKit;
+                    replacedKit = true;
+                }
+            }
+            if (!replacedKit) // it isn't, so add in this new one
+            {
+                soldierKitVector.push_back(potentialKit);
             }
         }
     }
@@ -266,7 +360,9 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
     }
 
     // add/update any new kits discovered in this mod
-    readInAllKits(modPath, tempKits);
+    //readInAllKits(modPath, tempKits);
+    if (fs::is_directory(modPath + "\\Kits", errorCode))
+        readInAllKits(modPath + "\\Kits", tempKits);
 
     // if this mod has a kit restriction list file read it
     if (fs::is_regular_file(modPath + "\\Kits\\quick_missions.qmk", errorCode))
