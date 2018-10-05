@@ -88,11 +88,11 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
         errorMessage += QString::fromStdString(mainGameDirectory) + "\\Mods\\Origmiss\\Actor\\demolitions";
     }
 
-    // randomly choose nine actors of each class and put them into the actors pool
-    if (rifleman.size() > 0) for (int i{0}; i < 76; ++i) { assignRandomActorToVector(rifleman, m_actors); }
-    if (heavyWeapons.size() > 0) for (int i{0}; i < 60; ++i) { assignRandomActorToVector(heavyWeapons, m_actors); }
-    if (sniper.size() > 0) for (int i{0}; i < 40; ++i) { assignRandomActorToVector(sniper, m_actors); }
-    if (demolitions.size() > 0) for (int i{0}; i < 59; ++i) { assignRandomActorToVector(demolitions, m_actors); }
+    // randomly choose 18 actors of each class and put them into the actors pool
+    if (rifleman.size() > 0) for (int i{0}; i < 18; ++i) { assignRandomActorToVector(rifleman, m_actors); }
+    if (heavyWeapons.size() > 0) for (int i{0}; i < 18; ++i) { assignRandomActorToVector(heavyWeapons, m_actors); }
+    if (sniper.size() > 0) for (int i{0}; i < 18; ++i) { assignRandomActorToVector(sniper, m_actors); }
+    if (demolitions.size() > 0) for (int i{0}; i < 18; ++i) { assignRandomActorToVector(demolitions, m_actors); }
 
     // read in strings
     if (fs::is_regular_file(mainGameDirectory + "\\Data\\Shell\\strings.txt", errorCode) && !errorLoadingBaseGameData)
@@ -273,10 +273,21 @@ PlatoonSetup::PlatoonSetup(QWidget *parent) :
     updateKitVectorPerKitPath(sniperKitPath, tempKits, m_sniperKits);
     updateKitVectorPerKitPath(demolitionsKitPath, tempKits, m_demolitionsKits);
 
-    // add kits from the quick_missions.qmk file only if all four soldier classes are using the default kit paths
+    // add kits from the quick_missions.qmk file to all four soldier classes at the same time if all four are using the default kit paths
     if (riflemanKitPath == defaultRiflemanKitPath && supportKitPath == defaultSupportKitPath && sniperKitPath == defaultSniperKitPath && demolitionsKitPath == defaultDemolitionsKitPath)
     {
         updateKitVectorsPerRestrictionList(tempKits, kitList, m_riflemanKits, m_heavyWeaponsKits, m_sniperKits, m_demolitionsKits);
+    }
+    else // otherwise check each class individually and add kits if that particular class is using the default kit path
+    {
+        if (riflemanKitPath == defaultRiflemanKitPath)
+            updateKitVectorPerRestrictionList(tempKits, kitList, classRifleman, m_riflemanKits);
+        if (supportKitPath == defaultSupportKitPath)
+            updateKitVectorPerRestrictionList(tempKits, kitList, classHeavyWeapons, m_heavyWeaponsKits);
+        if (sniperKitPath == defaultSniperKitPath)
+            updateKitVectorPerRestrictionList(tempKits, kitList, classSniper, m_sniperKits);
+        if (demolitionsKitPath == defaultDemolitionsKitPath)
+            updateKitVectorPerRestrictionList(tempKits, kitList, classDemolitions, m_demolitionsKits);
     }
 
     // check that each soldier class has at least one kit in their kit vector and close program if not (must do after loading mods as mods may add kits)

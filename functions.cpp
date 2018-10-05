@@ -168,7 +168,7 @@ void updateKitVectorPerKitPath(const QString &targetKitPath, const std::vector<K
     }
 }
 
-// adds/updates kits from passed in kit list to passed in soldier class specific kit vectors according to the passed in kit restriction list
+// adds/updates kits from passed in kit vector to passed in soldier class specific kit vectors according to the passed in kit restriction list
 // kits are checked one at a time and added to each soldier class that is a user of that kit
 // a kit could be used by more than one soldier class
 void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits)
@@ -198,6 +198,30 @@ void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const K
                 {
                     allClassesKits[currentClass]->push_back(potentialKit);
                 }
+            }
+        }
+    }
+}
+
+// adds/updates kits from passed in kit vector to passed in soldier class specific kit vector according to the passed in kit restriction list
+void updateKitVectorPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, const QString &soldierClass, std::vector<Kit> &soldierKitVector)
+{
+    for (const auto &potentialKit : allKits) // for every kit
+    {
+        if (kitList.checkKitAgainstRestrictionList(soldierClass, potentialKit.getFileName()) == true) // current kit belongs to passed in soldier class
+        {
+            bool replacedKit{false};
+            for (auto &existingKit : soldierKitVector) // check if current kit happens to already be in the passed in kit vector
+            {
+                if (QString::compare(potentialKit.getFileName(), existingKit.getFileName(), Qt::CaseInsensitive) == 0) // it is, so update it with this new one
+                {
+                    existingKit = potentialKit;
+                    replacedKit = true;
+                }
+            }
+            if (!replacedKit) // it isn't, so add in this new one
+            {
+                soldierKitVector.push_back(potentialKit);
             }
         }
     }
@@ -266,7 +290,8 @@ void loadMod(const std::string &modPath, std::vector<Actor> &actors, Strings &st
     }
 
     // add/update any new kits discovered in this mod
-    readInAllKits(modPath, tempKits);
+    if (fs::is_directory(modPath + "\\Kits", errorCode))
+        readInAllKits(modPath + "\\Kits", tempKits);
 
     // if this mod has a kit restriction list file read it
     if (fs::is_regular_file(modPath + "\\Kits\\quick_missions.qmk", errorCode))

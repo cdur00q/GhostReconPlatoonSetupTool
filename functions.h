@@ -33,10 +33,13 @@ void readInAllKits(const std::string &kitsDirectoryPath, std::vector<Kit> &kitVe
 // adds kits from the passed in source kit vector to the destination kit vector based on whether or not a kit's path matches the passed in kit path
 void updateKitVectorPerKitPath(const QString &targetKitPath, const std::vector<Kit> &source, std::vector<Kit> &destination);
 
-// adds/updates kits from passed in kit list to passed in soldier class specific kit vectors according to the passed in kit restriction list
+// adds/updates kits from passed in kit vector to passed in soldier class specific kit vectors according to the passed in kit restriction list
 // kits are checked one at a time and added to each soldier class that is a user of that kit
 // a kit could be used by more than one soldier class
 void updateKitVectorsPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, std::vector<Kit> &riflemanKits, std::vector<Kit> &heavyWeaponsKits, std::vector<Kit> &sniperKits, std::vector<Kit> &demolitionsKits);
+
+// adds/updates kits from passed in kit vector to passed in soldier class specific kit vector according to the passed in kit restriction list
+void updateKitVectorPerRestrictionList(const std::vector<Kit> &allKits, const KitRestrictionList &kitList, const QString &soldierClass, std::vector<Kit> &soldierKitVector);
 
 // reads in actor, gun, projectile, or item files
 // pass in a directory where actor, gun, projectile, or item files are held, the file extension of the desired file type, and a vector of the desired file type to store the results
